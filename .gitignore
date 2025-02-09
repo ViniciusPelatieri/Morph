@@ -1,2 +1,9 @@
 Morph/Morph/__history/
 Morph/
+Sample/__history/
+Sample/Forms/__history/
+*.dcu
+Src/Units/__history/
+Sample/Win32/
+Src/Units/Types/__history/
+*.exe
