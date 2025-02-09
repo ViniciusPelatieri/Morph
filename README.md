@@ -15,7 +15,7 @@ Morph is a powerful Query Builder for Delphi that allows developers to build and
 ## 🛠 Installation
 1. Clone the repository:
    ```sh
-   git clone https://github.com/YourUsername/Morph.git
+   git clone https://github.com/ViniciusPelatieri/Morph.git
    ```
 2. Open your Delphi project and add Morph to your library path.
 3. Start using Morph in your application!
