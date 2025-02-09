@@ -1,4 +1,6 @@
-![Morph Logo](https://raw.githubusercontent.com/ViniciusPelatieri/Morph/refs/heads/main/Media/png/Logo_Morph.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ViniciusPelatieri/Morph/refs/heads/main/Media/png/Logo_Morph.png" alt="Morph Logo" width="400">
+</p>
 
 # Morph - Query Builder for Delphi
 
