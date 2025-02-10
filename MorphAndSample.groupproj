@@ -3,10 +3,10 @@
         <ProjectGuid>{35B1C8A9-E0C9-4B0C-BCE3-BDD2B80A71FB}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="Morph\Morph\MorphProject.dproj">
+        <Projects Include="Src\MorphProject.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="Morph\Sample\Morph.Sample.Project.dproj">
+        <Projects Include="Sample\Morph.Sample.Project.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -18,22 +18,22 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="MorphProject">
-        <MSBuild Projects="Morph\Morph\MorphProject.dproj"/>
+        <MSBuild Projects="Src\MorphProject.dproj"/>
     </Target>
     <Target Name="MorphProject:Clean">
-        <MSBuild Projects="Morph\Morph\MorphProject.dproj" Targets="Clean"/>
+        <MSBuild Projects="Src\MorphProject.dproj" Targets="Clean"/>
     </Target>
     <Target Name="MorphProject:Make">
-        <MSBuild Projects="Morph\Morph\MorphProject.dproj" Targets="Make"/>
+        <MSBuild Projects="Src\MorphProject.dproj" Targets="Make"/>
     </Target>
     <Target Name="Morph_Sample_Project">
-        <MSBuild Projects="Morph\Sample\Morph.Sample.Project.dproj"/>
+        <MSBuild Projects="Sample\Morph.Sample.Project.dproj"/>
     </Target>
     <Target Name="Morph_Sample_Project:Clean">
-        <MSBuild Projects="Morph\Sample\Morph.Sample.Project.dproj" Targets="Clean"/>
+        <MSBuild Projects="Sample\Morph.Sample.Project.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Morph_Sample_Project:Make">
-        <MSBuild Projects="Morph\Sample\Morph.Sample.Project.dproj" Targets="Make"/>
+        <MSBuild Projects="Sample\Morph.Sample.Project.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="MorphProject;Morph_Sample_Project"/>
