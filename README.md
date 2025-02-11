@@ -22,20 +22,17 @@ Morph is a powerful Query Builder for Delphi that allows developers to build and
 
 ## 📌 Example Usage
 ```delphi
+uses Morph;
+
 var
-  Qry: TMorph;
+  Morph: TMorph;
 begin
-  Qry := TMorph.Create;
-  try
-    Qry.CreateTable('CLIENT')
-      .Field('ID').AsInteger.PrimaryKey.Identity.NotNull
-      .Field('NAME').AsVarchar(100).NotNull
-      .Field('EMAIL').AsVarchar(150).NotNull
-      .Field('PHONE').AsVarchar(15)
-      .Add;
-  finally
-    Qry.Free;
-  end;
+  Morph.Table('CLIENT')
+          .Field('ID').Integer.PrimaryKey.NotNull
+          .Field('NAME').Varchar(100).NotNull
+          .Field('EMAIL').Varchar(100).NotNull.Unique
+          .Field('PHONE').Varchar(15).NotNull.Unique
+        .Create;
 end;
 ```
 
