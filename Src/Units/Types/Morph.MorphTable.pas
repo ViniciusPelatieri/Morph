@@ -58,6 +58,11 @@ implementation
 
 { TMphTable }
 
+function TMphTable.AddField(const aFieldName: String): TMphTable;
+begin
+
+end;
+
 function TMphTable.AsFDMemtable: TFDMemTable;
 begin
 
@@ -74,6 +79,11 @@ begin
 end;
 
 function TMphTable.ExportSettings: TMorphSettings;
+begin
+
+end;
+
+function TMphTable.FieldByName(const aFieldName: String): TMphTable;
 begin
 
 end;
@@ -100,6 +110,36 @@ begin
 
 end;
 
+function TMphTable.NewLine: TMphTable;
+begin
+
+end;
+
+function TMphTable.Post: TMorphField;
+begin
+
+end;
+
+function TMphTable.SetFieldByname(const aFieldName: String): TMorphField;
+begin
+
+end;
+
+function TMphTable.SetFields(const aFieldID: Integer): TMorphField;
+begin
+
+end;
+
+function TMphTable.TypeInteger: TMphTable;
+begin
+
+end;
+
+function TMphTable.TypeString: TMphTable;
+begin
+
+end;
+
 { TMphTableArrange }
 
 function TMphTableArrange.ExportSettings: TMorphSettings;
@@ -114,6 +154,38 @@ begin
 end;
 
 function TMphTableArrange.Name(const aTableName: String): TMphTable;
+begin
+
+end;
+
+{ TMorphField }
+
+function TMorphField.AsBlob(const aValue: TMemoryStream): TMphTable;
+begin
+
+end;
+
+function TMorphField.AsBoolean(const aValue: Boolean): TMphTable;
+begin
+
+end;
+
+function TMorphField.AsDate(const aValue: TDateTime): TMphTable;
+begin
+
+end;
+
+function TMorphField.AsFloat(const aValue: Extended): TMphTable;
+begin
+
+end;
+
+function TMorphField.AsInteger(const aValue: Integer): TMphTable;
+begin
+
+end;
+
+function TMorphField.AsString(const aValue: String): TMphTable;
 begin
 
 end;

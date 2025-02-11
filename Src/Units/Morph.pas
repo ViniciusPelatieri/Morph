@@ -69,12 +69,28 @@ type
       function NoOrphaData : TMorph;
       function Post : TMorph;
       function Content(const aMorphTable : TMphTable) : TMorph;
-  end;
+      class function JSONParse(const aJSONString : String) : TMphTable;
+      function Equals<T>(const aValue : T) : TMorph;
+      function IsBiggerThan<T>(const aValue : T) : TMorph;
+      function _And : TMorph;
+      function IsSmallerThen<T>(const aValue : T) : TMorph;
+      function Select : TMorph;
+      function All : TMorph;
+      function From(const aTableName : String) : TMorph;
+      function IsBiggerOrEqualThen<T>(const aValue : T) : TMorph;
+      function _Or : TMorph;
+      function IsSmallerOrEqualThen<T>(const aValue : T) : TMorph;
+    end;
 implementation
 
 { TMorph }
 
 function TMorph.Add: TMorph;
+begin
+
+end;
+
+function TMorph.All: TMorph;
 begin
 
 end;
@@ -115,6 +131,11 @@ begin
 end;
 
 function TMorph.Connection(const aConnection: TFDConnection): TMorph;
+begin
+
+end;
+
+function TMorph.Content(const aMorphTable: TMphTable): TMorph;
 begin
 
 end;
@@ -160,6 +181,11 @@ begin
 
 end;
 
+function TMorph.Equals<T>(const aValue: T): TMorph;
+begin
+
+end;
+
 function TMorph.ExecuteSQL: TMorph;
 begin
 
@@ -196,6 +222,16 @@ begin
 end;
 
 function TMorph.Float: TMorph;
+begin
+
+end;
+
+function TMorph.ForeignKey: TMorph;
+begin
+
+end;
+
+function TMorph.From(const aTableName: String): TMorph;
 begin
 
 end;
@@ -240,7 +276,32 @@ begin
 
 end;
 
+function TMorph.IsBiggerOrEqualThen<T>(const aValue: T): TMorph;
+begin
+
+end;
+
+function TMorph.IsBiggerThan<T>(const aValue: T): TMorph;
+begin
+
+end;
+
+function TMorph.IsSmallerOrEqualThen<T>(const aValue: T): TMorph;
+begin
+
+end;
+
+function TMorph.IsSmallerThen<T>(const aValue: T): TMorph;
+begin
+
+end;
+
 function TMorph.JSONContent(const aJSONString: String): TMorph;
+begin
+
+end;
+
+class function TMorph.JSONParse(const aJSONString: String): TMphTable;
 begin
 
 end;
@@ -256,6 +317,11 @@ begin
 end;
 
 function TMorph.NewValues(const NewValues: TArray<String>): TMorph;
+begin
+
+end;
+
+function TMorph.NoOrphaData: TMorph;
 begin
 
 end;
@@ -277,7 +343,17 @@ begin
 
 end;
 
+function TMorph.Post: TMorph;
+begin
+
+end;
+
 function TMorph.PrimaryKey: TMorph;
+begin
+
+end;
+
+function TMorph.References: TMorph;
 begin
 
 end;
@@ -288,6 +364,11 @@ begin
 end;
 
 function TMorph.RunFindInAnOtherThread: TMorph;
+begin
+
+end;
+
+function TMorph.Select: TMorph;
 begin
 
 end;
@@ -333,6 +414,16 @@ begin
 end;
 
 function TMorph.Where: TMorph;
+begin
+
+end;
+
+function TMorph._And: TMorph;
+begin
+
+end;
+
+function TMorph._Or: TMorph;
 begin
 
 end;

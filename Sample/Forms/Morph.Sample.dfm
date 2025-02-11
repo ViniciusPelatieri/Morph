@@ -55,4 +55,30 @@ object Sample: TSample
     Left = 192
     Top = 216
   end
+  object FDMTOrder: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 744
+    Top = 264
+    object FDMTOrderID: TIntegerField
+      FieldName = 'ID'
+    end
+    object FDMTOrderCLIENT_ID: TIntegerField
+      FieldName = 'CLIENT_ID'
+    end
+    object FDMTOrderPRODUCT_ID: TIntegerField
+      FieldName = 'PRODUCT_ID'
+    end
+    object FDMTOrderQUANTITY: TFloatField
+      FieldName = 'QUANTITY'
+    end
+    object FDMTOrderORDER_DATE: TDateField
+      FieldName = 'ORDER_DATE'
+    end
+  end
 end
