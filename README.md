@@ -10,7 +10,7 @@ Morph is a powerful Query Builder for Delphi that allows developers to build and
 
 - **Eliminates inline SQL**: Keep your code clean and structured.
 - **Dynamic query generation**: Create, modify, and execute queries programmatically.
-- **Easy table management**: Use `Morph.CreateTable` to define database structures.
+- **Easy table management**: Use `Morph.Table` to define database structures.
 - **Enhanced readability**: Improves maintainability by replacing SQL strings with structured methods.
 
 ## 🛠 Installation
