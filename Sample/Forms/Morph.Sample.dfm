@@ -41,6 +41,13 @@ object Sample: TSample
     TitleFont.Style = []
   end
   object FDConnection1: TFDConnection
+    Params.Strings = (
+      'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'
+      'User_Name=SYSDBA'
+      'Password=1234#ioje'
+      'DriverID=FB')
+    Connected = True
+    LoginPrompt = False
     Left = 384
     Top = 256
   end
@@ -52,8 +59,8 @@ object Sample: TSample
     UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
-    Left = 192
-    Top = 216
+    Left = 240
+    Top = 320
   end
   object FDMTOrder: TFDMemTable
     FetchOptions.AssignedValues = [evMode]

@@ -9,7 +9,7 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, Vcl.StdCtrls,
-  Vcl.Grids, Vcl.DBGrids;
+  Vcl.Grids, Vcl.DBGrids, FireDAC.Phys.FB, FireDAC.Phys.FBDef;
 
 type
   TSample = class(TForm)
@@ -61,13 +61,13 @@ begin
           .Field('NAME').Varchar(100).NotNull
           .Field('EMAIL').Varchar(100).NotNull.Unique
           .Field('PHONE').Varchar(15).NotNull.Unique
+        .Create;
 
-       .Table('SELLER')
+   Morph.Table('SELLER')
           .Field('ID').Integer.PrimaryKey.NotNull
           .Field('NAME').Varchar(100).NotNull
           .Field('EMAIL').Varchar(100).NotNull.Unique
           .Field('DEPARTMENT').Varchar(30)
-
        .Create;
 
   Morph.Table('PRODUCT')

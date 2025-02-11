@@ -9,11 +9,15 @@ uses
   Morph.EnumeratedTypes, Morph.MorphTable, Morph.TableField, Morph.Settings;
 
 type
+
   TMorph = class
     private
+      FTableName : String;
+      FFieldsToProcess : TMorphFields;
     public
       constructor Create;
       destructor Destroy; override;
+      function Varchar(const aSize : Integer) : TMorph;
       function Config : TMorph;
       function DatabaseType(const aDBType : TMorphDBType) : TMorph;
       function Connection(const aConnection : TFDConnection) : TMorph;
@@ -37,7 +41,6 @@ type
       function Field(const aField : String) : TMorph;
       function Integer : TMorph;
       function Boolean : TMorph;
-      function Varchar(const aSize : Integer) : TMorph;
       function Float : TMorph;
       function Date : TMorph;
       function BynaryBlob : TMorph;
@@ -142,7 +145,7 @@ end;
 
 constructor TMorph.Create;
 begin
-
+  FFieldsToProcess := TMorphFields.Create;
 end;
 
 function TMorph.CurrentSQLCommand: String;
@@ -167,7 +170,7 @@ end;
 
 destructor TMorph.Destroy;
 begin
-
+  FFieldsToProcess.Free;
   inherited;
 end;
 
@@ -203,7 +206,22 @@ end;
 
 function TMorph.Field(const aField: String): TMorph;
 begin
+  //FFieldsToProcess.Add
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //Parei aqui
 end;
 
 function TMorph.FieldInfo: TMorphTableFieldInfo;
@@ -385,7 +403,9 @@ end;
 
 function TMorph.Table(const aTableName: String): TMorph;
 begin
-
+  FTableName := aTablename;
+  FFieldsToProcess.Clear;
+  Result := Self;
 end;
 
 function TMorph.Unique: TMorph;

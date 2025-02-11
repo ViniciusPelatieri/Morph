@@ -304,6 +304,7 @@
         <DCCReference Include="Units\Types\Morph.TableField.pas"/>
         <DCCReference Include="Units\Types\Morph.Settings.pas"/>
         <DCCReference Include="Units\Types\Motph.Filter.pas"/>
+        <DCCReference Include="Units\Types\Morph.Vector.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
