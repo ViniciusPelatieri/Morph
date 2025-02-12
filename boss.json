@@ -1,0 +1,9 @@
+{
+	"name": "Morph",
+	"description": "Query Builder for Delphi that allows developers to build and manipulate SQL queries",
+	"version": "1.0.0",
+	"homepage": "https://github.com/ViniciusPelatieri/Morph",
+	"mainsrc": "./Src/Units",
+	"projects": [],
+	"dependencies": {}
+}
