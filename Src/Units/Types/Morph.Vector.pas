@@ -21,6 +21,7 @@ type
       procedure SetElements(const anArray : TArray<T>);
       function GetRecNo : Integer;
       procedure SetRecNo(const aValue : Integer);
+      function Eof : Boolean;
 
       property Elements : TArray<T> read FArray write FArray;
       property RecNumbers : Integer read FRecNo write FRecNo;
@@ -73,6 +74,11 @@ end;
 function TMorphVector<T>.ElementsCount: Integer;
 begin
   Result := Length(FArray);
+end;
+
+function TMorphVector<T>.Eof: Boolean;
+begin
+  Result := (FRecNo = High(FArray));
 end;
 
 procedure TMorphVector<T>.First;

@@ -56,35 +56,36 @@ var
   JSONString : String;
 begin
   {$REGION 'Tables creation'}
+
   Morph.Table('CLIENT')
-          .Field('ID').Integer.PrimaryKey.NotNull
-          .Field('NAME').Varchar(100).NotNull
-          .Field('EMAIL').Varchar(100).NotNull.Unique
-          .Field('PHONE').Varchar(15).NotNull.Unique
-        .Create;
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('NAME').tVarchar(100).NotNull
+          .Field('EMAIL').tVarchar(100).NotNull.Unique
+          .Field('PHONE').tVarchar(15).NotNull.Unique
+        .CreateTable;
 
    Morph.Table('SELLER')
-          .Field('ID').Integer.PrimaryKey.NotNull
-          .Field('NAME').Varchar(100).NotNull
-          .Field('EMAIL').Varchar(100).NotNull.Unique
-          .Field('DEPARTMENT').Varchar(30)
-       .Create;
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('NAME').tVarchar(100).NotNull
+          .Field('EMAIL').tVarchar(100).NotNull.Unique
+          .Field('DEPARTMENT').tVarchar(30)
+       .CreateTable;
 
   Morph.Table('PRODUCT')
-          .Field('ID').Integer.PrimaryKey.NotNull
-          .Field('DESCRIPTION').Varchar(100).NotNull
-          .Field('CATEGORY').Varchar(15).NotNull
-          .Field('PRICE').Float.NotNull
-        .Create;
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('DESCRIPTION').tVarchar(100).NotNull
+          .Field('CATEGORY').tVarchar(15).NotNull
+          .Field('PRICE').tFloat.NotNull
+        .CreateTable;
 
   Morph.Table('ORDER')
-          .Field('ID').Integer.PrimaryKey.NotNull
-          .Field('CLIENT_ID').Integer.ForeignKey.References.Table('CLIENT').Field('ID').NoOrphaData
-          .Field('SELLER_ID').Integer.ForeignKey.References.Table('SELLER').Field('ID').NoOrphaData
-          .Field('PRODUCT_ID').Integer.ForeignKey.References.Table('PRODUCT').Field('ID').NoOrphaData
-          .Field('QUANTITY').Float.NotNull
-          .Field('ORDER_DATE').Date.NotNull
-        .Create;
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').NoOrphaData
+          .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').NoOrphaData
+          .Field('PRODUCT_ID').tInteger.ForeignKey.References.Table('PRODUCT').Field('ID').NoOrphaData
+          .Field('QUANTITY').tFloat.NotNull
+          .Field('ORDER_DATE').tDate.NotNull
+        .CreateTable;
   {$ENDREGION}
 
   {$REGION 'Fields population'}
@@ -529,14 +530,14 @@ begin
   {$ENDREGION}
 
   {$REGION 'Add fields on existing tables'}
-  Morph.Table('CLIENT').Field('LAST_VISIT').Date
-                       .Field('CREDIT').Float
+  Morph.Table('CLIENT').Field('LAST_VISIT').tDate
+                       .Field('CREDIT').tFloat
 
-       .Table('SELLER').Field('COMISSION').Float
-                       .Field('OBS').Varchar(50)
+       .Table('SELLER').Field('COMISSION').tFloat
+                       .Field('OBS').tVarchar(50)
        .Add;
 
-  Morph.Table('SELLER').Field('ACTIVE').Boolean.NotNull.Add;
+  Morph.Table('SELLER').Field('ACTIVE').tBoolean.NotNull.Add;
   {$ENDREGION}
 
   {$REGION 'Update'}

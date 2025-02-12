@@ -8,3 +8,5 @@ Sample/Win32/
 Src/Units/Types/__history/
 *.exe
 Src/__history/MorphProject.dpr.~1~
+Src/__history/MorphProject.dpr.~2~
+Src/Units/PSQL/__history/

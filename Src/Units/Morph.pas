@@ -6,18 +6,25 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, System.JSON,
-  Morph.EnumeratedTypes, Morph.MorphTable, Morph.TableField, Morph.Settings;
+  Morph.EnumeratedTypes, Morph.MorphTable, Morph.Field, Morph.Settings,
+  System.Generics.Collections;
 
 type
-
   TMorph = class
     private
       FTableName : String;
       FFieldsToProcess : TMorphFields;
+      FStage : TMorphStages;
+      FPSQLCommand : String;
+      FDBType : TMorphDBType;
+      FFDConnection : TFDConnection;
+
+      FFB2_5FieldTypeNames : TDictionary<Integer, String>;
+      FFB5FieldTypeNames : TDictionary<Integer, String>;
     public
       constructor Create;
       destructor Destroy; override;
-      function Varchar(const aSize : Integer) : TMorph;
+      function tVarchar(const aSize : Integer) : TMorph;
       function Config : TMorph;
       function DatabaseType(const aDBType : TMorphDBType) : TMorph;
       function Connection(const aConnection : TFDConnection) : TMorph;
@@ -39,11 +46,11 @@ type
       function Delete : TMorph;
       function ChangeNameTo(const aNewName : String) : TMorph;
       function Field(const aField : String) : TMorph;
-      function Integer : TMorph;
-      function Boolean : TMorph;
-      function Float : TMorph;
-      function Date : TMorph;
-      function BynaryBlob : TMorph;
+      function tInteger : TMorph;
+      function tBoolean : TMorph;
+      function tFloat : TMorph;
+      function tDate : TMorph;
+      function tBinaryBlob : TMorph;
       function PrimaryKey : TMorph;
       function Identity : TMorph;
       function NotNull : TMorph;
@@ -83,8 +90,18 @@ type
       function IsBiggerOrEqualThen<T>(const aValue : T) : TMorph;
       function _Or : TMorph;
       function IsSmallerOrEqualThen<T>(const aValue : T) : TMorph;
+      function CreateTable : TMorph;
+      function CurrentPSQL(Out anOutVar : String) : TMorph;
+      function GetPSQLTypeName : String;
+      function GetFB5FieldTypeName : String;
+      function GetFB2_5FieldTypeName : String;
+      procedure ExecutePSQL(const aCommand : String);
     end;
 implementation
+
+uses
+  Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common, System.TypInfo,
+  System.SysUtils;
 
 { TMorph }
 
@@ -113,14 +130,16 @@ begin
 
 end;
 
-function TMorph.Boolean: TMorph;
+function TMorph.tBoolean: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphBoolean;
+  Result := Self;
 end;
 
-function TMorph.BynaryBlob: TMorph;
+function TMorph.tBinaryBlob: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphBinaryBlob;
+  Result := Self;
 end;
 
 function TMorph.ChangeNameTo(const aNewName: String): TMorph;
@@ -130,12 +149,13 @@ end;
 
 function TMorph.Config: TMorph;
 begin
-
+  Result := Self;
 end;
 
 function TMorph.Connection(const aConnection: TFDConnection): TMorph;
 begin
-
+  FFDConnection := aConnection;
+  Result := Self;
 end;
 
 function TMorph.Content(const aMorphTable: TMphTable): TMorph;
@@ -145,7 +165,81 @@ end;
 
 constructor TMorph.Create;
 begin
+  FFB5FieldTypeNames := TDictionary<Integer, String>.Create;
+  FFB5FieldTypeNames.Add(Ord(mphInteger), PSQL_FB5_TYPE_INTEGER);
+  FFB5FieldTypeNames.Add(Ord(mphVarchar), PSQL_FB5_TYPE_VARCHAR);
+  FFB5FieldTypeNames.Add(Ord(mphFloat), PSQL_FB5_TYPE_FLOAT);
+  FFB5FieldTypeNames.Add(Ord(mphDate), PSQL_FB5_TYPE_DATE);
+  FFB5FieldTypeNames.Add(Ord(mphBoolean), PSQL_FB5_TYPE_BOOLEAN);
+  FFB5FieldTypeNames.Add(Ord(mphTXTBlob), PSQL_FB5_TYPE_TXTBLOB);
+  FFB5FieldTypeNames.Add(Ord(mphBinaryBlob), PSQL_FB5_TYPE_BINBLOB);
+
   FFieldsToProcess := TMorphFields.Create;
+  FStage := CreatingTable;
+  FPSQLCommand := '';
+end;
+
+function TMorph.CreateTable: TMorph;
+var
+  vFieldCount : Integer;
+  vField : TMorphField;
+begin
+  FPSQLCommand := PSQL_FB5_CREATE_TABLE+PSQL_SPACE+FTableName+PSQL_SPACE+PSQL_OPEN_PARENTHESES+PSQL_SPACE;
+
+  FFieldsToProcess.First;
+  for vFieldCount := 0 to FFieldsToProcess.Count -1 do
+  begin
+    if vFieldCount > 0 then
+      FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
+
+    vField := FFieldsToProcess.Fields[vFieldCount];
+
+    FPSQLCommand:=FPSQLCommand+ vField.Name+PSQL_SPACE+GetPSQLTypeName;
+
+    if FFieldsToProcess.CurrentField.FieldType = mphVarchar then
+      FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.CurrentField.Size)+PSQL_CLOSED_PARENTHESES;
+
+    if vField.Identity then
+      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_IDENTITY;
+
+    if vField.PrimaryKey then
+      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_PRIMARY_KEY;
+
+    if vField.NotNull then
+      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_NOT_NULL;
+
+    if vField.Unique then
+      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_UNIQUE;
+
+    if NOT FFieldsToProcess.Eof then
+      FFieldsToProcess.Next;
+  end;
+  FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
+
+  ExecutePSQL(FPSQLCommand);
+
+
+                //"CREATE TABLE "
+    {
+const PSQL_FB5_TYPE_INTEGER  = 'INTEGER';
+const PSQL_FB5_TYPE_VARCHAR  = 'VARCHAR';
+const PSQL_FB5_TYPE_FLOAT    = 'FLOAT';
+const PSQL_FB5_TYPE_DATE     = 'DATE';
+const PSQL_FB5_TYPE_BOOLEAN  = 'BOOLEAN';
+const PSQL_FB5_TYPE_TXTBLOB  = 'BLOB SUB_TYPE TEXT';
+const PSQL_FB5_TYPE_BIGINT   = 'BIGINT';
+
+const PSQL_OPEN_PARENTHESES = '(';
+const PSQL_PSQL_CLOSED_PARENTHESES = ')';
+const PSQL_COMMA = ',';
+const PSQL_SPACE = ' ';
+}
+end;
+
+function TMorph.CurrentPSQL(out anOutVar: String): TMorph;
+begin
+  anOutVar := FPSQLCommand;
+  Result := Self;
 end;
 
 function TMorph.CurrentSQLCommand: String;
@@ -155,12 +249,14 @@ end;
 
 function TMorph.DatabaseType(const aDBType: TMorphDBType): TMorph;
 begin
-
+  FDBType := aDBType;
+  Result := Self;
 end;
 
-function TMorph.Date: TMorph;
+function TMorph.tDate: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphDate;
+  Result := Self;
 end;
 
 function TMorph.Delete: TMorph;
@@ -206,22 +302,19 @@ end;
 
 function TMorph.Field(const aField: String): TMorph;
 begin
-  //FFieldsToProcess.Add
+  case FStage of
+    CreatingTable:
+    begin
+      FFieldsToProcess.Add(TMorphField.Create);
+      FFieldsToProcess.CurrentField.Name := aField;
+    end;
+    ReferencingTable:
+    begin
+      FFieldsToProcess.CurrentField.ReferencedField := aField;
+    end;
+  end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //Parei aqui
+  Result := Self;
 end;
 
 function TMorph.FieldInfo: TMorphTableFieldInfo;
@@ -239,14 +332,16 @@ begin
 
 end;
 
-function TMorph.Float: TMorph;
+function TMorph.tFloat: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphFloat;
+  Result := Self;
 end;
 
 function TMorph.ForeignKey: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.ForeignKey := True;
+  Result := Self;
 end;
 
 function TMorph.From(const aTableName: String): TMorph;
@@ -254,9 +349,28 @@ begin
 
 end;
 
-function TMorph.Identity: TMorph;
+function TMorph.GetFB2_5FieldTypeName: String;
 begin
 
+end;
+
+function TMorph.GetFB5FieldTypeName: String;
+begin
+  FFB5FieldTypeNames.TryGetValue(Ord(FFieldsToProcess.CurrentField.FieldType), Result);
+end;
+
+function TMorph.GetPSQLTypeName: String;
+begin
+  case FDBType of
+    FB2_5: Result := GetFB5FieldTypeName;
+    FB5: Result := GetFB5FieldTypeName;
+  end;
+end;
+
+function TMorph.Identity: TMorph;
+begin
+  FFieldsToProcess.CurrentField.Identity := True;
+  Result := Self;
 end;
 
 function TMorph.IgnoreCreatedStructure: TMorph;
@@ -289,9 +403,10 @@ begin
 
 end;
 
-function TMorph.Integer: TMorph;
+function TMorph.tInteger: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphInteger;
+  Result := Self;
 end;
 
 function TMorph.IsBiggerOrEqualThen<T>(const aValue: T): TMorph;
@@ -341,12 +456,13 @@ end;
 
 function TMorph.NoOrphaData: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.NoOrphaData := True;
 end;
 
 function TMorph.NotNull: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.NotNull := True;
+  Result := Self;
 end;
 
 
@@ -368,12 +484,14 @@ end;
 
 function TMorph.PrimaryKey: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.PrimaryKey := True;
+  Result := Self;
 end;
 
 function TMorph.References: TMorph;
 begin
-
+  FStage := ReferencingTable;
+  Result := Self;
 end;
 
 function TMorph.Return: TMorph;
@@ -384,6 +502,21 @@ end;
 function TMorph.RunFindInAnOtherThread: TMorph;
 begin
 
+end;
+
+procedure TMorph.ExecutePSQL(const aCommand: String);
+var
+  FDQry : TFDQuery;
+begin
+  FDQry := TFDQuery.Create(Nil);
+  try
+    FDQry.Connection := FFDConnection;
+    FDQry.FetchOptions.Mode := fmAll;
+    FDQry.SQL.Add(aCommand);
+    FDQry.ExecSQL;
+  finally
+    FDQry.Free;
+  end;
 end;
 
 function TMorph.Select: TMorph;
@@ -403,14 +536,26 @@ end;
 
 function TMorph.Table(const aTableName: String): TMorph;
 begin
-  FTableName := aTablename;
-  FFieldsToProcess.Clear;
+  case FStage of
+    CreatingTable:
+    begin
+      FTableName := aTableName;
+      FFieldsToProcess.Clear;
+    end;
+
+    ReferencingTable:
+    begin
+      FFieldsToProcess.CurrentField.ReferencedTable := aTableName;
+    end;
+  end;
+
   Result := Self;
 end;
 
 function TMorph.Unique: TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.Unique := True;
+  Result := Self;
 end;
 
 function TMorph.Update: TMorph;
@@ -428,9 +573,11 @@ begin
 
 end;
 
-function TMorph.Varchar(const aSize: Integer): TMorph;
+function TMorph.tVarchar(const aSize: Integer): TMorph;
 begin
-
+  FFieldsToProcess.CurrentField.FieldType := mphVarchar;
+  FFieldsToProcess.CurrentField.Size := aSize;
+  Result := Self;
 end;
 
 function TMorph.Where: TMorph;

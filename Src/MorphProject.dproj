@@ -301,10 +301,12 @@
         <DCCReference Include="Units\Morph.pas"/>
         <DCCReference Include="Units\Types\Morph.EnumeratedTypes.pas"/>
         <DCCReference Include="Units\Types\Morph.MorphTable.pas"/>
-        <DCCReference Include="Units\Types\Morph.TableField.pas"/>
+        <DCCReference Include="Units\Types\Morph.Field.pas"/>
         <DCCReference Include="Units\Types\Morph.Settings.pas"/>
         <DCCReference Include="Units\Types\Motph.Filter.pas"/>
         <DCCReference Include="Units\Types\Morph.Vector.pas"/>
+        <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.FB5.pas"/>
+        <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.Common.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
