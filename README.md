@@ -29,7 +29,7 @@ Morph is a powerful Query Builder for Delphi that allows developers to build and
 #### 🟢 CREATE
 
 ```delphi
-Morph.Table('CLIENT').Field('ID').Integer.PrimaryKey.NotNull.CreateTable;
+Morph.Table('CLIENT').Field('ID').tInteger.PrimaryKey.NotNull.CreateTable;
 ```
 
 #### 🔵 READ
