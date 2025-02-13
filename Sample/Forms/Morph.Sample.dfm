@@ -27,13 +27,39 @@ object Sample: TSample
     Height = 23
     TabOrder = 0
     Text = 'ComboBox1'
+    OnChange = ComboBox1Change
+  end
+  object Button1: TButton
+    Left = 896
+    Top = 30
+    Width = 98
+    Height = 25
+    Caption = 'Run Changes'
+    TabOrder = 1
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 151
+    Top = 30
+    Width = 26
+    Height = 25
+    Caption = #55357#56580
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 2
+    OnClick = Button2Click
   end
   object DBGrid1: TDBGrid
     Left = 8
     Top = 61
     Width = 986
     Height = 568
-    TabOrder = 1
+    DataSource = DataSource1
+    TabOrder = 3
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
@@ -48,19 +74,13 @@ object Sample: TSample
       'DriverID=FB')
     Connected = True
     LoginPrompt = False
-    Left = 384
-    Top = 256
+    Left = 728
+    Top = 144
   end
-  object FDMemTable1: TFDMemTable
-    FetchOptions.AssignedValues = [evMode]
-    FetchOptions.Mode = fmAll
-    ResourceOptions.AssignedValues = [rvSilentMode]
-    ResourceOptions.SilentMode = True
-    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
-    UpdateOptions.CheckRequired = False
-    UpdateOptions.AutoCommitUpdates = True
-    Left = 240
-    Top = 320
+  object DataSource1: TDataSource
+    DataSet = FDMemTable1
+    Left = 192
+    Top = 224
   end
   object FDMTOrder: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
@@ -70,8 +90,8 @@ object Sample: TSample
     UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
-    Left = 744
-    Top = 264
+    Left = 384
+    Top = 472
     object FDMTOrderID: TIntegerField
       FieldName = 'ID'
     end
@@ -86,6 +106,21 @@ object Sample: TSample
     end
     object FDMTOrderORDER_DATE: TDateField
       FieldName = 'ORDER_DATE'
+    end
+  end
+  object FDMemTable1: TFDMemTable
+    Active = True
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 192
+    Top = 344
+    object FDMemTable1ID: TIntegerField
+      FieldName = 'ID'
     end
   end
 end

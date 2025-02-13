@@ -7,7 +7,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, System.JSON,
   Morph.EnumeratedTypes, Morph.MorphTable, Morph.Field, Morph.Settings,
-  System.Generics.Collections;
+  System.Generics.Collections, Morph.Vector, Datasnap.DBClient;
 
 type
   TMorph = class
@@ -18,6 +18,7 @@ type
       FPSQLCommand : String;
       FDBType : TMorphDBType;
       FFDConnection : TFDConnection;
+      FDQResult : TFDQuery;
 
       FFB2_5FieldTypeNames : TDictionary<Integer, String>;
       FFB5FieldTypeNames : TDictionary<Integer, String>;
@@ -96,12 +97,15 @@ type
       function GetFB5FieldTypeName : String;
       function GetFB2_5FieldTypeName : String;
       procedure ExecutePSQL(const aCommand : String);
+      function GetTableNames : TMorphVector<String>;
+      function RunPSQLCommand(const aPSQLCommand : String) : TMorph;
+      function AsTClientDataSet : TClientDataSet;
     end;
 implementation
 
 uses
   Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common, System.TypInfo,
-  System.SysUtils;
+  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5;
 
 { TMorph }
 
@@ -112,7 +116,12 @@ end;
 
 function TMorph.All: TMorph;
 begin
+  case FDBType of
+    FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+ PSQL_ASTERISK;
+    FB5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+ PSQL_ASTERISK;
+  end;
 
+  Result := Self;
 end;
 
 function TMorph.AsJSONString: String;
@@ -125,9 +134,28 @@ begin
 
 end;
 
+function TMorph.AsTClientDataSet: TClientDataSet;
+begin
+  try
+    RunPSQLCommand(FPSQLCommand);
+  finally
+    FPSQLCommand := '';
+  end;
+
+  Result := TClientDataSet.Create(Nil);
+  TMorphDSUtls.FDQryToClientDS(FDQResult, Result);
+end;
+
 function TMorph.AsTFDMemTable: TFDMemTable;
 begin
+  try
+    RunPSQLCommand(FPSQLCommand);
+  finally
+    FPSQLCommand := '';
+  end;
 
+  Result := TFDMemTable.Create(Nil);
+  TMorphDSUtls.FDQryToFDMemtable(FDQResult, Result);
 end;
 
 function TMorph.tBoolean: TMorph;
@@ -155,6 +183,8 @@ end;
 function TMorph.Connection(const aConnection: TFDConnection): TMorph;
 begin
   FFDConnection := aConnection;
+  FDQResult.Connection := aConnection;
+  FDQResult.FetchOptions.Mode := fmAll;
   Result := Self;
 end;
 
@@ -177,6 +207,8 @@ begin
   FFieldsToProcess := TMorphFields.Create;
   FStage := CreatingTable;
   FPSQLCommand := '';
+
+  FDQResult := TFDQuery.Create(Nil);
 end;
 
 function TMorph.CreateTable: TMorph;
@@ -217,23 +249,7 @@ begin
   FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
 
   ExecutePSQL(FPSQLCommand);
-
-
-                //"CREATE TABLE "
-    {
-const PSQL_FB5_TYPE_INTEGER  = 'INTEGER';
-const PSQL_FB5_TYPE_VARCHAR  = 'VARCHAR';
-const PSQL_FB5_TYPE_FLOAT    = 'FLOAT';
-const PSQL_FB5_TYPE_DATE     = 'DATE';
-const PSQL_FB5_TYPE_BOOLEAN  = 'BOOLEAN';
-const PSQL_FB5_TYPE_TXTBLOB  = 'BLOB SUB_TYPE TEXT';
-const PSQL_FB5_TYPE_BIGINT   = 'BIGINT';
-
-const PSQL_OPEN_PARENTHESES = '(';
-const PSQL_PSQL_CLOSED_PARENTHESES = ')';
-const PSQL_COMMA = ',';
-const PSQL_SPACE = ' ';
-}
+  FPSQLCommand := '';
 end;
 
 function TMorph.CurrentPSQL(out anOutVar: String): TMorph;
@@ -346,7 +362,12 @@ end;
 
 function TMorph.From(const aTableName: String): TMorph;
 begin
+  case FDBType of
+    FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB2_5_FROM+PSQL_SPACE+ aTablename;
+    FB5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB2_5_FROM+PSQL_SPACE+ aTablename;
+  end;
 
+  Result := Self;
 end;
 
 function TMorph.GetFB2_5FieldTypeName: String;
@@ -364,6 +385,28 @@ begin
   case FDBType of
     FB2_5: Result := GetFB5FieldTypeName;
     FB5: Result := GetFB5FieldTypeName;
+  end;
+end;
+
+function TMorph.GetTableNames: TMorphVector<String>;
+var
+  FDQTableNames : TFDQuery;
+begin
+  FDQTableNames := TFDQuery.Create(Nil);
+  try
+    FDQTableNames.Connection := FFDConnection;
+    FDQTableNames.FetchOptions.Mode := fmAll;
+    FDQTableNames.SQL.Add(PSQL_FB5_LIST_TABLES);
+    FDQTableNames.Open;
+    Result := TMorphVector<String>.Create;
+    FDQTableNames.First;
+    while NOT FDQTableNames.Eof do
+    begin
+      Result.Add(FDQTableNames.Fields[0].AsString);
+      FDQTableNames.Next;
+    end;
+  finally
+    FDQTableNames.Free;
   end;
 end;
 
@@ -504,6 +547,12 @@ begin
 
 end;
 
+function TMorph.RunPSQLCommand(const aPSQLCommand : String): TMorph;
+begin
+  FDQResult.SQL.Text := aPSQLCommand;
+  FDQResult.Open;
+end;
+
 procedure TMorph.ExecutePSQL(const aCommand: String);
 var
   FDQry : TFDQuery;
@@ -512,7 +561,7 @@ begin
   try
     FDQry.Connection := FFDConnection;
     FDQry.FetchOptions.Mode := fmAll;
-    FDQry.SQL.Add(aCommand);
+    FDQry.SQL.Text := aCommand;
     FDQry.ExecSQL;
   finally
     FDQry.Free;
@@ -521,7 +570,12 @@ end;
 
 function TMorph.Select: TMorph;
 begin
+  case FDBType of
+    FB2_5: FPSQLCommand:=FPSQLCommand+ PSQL_FB2_5_SELECT;
+    FB5: FPSQLCommand:=FPSQLCommand+ PSQL_FB5_SELECT;
+  end;
 
+  Result := Self;
 end;
 
 function TMorph.SetField(const aFieldName: String): TMorph;

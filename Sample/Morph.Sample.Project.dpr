@@ -2,6 +2,7 @@ program Morph.Sample.Project;
 
 uses
   Vcl.Forms,
+  Firedac.DApt,
   Morph.Sample in 'Forms\Morph.Sample.pas' {Sample};
 
 {$R *.res}

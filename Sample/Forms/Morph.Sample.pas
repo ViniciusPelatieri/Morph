@@ -9,27 +9,36 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, Vcl.StdCtrls,
-  Vcl.Grids, Vcl.DBGrids, FireDAC.Phys.FB, FireDAC.Phys.FBDef;
+  Vcl.Grids, Vcl.DBGrids, FireDAC.Phys.FB, FireDAC.Phys.FBDef, Datasnap.DBClient;
 
 type
   TSample = class(TForm)
     FDConnection1: TFDConnection;
-    FDMemTable1: TFDMemTable;
     ComboBox1: TComboBox;
     Label1: TLabel;
+    Button1: TButton;
+    Button2: TButton;
     DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
     FDMTOrder: TFDMemTable;
     FDMTOrderID: TIntegerField;
     FDMTOrderCLIENT_ID: TIntegerField;
     FDMTOrderPRODUCT_ID: TIntegerField;
     FDMTOrderQUANTITY: TFloatField;
     FDMTOrderORDER_DATE: TDateField;
+    FDMemTable1: TFDMemTable;
+    FDMemTable1ID: TIntegerField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure ComboBox1Change(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
-      procedure ExecutarAlteracoes;
+      procedure LoadTablesInComboBox;
+      procedure RunChanges;
+      procedure LoadTableData;
   public
     { Public declarations }
   end;
@@ -40,11 +49,27 @@ var
 implementation
 
 uses
-  Morph.EnumeratedTypes, Morph.MorphTable, Morph.Settings, System.JSON;
+  Morph.EnumeratedTypes, Morph.MorphTable, Morph.Settings, System.JSON,
+  Morph.Vector;
 
 {$R *.dfm}
 
-procedure TSample.ExecutarAlteracoes;
+procedure TSample.Button1Click(Sender: TObject);
+begin
+ RunChanges;
+end;
+
+procedure TSample.Button2Click(Sender: TObject);
+begin
+  LoadTablesInComboBox;
+end;
+
+procedure TSample.ComboBox1Change(Sender: TObject);
+begin
+  LoadTableData;
+end;
+
+procedure TSample.RunChanges;
 var
   MorphTableArrange : TMphTableArrange;
   Settings : TMorphSettings;
@@ -521,7 +546,7 @@ begin
   FDMTOrder.Post;
   {$ENDREGION}
 
-  Morph.InserFDMEMtableInto('ORDER').FDMemTable(FDMemTable1);
+  Morph.InserFDMEMtableInto('ORDER').FDMemTable(FDMTOrder);
   {$ENDREGION}
 
   {$REGION 'Dropping entire columns'}
@@ -622,11 +647,12 @@ begin
   Morph.Delete.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
   {$ENDREGION}
 
-  {$REGION 'Select'}
-  Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Integer>(5)
-                                  ._Or.Field('CLIENT').IsSmallerOrEqualThen<Integer>(9);
   {$ENDREGION}
 
+  {$REGION 'Select'}
+  Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Integer>(5)
+                                  ._Or.Field('CLIENT').IsSmallerOrEqualThen<Integer>(9)
+       .AsTFDMemTable;
   {$ENDREGION}
 //=======================================================================================================
   {
@@ -747,8 +773,6 @@ begin
    Morph := TMorph.Create;
 
    Morph.Config.DatabaseType(FB5).Connection(FDConnection1);
-
-   ExecutarAlteracoes;
 end;
 
 procedure TSample.FormDestroy(Sender: TObject);
@@ -756,6 +780,39 @@ begin
   Morph.Free;
 end;
 
+
+procedure TSample.LoadTableData;
+begin
+  FDMemTable1 := Morph.Select.All.From(ComboBox1.Text).AsTFDMemtable;
+  FDMemTable1.Close;
+  FDMemTable1.Open;
+  FDMemTable1.Refresh;
+  DBGrid1.Refresh;
+end;
+
+procedure TSample.LoadTablesInComboBox;
+var
+  TableNames : TMorphVector<String>;
+  TableName : String;
+  LastTable : String;
+begin
+  TableNames := Morph.GetTableNames;
+
+  ComboBox1.Items.Clear;
+  for TableName in TableNames.Elements do
+    ComboBox1.Items.Add(Tablename);
+
+  LastTable := ComboBox1.Text;
+  if ComboBox1.Items.Count > 0 then
+  begin
+    if ComboBox1.Items.Contains(LastTable) then
+      ComboBox1.Text := LastTable
+    else
+      ComboBox1.ItemIndex := 0;
+  end;
+
+  LoadTableData;
+end;
 
 end.
 

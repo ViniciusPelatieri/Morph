@@ -125,7 +125,6 @@
         </DelphiCompile>
         <DCCReference Include="Forms\Morph.Sample.pas">
             <Form>Sample</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

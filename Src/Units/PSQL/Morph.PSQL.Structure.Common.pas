@@ -7,6 +7,7 @@ const PSQL_CLOSED_PARENTHESES = ')';
 const PSQL_COMMA = ',';
 const PSQL_SPACE = ' ';
 const PSQL_SEMICOLON = ';';
+const PSQL_ASTERISK = '*';
 
 implementation
 
