@@ -784,10 +784,8 @@ end;
 procedure TSample.LoadTableData;
 begin
   FDMemTable1 := Morph.Select.All.From(ComboBox1.Text).AsTFDMemtable;
-  FDMemTable1.Close;
-  FDMemTable1.Open;
-  FDMemTable1.Refresh;
-  DBGrid1.Refresh;
+  DataSource1.DataSet := Nil;
+  DataSource1.DataSet := FDMemTable1;
 end;
 
 procedure TSample.LoadTablesInComboBox;

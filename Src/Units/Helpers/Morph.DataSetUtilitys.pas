@@ -73,9 +73,9 @@ begin
   if not Assigned(AFDQuery) or not Assigned(AFDMemTable) then
     Exit;
 
-  AFDMemTable.Close;  // Garante que o MemTable está fechado
-  AFDMemTable.CopyDataSet(AFDQuery, [coStructure, coRestart, coAppend]);  // Copia estrutura e dados
-  AFDMemTable.Open;
+  AFDMemTable.Close;
+  AFDMemTable.CopyDataSet(AFDQuery, [coStructure, coRestart, coAppend]);
+  aFDMemTable.Open;
 end;
 
 end.
