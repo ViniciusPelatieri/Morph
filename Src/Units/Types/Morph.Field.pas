@@ -28,6 +28,8 @@ type
       FReferencedField : String;
       FNoOrphanData : Boolean;
       FIdentity : Boolean;
+      FFKName : String;
+      FRelationsBehavior : TMorphRelationsbehavior;
     public
       constructor Create;
       property Name : String read FName write FName;
@@ -41,6 +43,8 @@ type
       property NoOrphaData : Boolean read FNoOrphanData write FNoOrphanData;
       property Size : Integer read FSize write FSize;
       property Identity : Boolean read FIdentity write FIdentity;
+      property FKName : String read FFKName write FFKName;
+      property RelationsBehavior : TMorphRelationsbehavior read FRelationsBehavior write FRelationsBehavior;
   end;
 
   TMorphFields = class(TMorphVector<TMorphField>)

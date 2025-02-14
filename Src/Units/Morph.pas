@@ -19,9 +19,12 @@ type
       FDBType : TMorphDBType;
       FFDConnection : TFDConnection;
       FDQResult : TFDQuery;
+      FTempConnection : TFDConnection;
 
       FFB2_5FieldTypeNames : TDictionary<Integer, String>;
       FFB5FieldTypeNames : TDictionary<Integer, String>;
+
+      procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
     public
       constructor Create;
       destructor Destroy; override;
@@ -36,15 +39,12 @@ type
       function RunFindInAnOtherThread : TMorph;
       function LoadSettings(const aMorphSettings : TMorphSettings) : TMorph;
       function ExportSettings : TJSONObject;
-      function CurrentSQLCommand : String;
-      function ExecuteSQL() : TMorph;
       function Return : TMorph;
       function AsMorphTable : TMphTable;
       function AsJSONString : String;
       function AsTFDMemTable : TFDMemTable;
       function Table(const aTableName : String) : TMorph;
       function Drop : TMorph;
-      function Delete : TMorph;
       function ChangeNameTo(const aNewName : String) : TMorph;
       function Field(const aField : String) : TMorph;
       function tInteger : TMorph;
@@ -98,8 +98,13 @@ type
       function GetFB2_5FieldTypeName : String;
       procedure ExecutePSQL(const aCommand : String);
       function GetTableNames : TMorphVector<String>;
-      function RunPSQLCommand(const aPSQLCommand : String) : TMorph;
       function AsTClientDataSet : TClientDataSet;
+      function OpenPSQL(const aCommand: String) : TMorph;
+      function FKName(const aFKName : String) : TMorph;
+      function NoOrphanData : TMorph;
+      function NullOrphanData : TMorph;
+      function DeleteOrphanData : TMorph;
+      function Delete : TMorph;
     end;
 implementation
 
@@ -137,7 +142,7 @@ end;
 function TMorph.AsTClientDataSet: TClientDataSet;
 begin
   try
-    RunPSQLCommand(FPSQLCommand);
+    OpenPSQL(FPSQLCommand);
   finally
     FPSQLCommand := '';
   end;
@@ -149,7 +154,7 @@ end;
 function TMorph.AsTFDMemTable: TFDMemTable;
 begin
   try
-    RunPSQLCommand(FPSQLCommand);
+     OpenPSQL(FPSQLCommand);
   finally
     FPSQLCommand := '';
   end;
@@ -183,7 +188,6 @@ end;
 function TMorph.Connection(const aConnection: TFDConnection): TMorph;
 begin
   FFDConnection := aConnection;
-  FDQResult.Connection := aConnection;
   FDQResult.FetchOptions.Mode := fmAll;
   Result := Self;
 end;
@@ -245,7 +249,22 @@ begin
 
     if NOT FFieldsToProcess.Eof then
       FFieldsToProcess.Next;
-  end;
+
+    if vField.ForeignKey then
+    begin
+      {FK_<SourceTable>_<DesntinationTable>}
+      FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE+PSQL_FB5_CONSTRAINT+PSQL_SPACE+vField.FKName+PSQL_SPACE+PSQL_FB5_FOREIGN_KEY+PSQL_SPACE+PSQL_OPEN_PARENTHESES+vField.Name+PSQL_CLOSED_PARENTHESES+PSQL_FB5_REFERENCES+vField.ReferencedTable+PSQL_OPEN_PARENTHESES+vField.ReferencedField+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_ON;
+                                           {CONSTRAINT                      FK_ORDER_CLIENT F       OREIGN KEY                      (                      CLIENT_ID  )                       REFERENCES          CLIENT                 (                     ID                     )                                  ON}
+
+      case vField.RelationsBehavior of
+        mrbNoOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+        mrbNullOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_SET+PSQL_SPACE+PSQL_FB5_NULL+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+        mrbDeleteOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_CASCADE+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+      end;
+
+    end;
+  end;                 COLOCAR AO FINAL DO COMANDO
+
   FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
 
   ExecutePSQL(FPSQLCommand);
@@ -256,11 +275,6 @@ function TMorph.CurrentPSQL(out anOutVar: String): TMorph;
 begin
   anOutVar := FPSQLCommand;
   Result := Self;
-end;
-
-function TMorph.CurrentSQLCommand: String;
-begin
-
 end;
 
 function TMorph.DatabaseType(const aDBType: TMorphDBType): TMorph;
@@ -280,6 +294,12 @@ begin
 
 end;
 
+function TMorph.DeleteOrphanData: TMorph;
+begin
+  FFieldsToProcess.CurrentField.RelationsBehavior := mrbDeleteOrphanData;
+  Result := Self;
+end;
+
 destructor TMorph.Destroy;
 begin
   FFieldsToProcess.Free;
@@ -293,7 +313,15 @@ end;
 
 function TMorph.Drop: TMorph;
 begin
+  case FDBType of
+    FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_FB2_5_DROP_TABLE+PSQL_SPACE+FTableName;
+    FB5: FPSQLCommand:=FPSQLCommand+PSQL_FB5_DROP_TABLE+PSQL_SPACE+FTableName;
+  end;
 
+  ExecutePSQL(FPSQLCommand);
+  FPSQLCommand := '';
+
+  Result := Self;
 end;
 
 function TMorph.Equals<T>(const aValue: T): TMorph;
@@ -301,9 +329,9 @@ begin
 
 end;
 
-function TMorph.ExecuteSQL: TMorph;
+function TMorph.OpenPSQL(const aCommand: String): TMorph;
 begin
-
+  RunPSQL(aCommand, Open);
 end;
 
 function TMorph.ExportSettings: TJSONObject;
@@ -348,6 +376,12 @@ begin
 
 end;
 
+function TMorph.FKName(const aFKName: String): TMorph;
+begin
+  FFieldsToProcess.CurrentField.FKName := aFKName;
+  Result := Self;
+end;
+
 function TMorph.tFloat: TMorph;
 begin
   FFieldsToProcess.CurrentField.FieldType := mphFloat;
@@ -389,24 +423,14 @@ begin
 end;
 
 function TMorph.GetTableNames: TMorphVector<String>;
-var
-  FDQTableNames : TFDQuery;
 begin
-  FDQTableNames := TFDQuery.Create(Nil);
-  try
-    FDQTableNames.Connection := FFDConnection;
-    FDQTableNames.FetchOptions.Mode := fmAll;
-    FDQTableNames.SQL.Add(PSQL_FB5_LIST_TABLES);
-    FDQTableNames.Open;
-    Result := TMorphVector<String>.Create;
-    FDQTableNames.First;
-    while NOT FDQTableNames.Eof do
-    begin
-      Result.Add(FDQTableNames.Fields[0].AsString);
-      FDQTableNames.Next;
-    end;
-  finally
-    FDQTableNames.Free;
+  OpenPSQL(PSQL_FB5_LIST_TABLES);
+  Result := TMorphVector<String>.Create;
+  FDQResult.First;
+  while NOT FDQResult.Eof do
+  begin
+    Result.Add(FDQResult.Fields[0].AsString);
+    FDQResult.Next;
   end;
 end;
 
@@ -500,6 +524,13 @@ end;
 function TMorph.NoOrphaData: TMorph;
 begin
   FFieldsToProcess.CurrentField.NoOrphaData := True;
+  Result := Self;
+end;
+
+function TMorph.NoOrphanData: TMorph;
+begin
+  FFieldsToProcess.CurrentField.RelationsBehavior := mrbNoOrphanData;
+  Result := Self;
 end;
 
 function TMorph.NotNull: TMorph;
@@ -508,7 +539,11 @@ begin
   Result := Self;
 end;
 
-
+function TMorph.NullOrphanData: TMorph;
+begin
+  FFieldsToProcess.CurrentField.RelationsBehavior := mrbNullOrphanData;
+  Result := Self;
+end;
 
 function TMorph.OutputFDMemTable(const anOutputTable: TFDMemTable): TMorph;
 begin
@@ -547,25 +582,43 @@ begin
 
 end;
 
-function TMorph.RunPSQLCommand(const aPSQLCommand : String): TMorph;
+procedure TMorph.RunPSQL(const aCommand: String;
+  const aQryAction: TMorphQryAction);
 begin
-  FDQResult.SQL.Text := aPSQLCommand;
-  FDQResult.Open;
+  if Assigned(FDQResult) then
+    FDQResult.Free;
+
+  if Assigned(FTempConnection) then
+  begin
+    FTempConnection.Close;
+    FTempConnection.Free;
+  end;
+
+  FDQResult := TFDQuery.Create(Nil);
+  FTempConnection := TFDConnection.Create(Nil);
+
+  FTempConnection.Params.DriverID := FFDConnection.Params.DriverID;
+  FTempConnection.Params.Database := FFDConnection.Params.Database;
+  FTempConnection.Params.UserName := FFDConnection.Params.UserName;
+  FTempConnection.Params.Password := FFDConnection.Params.Password;
+  FTempConnection.TxOptions.AutoCommit := True;
+  FTempConnection.LoginPrompt := False;
+  FTempConnection.Open;
+
+  FDQResult.Connection := FTempConnection;
+  FDQResult.FetchOptions.Mode := fmAll;
+  FDQResult.SQL.Text := aCommand;
+
+  case aQryAction of
+    Open: FDQResult.Open;
+    Execute: FDQResult.ExecSQL;
+  end;
+
 end;
 
 procedure TMorph.ExecutePSQL(const aCommand: String);
-var
-  FDQry : TFDQuery;
 begin
-  FDQry := TFDQuery.Create(Nil);
-  try
-    FDQry.Connection := FFDConnection;
-    FDQry.FetchOptions.Mode := fmAll;
-    FDQry.SQL.Text := aCommand;
-    FDQry.ExecSQL;
-  finally
-    FDQry.Free;
-  end;
+  RunPSQL(aCommand, Execute);
 end;
 
 function TMorph.Select: TMorph;
@@ -603,6 +656,7 @@ begin
     end;
   end;
 
+  FStage := CreatingTable;
   Result := Self;
 end;
 

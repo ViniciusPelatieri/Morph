@@ -66,6 +66,24 @@ object Sample: TSample
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
   end
+  object Button3: TButton
+    Left = 248
+    Top = 4
+    Width = 75
+    Height = 25
+    Caption = 'Create Tables'
+    TabOrder = 4
+    OnClick = Button3Click
+  end
+  object BtnDelete: TButton
+    Left = 248
+    Top = 30
+    Width = 75
+    Height = 25
+    Caption = 'Drop Tables'
+    TabOrder = 5
+    OnClick = BtnDeleteClick
+  end
   object FDConnection1: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'

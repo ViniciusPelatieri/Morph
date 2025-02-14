@@ -28,11 +28,15 @@ type
     FDMTOrderORDER_DATE: TDateField;
     FDMemTable1: TFDMemTable;
     FDMemTable1ID: TIntegerField;
+    Button3: TButton;
+    BtnDelete: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure BtnDeleteClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -54,6 +58,19 @@ uses
 
 {$R *.dfm}
 
+procedure TSample.BtnDeleteClick(Sender: TObject);
+var
+  TableNames : TMorphVector<String>;
+  TableName : String;
+begin
+  TableNames := Morph.GetTableNames;
+
+  for TableName in TableNames.Elements do
+    Morph.Table(TableName).Drop;
+
+end;
+
+
 procedure TSample.Button1Click(Sender: TObject);
 begin
  RunChanges;
@@ -64,24 +81,8 @@ begin
   LoadTablesInComboBox;
 end;
 
-procedure TSample.ComboBox1Change(Sender: TObject);
+procedure TSample.Button3Click(Sender: TObject);
 begin
-  LoadTableData;
-end;
-
-procedure TSample.RunChanges;
-var
-  MorphTableArrange : TMphTableArrange;
-  Settings : TMorphSettings;
-  InsertJSON : TJSONArray;
-  ConfigString : String;
-  ClientMorphTable : TMphTable;
-  Conteudo : String;
-  JSONLine : TJSONObject;
-  JSONString : String;
-begin
-  {$REGION 'Tables creation'}
-
   Morph.Table('CLIENT')
           .Field('ID').tInteger.PrimaryKey.NotNull
           .Field('NAME').tVarchar(100).NotNull
@@ -105,13 +106,31 @@ begin
 
   Morph.Table('ORDER')
           .Field('ID').tInteger.PrimaryKey.NotNull
-          .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').NoOrphaData
-          .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').NoOrphaData
-          .Field('PRODUCT_ID').tInteger.ForeignKey.References.Table('PRODUCT').Field('ID').NoOrphaData
+          .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').FKName('FK_ORDER_CLIENT').DeleteOrphanData
+          .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').FKName('FK_ORDER_SELLER').NullOrphanData
+          .Field('PRODUCT_ID').tInteger.ForeignKey.References.Table('PRODUCT').Field('ID').FKName('FK_ORDER_PRODUCT').NoOrphanData
           .Field('QUANTITY').tFloat.NotNull
           .Field('ORDER_DATE').tDate.NotNull
         .CreateTable;
-  {$ENDREGION}
+end;
+
+procedure TSample.ComboBox1Change(Sender: TObject);
+begin
+  LoadTableData;
+end;
+
+procedure TSample.RunChanges;
+var
+  MorphTableArrange : TMphTableArrange;
+  Settings : TMorphSettings;
+  InsertJSON : TJSONArray;
+  ConfigString : String;
+  ClientMorphTable : TMphTable;
+  Conteudo : String;
+  JSONLine : TJSONObject;
+  JSONString : String;
+begin
+ 
 
   {$REGION 'Fields population'}
   //Line Insert
@@ -809,7 +828,8 @@ begin
       ComboBox1.ItemIndex := 0;
   end;
 
-  LoadTableData;
+  if TableNames.ElementsCount > 0 then
+    LoadTableData;
 end;
 
 end.

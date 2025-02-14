@@ -7,6 +7,8 @@ type
   TMorphEmptyType = (Empty);
   TMorphFieldTypes = (mphInteger, mphVarchar, mphFloat, mphDate, mphBoolean, mphTXTBlob,  mphBinaryBlob);
   TMorphStages = (CreatingTable, ReferencingTable);
+  TMorphQryAction = (Open, Execute);
+  TMorphRelationsbehavior = (mrbNoOrphanData, mrbNullOrphanData, mrbDeleteOrphanData);
 
 implementation
 
