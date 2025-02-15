@@ -67,7 +67,6 @@ begin
 
   for TableName in TableNames.Elements do
     Morph.Table(TableName).Drop;
-
 end;
 
 
@@ -104,7 +103,7 @@ begin
           .Field('PRICE').tFloat.NotNull
         .CreateTable;
 
-  Morph.Table('ORDER')
+  Morph.Table('ORDERS')
           .Field('ID').tInteger.PrimaryKey.NotNull
           .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').FKName('FK_ORDER_CLIENT').DeleteOrphanData
           .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').FKName('FK_ORDER_SELLER').NullOrphanData

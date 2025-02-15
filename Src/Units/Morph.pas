@@ -225,10 +225,10 @@ begin
   FFieldsToProcess.First;
   for vFieldCount := 0 to FFieldsToProcess.Count -1 do
   begin
+    vField := FFieldsToProcess.Fields[vFieldCount];
+
     if vFieldCount > 0 then
       FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
-
-    vField := FFieldsToProcess.Fields[vFieldCount];
 
     FPSQLCommand:=FPSQLCommand+ vField.Name+PSQL_SPACE+GetPSQLTypeName;
 
@@ -249,13 +249,17 @@ begin
 
     if NOT FFieldsToProcess.Eof then
       FFieldsToProcess.Next;
+  end;
 
+  FFieldsToProcess.First;
+  for vFieldCount := 0 to FFieldsToProcess.Count -1 do   //FK
+  begin
+    vField := FFieldsToProcess.Fields[vFieldCount];
     if vField.ForeignKey then
     begin
       {FK_<SourceTable>_<DesntinationTable>}
-      FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE+PSQL_FB5_CONSTRAINT+PSQL_SPACE+vField.FKName+PSQL_SPACE+PSQL_FB5_FOREIGN_KEY+PSQL_SPACE+PSQL_OPEN_PARENTHESES+vField.Name+PSQL_CLOSED_PARENTHESES+PSQL_FB5_REFERENCES+vField.ReferencedTable+PSQL_OPEN_PARENTHESES+vField.ReferencedField+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_ON;
-                                           {CONSTRAINT                      FK_ORDER_CLIENT F       OREIGN KEY                      (                      CLIENT_ID  )                       REFERENCES          CLIENT                 (                     ID                     )                                  ON}
-
+      FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE+PSQL_FB5_CONSTRAINT+PSQL_SPACE+vField.FKName+PSQL_SPACE+PSQL_FB5_FOREIGN_KEY+PSQL_SPACE+PSQL_OPEN_PARENTHESES+vField.Name+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_REFERENCES+PSQL_SPACE+vField.ReferencedTable+PSQL_OPEN_PARENTHESES+vField.ReferencedField+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_ON;
+                                           {CONSTRAINT                      FK_ORDER_CLIENT                    FOREIGN KEY                     (                      CLIENT_ID  )                                  REFERENCES          CLIENT                 (                     ID                     )                                  ON}
       case vField.RelationsBehavior of
         mrbNoOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
         mrbNullOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_SET+PSQL_SPACE+PSQL_FB5_NULL+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
@@ -263,12 +267,18 @@ begin
       end;
 
     end;
-  end;                 COLOCAR AO FINAL DO COMANDO
+
+    if NOT FFieldsToProcess.Eof then
+      FFieldsToProcess.Next;
+  end;
 
   FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
 
-  ExecutePSQL(FPSQLCommand);
-  FPSQLCommand := '';
+  try
+    ExecutePSQL(FPSQLCommand);
+  finally
+    FPSQLCommand := '';
+  end;
 end;
 
 function TMorph.CurrentPSQL(out anOutVar: String): TMorph;
@@ -297,6 +307,7 @@ end;
 function TMorph.DeleteOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbDeleteOrphanData;
+  FStage := CreatingTable;
   Result := Self;
 end;
 
@@ -318,10 +329,12 @@ begin
     FB5: FPSQLCommand:=FPSQLCommand+PSQL_FB5_DROP_TABLE+PSQL_SPACE+FTableName;
   end;
 
-  ExecutePSQL(FPSQLCommand);
-  FPSQLCommand := '';
-
-  Result := Self;
+  try
+    ExecutePSQL(FPSQLCommand);
+  finally
+    FPSQLCommand := '';
+    Result := Self;
+  end;
 end;
 
 function TMorph.Equals<T>(const aValue: T): TMorph;
@@ -530,18 +543,21 @@ end;
 function TMorph.NoOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbNoOrphanData;
+  FStage := CreatingTable;
   Result := Self;
 end;
 
 function TMorph.NotNull: TMorph;
 begin
   FFieldsToProcess.CurrentField.NotNull := True;
+  FStage := CreatingTable;
   Result := Self;
 end;
 
 function TMorph.NullOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbNullOrphanData;
+  FStage := CreatingTable;
   Result := Self;
 end;
 
@@ -656,7 +672,6 @@ begin
     end;
   end;
 
-  FStage := CreatingTable;
   Result := Self;
 end;
 
