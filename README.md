@@ -39,6 +39,16 @@ Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Inte
          
 ```
 
+#### 🟣 INSERT
+
+```delphi
+  Morph.InsertInto.Table('CLIENT').Fields(['ID', 'NAME',         'EMAIL',          'PHONE'])
+                                  .Values([1,    'John Smith',   'John@email.com', '9999-1111'])
+                                  .Values([2,    'Mary Johnson', 'mary@email.com', '9999-2222'])
+                                  .Post;
+
+```
+
 #### 🟠 UPDATE
 
 ```delphi
