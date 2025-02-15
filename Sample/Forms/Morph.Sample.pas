@@ -13,30 +13,29 @@ uses
 
 type
   TSample = class(TForm)
-    FDConnection1: TFDConnection;
-    ComboBox1: TComboBox;
-    Label1: TLabel;
-    Button1: TButton;
-    Button2: TButton;
-    DBGrid1: TDBGrid;
-    DataSource1: TDataSource;
-    FDMTOrder: TFDMemTable;
-    FDMTOrderID: TIntegerField;
-    FDMTOrderCLIENT_ID: TIntegerField;
-    FDMTOrderPRODUCT_ID: TIntegerField;
-    FDMTOrderQUANTITY: TFloatField;
-    FDMTOrderORDER_DATE: TDateField;
-    FDMemTable1: TFDMemTable;
-    FDMemTable1ID: TIntegerField;
-    Button3: TButton;
-    BtnDelete: TButton;
+    FDCDB: TFDConnection;
+    CBTable: TComboBox;
+    LbTable: TLabel;
+    BtnRefrshyables: TButton;
+    DBGrid: TDBGrid;
+    DSTable: TDataSource;
+    FDMTInsertOrder: TFDMemTable;
+    FDMTInsertOrderID: TIntegerField;
+    FDMTInsertOrderCLIENT_ID: TIntegerField;
+    FDMTInsertOrderPRODUCT_ID: TIntegerField;
+    FDMTInsertOrderQUANTITY: TFloatField;
+    FDMTInsertOrderORDER_DATE: TDateField;
+    FDMTTable: TFDMemTable;
+    FDMTTableID: TIntegerField;
+    BtnCreateTables: TButton;
+    BtnDropTables: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure ComboBox1Change(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure BtnDeleteClick(Sender: TObject);
+    procedure BtnRefrshyablesClick(Sender: TObject);
+    procedure CBTableChange(Sender: TObject);
+    procedure BtnCreateTablesClick(Sender: TObject);
+    procedure BtnDropTablesClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -58,7 +57,7 @@ uses
 
 {$R *.dfm}
 
-procedure TSample.BtnDeleteClick(Sender: TObject);
+procedure TSample.BtnDropTablesClick(Sender: TObject);
 var
   TableNames : TMorphVector<String>;
   TableName : String;
@@ -75,12 +74,12 @@ begin
  RunChanges;
 end;
 
-procedure TSample.Button2Click(Sender: TObject);
+procedure TSample.BtnRefrshyablesClick(Sender: TObject);
 begin
   LoadTablesInComboBox;
 end;
 
-procedure TSample.Button3Click(Sender: TObject);
+procedure TSample.BtnCreateTablesClick(Sender: TObject);
 begin
   Morph.Table('CLIENT')
           .Field('ID').tInteger.PrimaryKey.NotNull
@@ -113,7 +112,7 @@ begin
         .CreateTable;
 end;
 
-procedure TSample.ComboBox1Change(Sender: TObject);
+procedure TSample.CBTableChange(Sender: TObject);
 begin
   LoadTableData;
 end;
@@ -441,130 +440,130 @@ begin
 
   //TFDMemTable Table Insert
   {$REGION 'Populating TFDMemTable'}
-  FDMTOrder.Open;
+  FDMTInsertOrder.Open;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 1;
-  FDMTOrderCLIENT_ID.AsInteger := 1;
-  FDMTOrderPRODUCT_ID.AsInteger := 2;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime :=  EncodeDate(2025, 2, 1);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 1;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 1;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 2;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime :=  EncodeDate(2025, 2, 1);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 2;
-  FDMTOrderCLIENT_ID.AsInteger := 3;
-  FDMTOrderPRODUCT_ID.AsInteger := 5;
-  FDMTOrderQUANTITY.AsFloat := 2;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 2);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 2;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 3;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 5;
+  FDMTInsertOrderQUANTITY.AsFloat := 2;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 2);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 3;
-  FDMTOrderCLIENT_ID.AsInteger := 5;
-  FDMTOrderPRODUCT_ID.AsInteger := 8;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 3);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 3;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 5;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 8;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 3);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 4;
-  FDMTOrderCLIENT_ID.AsInteger := 2;
-  FDMTOrderPRODUCT_ID.AsInteger := 10;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 4);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 4;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 2;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 10;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 4);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 5;
-  FDMTOrderCLIENT_ID.AsInteger := 6;
-  FDMTOrderPRODUCT_ID.AsInteger := 15;
-  FDMTOrderQUANTITY.AsFloat := 3;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 5);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 5;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 6;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 15;
+  FDMTInsertOrderQUANTITY.AsFloat := 3;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 5);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 6;
-  FDMTOrderCLIENT_ID.AsInteger := 8;
-  FDMTOrderPRODUCT_ID.AsInteger := 7;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 6);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 6;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 8;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 7;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 6);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 7;
-  FDMTOrderCLIENT_ID.AsInteger := 10;
-  FDMTOrderPRODUCT_ID.AsInteger := 12;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 7);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 7;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 10;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 12;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 7);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 8;
-  FDMTOrderCLIENT_ID.AsInteger := 4;
-  FDMTOrderPRODUCT_ID.AsInteger := 3;
-  FDMTOrderQUANTITY.AsFloat := 5;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 8);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 8;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 4;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 3;
+  FDMTInsertOrderQUANTITY.AsFloat := 5;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 8);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 9;
-  FDMTOrderCLIENT_ID.AsInteger := 9;
-  FDMTOrderPRODUCT_ID.AsInteger := 6;
-  FDMTOrderQUANTITY.AsFloat := 2;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 9);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 9;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 9;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 6;
+  FDMTInsertOrderQUANTITY.AsFloat := 2;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 9);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 10;
-  FDMTOrderCLIENT_ID.AsInteger := 7;
-  FDMTOrderPRODUCT_ID.AsInteger := 1;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 10);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 10;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 7;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 1;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 10);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 11;
-  FDMTOrderCLIENT_ID.AsInteger := 12;
-  FDMTOrderPRODUCT_ID.AsInteger := 14;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 11);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 11;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 12;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 14;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 11);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 12;
-  FDMTOrderCLIENT_ID.AsInteger := 15;
-  FDMTOrderPRODUCT_ID.AsInteger := 4;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 12);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 12;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 15;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 4;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 12);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 13;
-  FDMTOrderCLIENT_ID.AsInteger := 13;
-  FDMTOrderPRODUCT_ID.AsInteger := 11;
-  FDMTOrderQUANTITY.AsFloat := 2;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 13);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 13;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 13;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 11;
+  FDMTInsertOrderQUANTITY.AsFloat := 2;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 13);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 14;
-  FDMTOrderCLIENT_ID.AsInteger := 11;
-  FDMTOrderPRODUCT_ID.AsInteger := 9;
-  FDMTOrderQUANTITY.AsFloat := 1;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 14);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 14;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 11;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 9;
+  FDMTInsertOrderQUANTITY.AsFloat := 1;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 14);
+  FDMTInsertOrder.Post;
 
-  FDMTOrder.Append;
-  FDMTOrderID.AsInteger := 15;
-  FDMTOrderCLIENT_ID.AsInteger := 14;
-  FDMTOrderPRODUCT_ID.AsInteger := 13;
-  FDMTOrderQUANTITY.AsFloat := 3;
-  FDMTOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 15);
-  FDMTOrder.Post;
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 15;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 14;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 13;
+  FDMTInsertOrderQUANTITY.AsFloat := 3;
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 15);
+  FDMTInsertOrder.Post;
   {$ENDREGION}
 
-  Morph.InserFDMEMtableInto('ORDER').FDMemTable(FDMTOrder);
+  Morph.InserFDMEMtableInto('ORDER').FDMemTable(FDMTInsertOrder);
   {$ENDREGION}
 
   {$REGION 'Dropping entire columns'}
@@ -790,7 +789,7 @@ procedure TSample.FormCreate(Sender: TObject);
 begin
    Morph := TMorph.Create;
 
-   Morph.Config.DatabaseType(FB5).Connection(FDConnection1);
+   Morph.Config.DatabaseType(FB5).Connection(FDCDB);
 end;
 
 procedure TSample.FormDestroy(Sender: TObject);
@@ -801,9 +800,9 @@ end;
 
 procedure TSample.LoadTableData;
 begin
-  FDMemTable1 := Morph.Select.All.From(ComboBox1.Text).AsTFDMemtable;
-  DataSource1.DataSet := Nil;
-  DataSource1.DataSet := FDMemTable1;
+  FDMTTable := Morph.Select.All.From(CBTable.Text).AsTFDMemtable;
+  DSTable.DataSet := Nil;
+  DSTable.DataSet := FDMTTable;
 end;
 
 procedure TSample.LoadTablesInComboBox;
@@ -814,17 +813,17 @@ var
 begin
   TableNames := Morph.GetTableNames;
 
-  ComboBox1.Items.Clear;
+  CBTable.Items.Clear;
   for TableName in TableNames.Elements do
-    ComboBox1.Items.Add(Tablename);
+    CBTable.Items.Add(Tablename);
 
-  LastTable := ComboBox1.Text;
-  if ComboBox1.Items.Count > 0 then
+  LastTable := CBTable.Text;
+  if CBTable.Items.Count > 0 then
   begin
-    if ComboBox1.Items.Contains(LastTable) then
-      ComboBox1.Text := LastTable
+    if CBTable.Items.Contains(LastTable) then
+      CBTable.Text := LastTable
     else
-      ComboBox1.ItemIndex := 0;
+      CBTable.ItemIndex := 0;
   end;
 
   if TableNames.ElementsCount > 0 then

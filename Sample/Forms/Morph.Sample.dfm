@@ -13,32 +13,22 @@ object Sample: TSample
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
-  object Label1: TLabel
+  object LbTable: TLabel
     Left = 8
     Top = 8
-    Width = 34
+    Width = 28
     Height = 15
-    Caption = 'Tabela'
+    Caption = 'Table'
   end
-  object ComboBox1: TComboBox
+  object CBTable: TComboBox
     Left = 8
     Top = 32
     Width = 145
     Height = 23
     TabOrder = 0
-    Text = 'ComboBox1'
-    OnChange = ComboBox1Change
+    OnChange = CBTableChange
   end
-  object Button1: TButton
-    Left = 896
-    Top = 30
-    Width = 98
-    Height = 25
-    Caption = 'Run Changes'
-    TabOrder = 1
-    OnClick = Button1Click
-  end
-  object Button2: TButton
+  object BtnRefrshyables: TButton
     Left = 151
     Top = 30
     Width = 26
@@ -50,41 +40,41 @@ object Sample: TSample
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 2
-    OnClick = Button2Click
+    TabOrder = 1
+    OnClick = BtnRefrshyablesClick
   end
-  object DBGrid1: TDBGrid
+  object DBGrid: TDBGrid
     Left = 8
     Top = 61
     Width = 986
     Height = 568
-    DataSource = DataSource1
-    TabOrder = 3
+    DataSource = DSTable
+    TabOrder = 2
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
   end
-  object Button3: TButton
+  object BtnCreateTables: TButton
     Left = 248
     Top = 4
     Width = 75
     Height = 25
     Caption = 'Create Tables'
-    TabOrder = 4
-    OnClick = Button3Click
+    TabOrder = 3
+    OnClick = BtnCreateTablesClick
   end
-  object BtnDelete: TButton
+  object BtnDropTables: TButton
     Left = 248
     Top = 30
     Width = 75
     Height = 25
     Caption = 'Drop Tables'
-    TabOrder = 5
-    OnClick = BtnDeleteClick
+    TabOrder = 4
+    OnClick = BtnDropTablesClick
   end
-  object FDConnection1: TFDConnection
+  object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'
       'User_Name=SYSDBA'
@@ -92,15 +82,15 @@ object Sample: TSample
       'DriverID=FB')
     Connected = True
     LoginPrompt = False
-    Left = 728
-    Top = 144
-  end
-  object DataSource1: TDataSource
-    DataSet = FDMemTable1
     Left = 192
-    Top = 224
+    Top = 168
   end
-  object FDMTOrder: TFDMemTable
+  object DSTable: TDataSource
+    DataSet = FDMTTable
+    Left = 192
+    Top = 232
+  end
+  object FDMTInsertOrder: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
     ResourceOptions.AssignedValues = [rvSilentMode]
@@ -110,23 +100,23 @@ object Sample: TSample
     UpdateOptions.AutoCommitUpdates = True
     Left = 384
     Top = 472
-    object FDMTOrderID: TIntegerField
+    object FDMTInsertOrderID: TIntegerField
       FieldName = 'ID'
     end
-    object FDMTOrderCLIENT_ID: TIntegerField
+    object FDMTInsertOrderCLIENT_ID: TIntegerField
       FieldName = 'CLIENT_ID'
     end
-    object FDMTOrderPRODUCT_ID: TIntegerField
+    object FDMTInsertOrderPRODUCT_ID: TIntegerField
       FieldName = 'PRODUCT_ID'
     end
-    object FDMTOrderQUANTITY: TFloatField
+    object FDMTInsertOrderQUANTITY: TFloatField
       FieldName = 'QUANTITY'
     end
-    object FDMTOrderORDER_DATE: TDateField
+    object FDMTInsertOrderORDER_DATE: TDateField
       FieldName = 'ORDER_DATE'
     end
   end
-  object FDMemTable1: TFDMemTable
+  object FDMTTable: TFDMemTable
     Active = True
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -136,8 +126,8 @@ object Sample: TSample
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
     Left = 192
-    Top = 344
-    object FDMemTable1ID: TIntegerField
+    Top = 296
+    object FDMTTableID: TIntegerField
       FieldName = 'ID'
     end
   end
