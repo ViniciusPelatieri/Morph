@@ -3,7 +3,7 @@ unit Morph.Field;
 interface
 
 uses
-  Morph.Vector, Morph.EnumeratedTypes;
+  Morph.Vector, Morph.EnumeratedTypes, System.Rtti;
 type
   TMorphTableFieldInfo = class
     private
@@ -30,8 +30,14 @@ type
       FIdentity : Boolean;
       FFKName : String;
       FRelationsBehavior : TMorphRelationsbehavior;
+      FValues : TMorphVector<TValue>;
     public
       constructor Create;
+      destructor Destroy;
+      class function New : TMorphField;
+      function SetName(const aFieldName : String) : TMorphField;
+      function SetFieldType(const aFieldType: TMorphFieldTypes) : TMorphField;
+      function AddValue(const aValue : TValue) : TMorphField;
       property Name : String read FName write FName;
       property FieldType : TMorphFieldTypes read FType write FType;
       property PrimaryKey : Boolean read FPrimaryKey write FPrimaryKey;
@@ -45,6 +51,7 @@ type
       property Identity : Boolean read FIdentity write FIdentity;
       property FKName : String read FFKName write FFKName;
       property RelationsBehavior : TMorphRelationsbehavior read FRelationsBehavior write FRelationsBehavior;
+      property Values : TMorphVector<TValue> read FValues write FValues;
   end;
 
   TMorphFields = class(TMorphVector<TMorphField>)
@@ -77,8 +84,15 @@ end;
 
 { TMorphField }
 
+function TMorphField.AddValue(const aValue: TValue): TMorphField;
+begin
+  FValues.Add(aValue);
+  Result := Self;
+end;
+
 constructor TMorphField.Create;
 begin
+  FValues := TMorphVector<TValue>.Create;
   FPrimaryKey := False;
   FForeignKey := False;
   FNotNull := False;
@@ -86,6 +100,29 @@ begin
   FNoOrphanData := False;
   FIdentity := False;
   FSize := 0;
+end;
+
+destructor TMorphField.Destroy;
+begin
+  FValues.Free;
+end;
+
+class function TMorphField.New: TMorphField;
+begin
+  Result := TMorphField.Create;
+end;
+
+function TMorphField.SetFieldType(
+  const aFieldType: TMorphFieldTypes): TMorphField;
+begin
+  FType := aFieldType;
+  Result := Self;
+end;
+
+function TMorphField.SetName(const aFieldName: String): TMorphField;
+begin
+  FName := aFieldName;
+  Result := Self;
 end;
 
 end.

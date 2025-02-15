@@ -74,6 +74,15 @@ object Sample: TSample
     TabOrder = 4
     OnClick = BtnDropTablesClick
   end
+  object BtnLineInsert: TButton
+    Left = 329
+    Top = 30
+    Width = 75
+    Height = 25
+    Caption = 'Line Insert'
+    TabOrder = 5
+    OnClick = BtnLineInsertClick
+  end
   object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'

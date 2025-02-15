@@ -1,4 +1,4 @@
-unit Morph.Sample;
+﻿unit Morph.Sample;
 
 interface
 
@@ -29,13 +29,14 @@ type
     FDMTTableID: TIntegerField;
     BtnCreateTables: TButton;
     BtnDropTables: TButton;
+    BtnLineInsert: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
     procedure CBTableChange(Sender: TObject);
     procedure BtnCreateTablesClick(Sender: TObject);
     procedure BtnDropTablesClick(Sender: TObject);
+    procedure BtnLineInsertClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -52,7 +53,7 @@ var
 implementation
 
 uses
-  Morph.EnumeratedTypes, Morph.MorphTable, Morph.Settings, System.JSON,
+  Morph.EnumeratedTypes, Morph.Table, Morph.Settings, System.JSON,
   Morph.Vector;
 
 {$R *.dfm}
@@ -69,9 +70,16 @@ begin
 end;
 
 
-procedure TSample.Button1Click(Sender: TObject);
+procedure TSample.BtnLineInsertClick(Sender: TObject);
 begin
- RunChanges;
+  Morph.InsertInto.Table('CLIENT').Fields(['ID', 'NAME',         'EMAIL',          'PHONE'])
+                                  .Values([1,    'John Smith',   'John@email.com', '9999-1111'])
+                                  .Values([2,    'Mary Johnson', 'mary@email.com', '9999-2222'])
+                                  .Post;
+
+  Morph.InsertInto.Table('CLIENT').Fields(['ID',   'NAME',   'EMAIL',  'PHONE'])
+                                  .Values([5000,   'TEST',   'delete-meE@email.com', '0000-0000'])
+                  .Post;
 end;
 
 procedure TSample.BtnRefrshyablesClick(Sender: TObject);
@@ -131,21 +139,12 @@ begin
  
 
   {$REGION 'Fields population'}
-  //Line Insert
-  Morph.InsertInto.Table('CLIENT').Fields(['ID', 'NAME',         'EMAIL',          'PHONE'])
-                                  .Values(['1',  'John Smith',   'John@email.com', '9999-1111'])
-                                  .Values(['1',  'Mary Johnson', 'mary@email.com', '9999-2222'])
-                  .Post;
-
-  Morph.InsertInto.Table('CLIENT').Fields(['ID',   'NAME',   'EMAIL',  'PHONE'])
-                                  .Values(['5000', 'TEST',   'DELETE', '0000-0000'])
-                  .Post;
   //MorphTable Insert
   ClientMorphTable := TMphTable.Create;
   try
     {$REGION 'Preparing Morph Table'}
     ClientMorphTable.Clear;
-    ClientMorphTable.Name := 'CLIENT'; //Optional
+    ClientMorphTable.Name := 'CLIENT';
 
     ClientMorphTable.AddField('ID').TypeInteger
                     .AddField('NAME').TypeString
@@ -153,70 +152,70 @@ begin
                     .AddField('PHONE').TypeString;
 
     ClientMorphTable.NewLine
-                        .SetFields(0).AsInteger(3)
-                        .SetFields(1).AsString('Charles Brown')
-                        .SetFields(2).AsString('charles@email.com')
-                        .SetFields(3).AsString('9999-3333')
+                        .SetField(0).AsValue(3)
+                        .SetField(1).AsValue('Charles Brown')
+                        .SetField(2).AsValue('charles@email.com')
+                        .SetField(3).AsValue('9999-3333')
                     .NewLine
-                        .SetFieldByname('ID').AsInteger(4)
-                        .SetFieldByname('NAME').AsString('Anna Davis')
-                        .SetFieldByname('EMAIL').AsString('anna@email.com')
-                        .SetFieldByname('PHONE').AsString('9999-4444')
+                        .SetField('ID').AsValue(4)
+                        .SetField('NAME').AsValue('Anna Davis')
+                        .SetField('EMAIL').AsValue('anna@email.com')
+                        .SetField('PHONE').AsValue('9999-4444')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(5)
-                        .SetFieldByName('NAME').AsString('Peter Wilson')
-                        .SetFieldByName('EMAIL').AsString('peter@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-5555')
+                        .SetField('ID').AsValue(5)
+                        .SetField('NAME').AsValue('Peter Wilson')
+                        .SetField('EMAIL').AsValue('peter@email.com')
+                        .SetField('PHONE').AsValue('9999-5555')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(6)
-                        .SetFieldByName('NAME').AsString('Laura Miller')
-                        .SetFieldByName('EMAIL').AsString('laura@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-6666')
+                        .SetField('ID').AsValue(6)
+                        .SetField('NAME').AsValue('Laura Miller')
+                        .SetField('EMAIL').AsValue('laura@email.com')
+                        .SetField('PHONE').AsValue('9999-6666')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(7)
-                        .SetFieldByName('NAME').AsString('Brian White')
-                        .SetFieldByName('EMAIL').AsString('brian@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-7777')
+                        .SetField('ID').AsValue(7)
+                        .SetField('NAME').AsValue('Brian White')
+                        .SetField('EMAIL').AsValue('brian@email.com')
+                        .SetField('PHONE').AsValue('9999-7777')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(8)
-                        .SetFieldByName('NAME').AsString('Paula Harris')
-                        .SetFieldByName('EMAIL').AsString('paula@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-8888')
+                        .SetField('ID').AsValue(8)
+                        .SetField('NAME').AsValue('Paula Harris')
+                        .SetField('EMAIL').AsValue('paula@email.com')
+                        .SetField('PHONE').AsValue('9999-8888')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(9)
-                        .SetFieldByName('NAME').AsString('Andrew Clark')
-                        .SetFieldByName('EMAIL').AsString('andrew@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-9999')
+                        .SetField('ID').AsValue(9)
+                        .SetField('NAME').AsValue('Andrew Clark')
+                        .SetField('EMAIL').AsValue('andrew@email.com')
+                        .SetField('PHONE').AsValue('9999-9999')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(10)
-                        .SetFieldByName('NAME').AsString('Sophia Lewis')
-                        .SetFieldByName('EMAIL').AsString('sophia@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-0000')
+                        .SetField('ID').AsValue(10)
+                        .SetField('NAME').AsValue('Sophia Lewis')
+                        .SetField('EMAIL').AsValue('sophia@email.com')
+                        .SetField('PHONE').AsValue('9999-0000')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(11)
-                        .SetFieldByName('NAME').AsString('Thomas Young')
-                        .SetFieldByName('EMAIL').AsString('thomas@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-1234')
+                        .SetField('ID').AsValue(11)
+                        .SetField('NAME').AsValue('Thomas Young')
+                        .SetField('EMAIL').AsValue('thomas@email.com')
+                        .SetField('PHONE').AsValue('9999-1234')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(12)
-                        .SetFieldByName('NAME').AsString('Vanessa Hall')
-                        .SetFieldByName('EMAIL').AsString('vanessa@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-2345')
+                        .SetField('ID').AsValue(12)
+                        .SetField('NAME').AsValue('Vanessa Hall')
+                        .SetField('EMAIL').AsValue('vanessa@email.com')
+                        .SetField('PHONE').AsValue('9999-2345')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(13)
-                        .SetFieldByName('NAME').AsString('Lucas Allen')
-                        .SetFieldByName('EMAIL').AsString('lucas@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-3456')
+                        .SetField('ID').AsValue(13)
+                        .SetField('NAME').AsValue('Lucas Allen')
+                        .SetField('EMAIL').AsValue('lucas@email.com')
+                        .SetField('PHONE').AsValue('9999-3456')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(14)
-                        .SetFieldByName('NAME').AsString('Daniel Scott')
-                        .SetFieldByName('EMAIL').AsString('daniel@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-4567')
+                        .SetField('ID').AsValue(14)
+                        .SetField('NAME').AsValue('Daniel Scott')
+                        .SetField('EMAIL').AsValue('daniel@email.com')
+                        .SetField('PHONE').AsValue('9999-4567')
                     .NewLine
-                        .SetFieldByName('ID').AsInteger(15)
-                        .SetFieldByName('NAME').AsString('Rachel King')
-                        .SetFieldByName('EMAIL').AsString('rachel@email.com')
-                        .SetFieldByName('PHONE').AsString('9999-5678')
+                        .SetField('ID').AsValue(15)
+                        .SetField('NAME').AsValue('Rachel King')
+                        .SetField('EMAIL').AsValue('rachel@email.com')
+                        .SetField('PHONE').AsValue('9999-5678')
                     .Post;
     {$ENDREGION}
     Morph.InsertInto.Table('CLIENT').Content(ClientMorphTable);

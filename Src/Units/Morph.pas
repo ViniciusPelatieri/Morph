@@ -6,8 +6,8 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, System.JSON,
-  Morph.EnumeratedTypes, Morph.MorphTable, Morph.Field, Morph.Settings,
-  System.Generics.Collections, Morph.Vector, Datasnap.DBClient;
+  Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings,
+  System.Generics.Collections, Morph.Vector, Datasnap.DBClient, System.Rtti;
 
 type
   TMorph = class
@@ -20,6 +20,7 @@ type
       FFDConnection : TFDConnection;
       FDQResult : TFDQuery;
       FTempConnection : TFDConnection;
+      FInsertTable : TMphTable;
 
       FFB2_5FieldTypeNames : TDictionary<Integer, String>;
       FFB5FieldTypeNames : TDictionary<Integer, String>;
@@ -62,8 +63,8 @@ type
       function InsertInto : TMorph;
       function InsertJSONStringInto : TMorph;
       function Value<T>(const aValue : T) : TMorph;
-      function Fields(const Fields : TArray<string>) : TMorph;
-      function Values(const Fields : TArray<string>) : TMorph;
+      function Fields(const aFieldNames : TArray<String>) : TMorph;
+      function Values(const aValues : TArray<TValue>) : TMorph;
       function InsertJSON(const aJSONString : String) : TMorph;
       function JSONContent(const aJSONString : String) : TMorph;
       function InserFDMEMtableInto(const aTableName : String) : TMorph;
@@ -110,7 +111,8 @@ implementation
 
 uses
   Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common, System.TypInfo,
-  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5;
+  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5, 
+  Winapi.Windows;
 
 { TMorph }
 
@@ -209,10 +211,11 @@ begin
   FFB5FieldTypeNames.Add(Ord(mphBinaryBlob), PSQL_FB5_TYPE_BINBLOB);
 
   FFieldsToProcess := TMorphFields.Create;
-  FStage := CreatingTable;
+  FStage := mpsCreate;
   FPSQLCommand := '';
 
   FDQResult := TFDQuery.Create(Nil);
+  FInsertTable := TMphTable.Create;
 end;
 
 function TMorph.CreateTable: TMorph;
@@ -307,13 +310,14 @@ end;
 function TMorph.DeleteOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbDeleteOrphanData;
-  FStage := CreatingTable;
+  FStage := mpsCreate;
   Result := Self;
 end;
 
 destructor TMorph.Destroy;
 begin
   FFieldsToProcess.Free;
+  FInsertTable.Free;
   inherited;
 end;
 
@@ -360,12 +364,12 @@ end;
 function TMorph.Field(const aField: String): TMorph;
 begin
   case FStage of
-    CreatingTable:
+    mpsCreate:
     begin
       FFieldsToProcess.Add(TMorphField.Create);
       FFieldsToProcess.CurrentField.Name := aField;
     end;
-    ReferencingTable:
+    mpsReference:
     begin
       FFieldsToProcess.CurrentField.ReferencedField := aField;
     end;
@@ -379,9 +383,14 @@ begin
 
 end;
 
-function TMorph.Fields(const Fields: TArray<string>): TMorph;
+function TMorph.Fields(const aFieldNames: TArray<String>): TMorph;
+var
+  LFieldName : String;
 begin
+  for LFieldName in aFieldNames do
+    FInserTTable.Fields.Add(TMorphField.New.SetName(LFieldName));
 
+  Result := Self;
 end;
 
 function TMorph.FieldsInfo: TMorphTableFieldsInfo;
@@ -470,7 +479,8 @@ end;
 
 function TMorph.InsertInto: TMorph;
 begin
-
+  FStage := mpsInsert;
+  Result := Self;
 end;
 
 function TMorph.InsertJSON(const aJSONString: String): TMorph;
@@ -543,21 +553,21 @@ end;
 function TMorph.NoOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbNoOrphanData;
-  FStage := CreatingTable;
+  FStage := mpsCreate;
   Result := Self;
 end;
 
 function TMorph.NotNull: TMorph;
 begin
   FFieldsToProcess.CurrentField.NotNull := True;
-  FStage := CreatingTable;
+  FStage := mpsCreate;
   Result := Self;
 end;
 
 function TMorph.NullOrphanData: TMorph;
 begin
   FFieldsToProcess.CurrentField.RelationsBehavior := mrbNullOrphanData;
-  FStage := CreatingTable;
+  FStage := mpsCreate;
   Result := Self;
 end;
 
@@ -572,8 +582,62 @@ begin
 end;
 
 function TMorph.Post: TMorph;
+var
+  LFieldCount, LValueCount : Integer;
+  FPSQLInsertBase : String;
 begin
+  case FDBType of
+    FB2_5:;
+    FB5:
+    begin
+      FPSQLCommand:= PSQL_FB5_INSERT_INTO+PSQL_SPACE+FInsertTable.Name+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
+                    {INSERT INTO CLIENT              (                     }
 
+      FInsertTable.Fields.First;
+      for LFieldCount := 0 to FInsertTable.Fields.Count -1 do
+      begin
+        if LFieldCount > 0 then
+          FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
+
+        FPSQLCommand:=FPSQLCommand+ FInsertTable.Fields.Elements[LFieldCount].Name;
+
+        if NOT FFieldsToProcess.Eof then
+          FFieldsToProcess.Next;
+      end;
+      {ID, NAME, EMAIL, PHONE}
+      FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_VALUES+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
+                                 {)                      VALUES          (}
+      FPSQLInsertBase := FPSQLCommand;
+
+      FInsertTable.Fields.First;
+      for LValueCount := 0 to FInsertTable.Fields.Elements[0].Values.ElementsCount -1 do //Values
+      begin
+
+        FPSQLCommand := FPSQLInsertBase;
+        for LFieldCount := 0 to FInsertTable.Fields.Count -1 do //Fields
+        begin
+          if LFieldCount > 0 then
+            FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
+          
+          if FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].IsType<String> then          
+            FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)
+          else
+            FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
+
+        end;
+        {1, 'John Smith', 'john@email.com', '9999-1111');}
+        FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON; 
+
+        try
+          ExecutePSQL(FPSQLCommand);
+        finally
+          FPSQLCommand := '';  
+        end;
+      end;
+    end;
+  end;
+
+  Result := Self;
 end;
 
 function TMorph.PrimaryKey: TMorph;
@@ -584,7 +648,7 @@ end;
 
 function TMorph.References: TMorph;
 begin
-  FStage := ReferencingTable;
+  FStage := mpsReference;
   Result := Self;
 end;
 
@@ -629,7 +693,6 @@ begin
     Open: FDQResult.Open;
     Execute: FDQResult.ExecSQL;
   end;
-
 end;
 
 procedure TMorph.ExecutePSQL(const aCommand: String);
@@ -660,15 +723,19 @@ end;
 function TMorph.Table(const aTableName: String): TMorph;
 begin
   case FStage of
-    CreatingTable:
+    mpsCreate:
     begin
       FTableName := aTableName;
       FFieldsToProcess.Clear;
     end;
 
-    ReferencingTable:
+    mpsReference: FFieldsToProcess.CurrentField.ReferencedTable := aTableName;
+
+    mpsInsert:
     begin
-      FFieldsToProcess.CurrentField.ReferencedTable := aTableName;
+      FTableName := aTableName;
+      FInsertTable.Clear;
+      FInserttable.Name := aTablename;
     end;
   end;
 
@@ -691,9 +758,22 @@ begin
 
 end;
 
-function TMorph.Values(const Fields: TArray<string>): TMorph;
+function TMorph.Values(const aValues: TArray<TValue>): TMorph;
+var
+  LFieldsCount : Integer;
 begin
+  for LFieldsCount := 0 to High(aValues) do
+  begin
+    FInsertTable.Fields.Elements[LFieldsCount].Values.Add(aValues[LFieldsCount]);
+    
+   {$IFDEF DEBUG} 
+   OutputDebugString(PChar('Campo: '+FInsertTable.Fields.Elements[LFieldsCount].Name+' Valor: '+aValues[LFieldsCount].ToString));
+   {$ENDIF}
+  end;
 
+
+    
+  Result := Self;
 end;
 
 function TMorph.tVarchar(const aSize: Integer): TMorph;

@@ -1,30 +1,22 @@
-unit Morph.MorphTable;
+unit Morph.Table;
 
 interface
 
 uses
-  Morph.Settings, FireDAC.Comp.Client, System.Classes;
+  Morph.Settings, FireDAC.Comp.Client, System.Classes, System.Rtti,
+  Morph.EnumeratedTypes, Morph.Vector, Morph.Field;
 
 type
- TMphTable = class;
-
-  TMorphField = class
-    public
-      function AsInteger(const aValue : Integer) : TMphTable;
-      function AsString(const aValue : String) : TMphTable;
-      function AsFloat(const aValue : Extended) : TMphTable;
-      function AsBoolean(const aValue : Boolean) : TMphTable;
-      function AsDate(const aValue : TDateTime) : TMphTable;
-      function AsBlob(const aValue : TMemoryStream) : TMphTable;
-  end;
-
-  TMorphFields = TArray<TMorphField>;
 
   TMphTable = class
     private
       FName : String;
-      FFields : TArray<TMorphFields>;
+      FFields : TMorphFields;
+      FCurrendFieldName : String;
+      function RegisteredField(const aFieldName : String) : Boolean;
     public
+      constructor Create;
+      destructor Destroy; override;
       function ImportSettings(const aJSONSettings : TMorphSettings) : TMphTable;
       function ExportSettings : TMorphSettings;
       function InsertInto(const aTableName : String) : TMphTable;
@@ -38,12 +30,15 @@ type
       function NewLine : TMphTable;
       function TypeString : TMphTable;
       function FieldByName(const aFieldName : String) : TMphTable;
-      function SetFields(const aFieldID : Integer) : TMorphField;
-      function SetFieldByname(const aFieldName : String) : TMorphField;
       function Post : TMorphField;
+      function AsValue(const aValue : TValue) : TMphTable;
+
+      //overloaded
+      function SetField(const aFieldID : Integer): TMphTable; overload;
+      function SetField(const aFieldName : String): TMphTable; overload;
 
       property Name : String read FName write FName;
-      property Fields : TArray<TMorphFields> read FFields write FFields;
+      property Fields : TMorphFields read FFields write FFields;
   end;
 
   TMphTableArrange = class
@@ -56,11 +51,18 @@ type
 
 implementation
 
+uses
+  System.SysUtils, Morph.Messages;
+
 { TMphTable }
 
 function TMphTable.AddField(const aFieldName: String): TMphTable;
 begin
+  if RegisteredField(aFieldName) then
+    Raise Exception.Create(Format(MORPH_MESSAGE_FIELD_DUPLICATE, [aFieldName]));
 
+  FCurrendFieldName := aFieldName;
+  Result := Self;
 end;
 
 function TMphTable.AsFDMemtable: TFDMemTable;
@@ -73,9 +75,30 @@ begin
 
 end;
 
+function TMphTable.AsValue(const aValue: TValue): TMphTable;
+begin
+  FFields.CurrentField.AddValue(aValue);
+  Result := Self;
+end;
+
 procedure TMphTable.Clear;
 begin
+  FName := '';
+  FCurrendFieldName := '';
 
+  if Assigned(FFields) then
+    FFields.Clear;
+end;
+
+constructor TMphTable.Create;
+begin
+  FFields := TMorphFields.Create;
+end;
+
+destructor TMphTable.Destroy;
+begin
+  FFields.Free;
+  inherited;
 end;
 
 function TMphTable.ExportSettings: TMorphSettings;
@@ -120,24 +143,42 @@ begin
 
 end;
 
-function TMphTable.SetFieldByname(const aFieldName: String): TMorphField;
+function TMphTable.RegisteredField(const aFieldName: String): Boolean;
+begin
+  Result := False;
+  FFields.First;
+  while NOT FFields.Eof do
+  begin
+    if FFields.CurrentField.Name = aFieldName then
+    begin
+      Result := True;
+      Exit;
+    end;
+    FFields.Next;
+  end;
+end;
+
+function TMphTable.SetField(const aFieldName: String): TMphTable;
 begin
 
 end;
 
-function TMphTable.SetFields(const aFieldID: Integer): TMorphField;
+function TMphTable.SetField(const aFieldID: Integer): TMphTable;
 begin
-
+  FFields.RecNo := aFieldID;
+  Result := Self;
 end;
 
 function TMphTable.TypeInteger: TMphTable;
 begin
-
+  FFields.Add(TMorphField.New.SetName(FCurrendFieldName).SetFieldType(mphInteger));
+  Result := Self;
 end;
 
 function TMphTable.TypeString: TMphTable;
 begin
-
+  FFields.Add(TMorphField.New.SetName(FCurrendFieldName).SetFieldType(mphVarchar));
+  Result := Self;
 end;
 
 { TMphTableArrange }
@@ -154,38 +195,6 @@ begin
 end;
 
 function TMphTableArrange.Name(const aTableName: String): TMphTable;
-begin
-
-end;
-
-{ TMorphField }
-
-function TMorphField.AsBlob(const aValue: TMemoryStream): TMphTable;
-begin
-
-end;
-
-function TMorphField.AsBoolean(const aValue: Boolean): TMphTable;
-begin
-
-end;
-
-function TMorphField.AsDate(const aValue: TDateTime): TMphTable;
-begin
-
-end;
-
-function TMorphField.AsFloat(const aValue: Extended): TMphTable;
-begin
-
-end;
-
-function TMorphField.AsInteger(const aValue: Integer): TMphTable;
-begin
-
-end;
-
-function TMorphField.AsString(const aValue: String): TMphTable;
 begin
 
 end;
