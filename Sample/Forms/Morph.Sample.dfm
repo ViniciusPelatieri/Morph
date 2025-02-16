@@ -110,6 +110,15 @@ object Sample: TSample
     TabOrder = 8
     OnClick = BtnJSONArrayInsertClick
   end
+  object BtnJSONStringInsert: TButton
+    Left = 543
+    Top = 30
+    Width = 106
+    Height = 25
+    Caption = 'JSON String insert'
+    TabOrder = 9
+    OnClick = BtnJSONStringInsertClick
+  end
   object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'

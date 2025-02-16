@@ -79,7 +79,7 @@ type
       function References : TMorph;
       function NoOrphaData : TMorph;
       function Post : TMorph;
-      function Content(const aMorphTable : TMphTable) : TMorph;
+      function Content(const aJSONStringArray : String) : TMorph;
       class function JSONParse(const aJSONString : String) : TMphTable;
       function Equals<T>(const aValue : T) : TMorph;
       function IsBiggerThan<T>(const aValue : T) : TMorph;
@@ -198,9 +198,66 @@ begin
   Result := Self;
 end;
 
-function TMorph.Content(const aMorphTable: TMphTable): TMorph;
+function TMorph.Content(const aJSONStringArray : String): TMorph;
+var
+  InsertJSONObject, LineJSONObject : TJSONObject;
+  InsertJSONArray : TJSONArray;
+  TempJSONLine, TempJSONKeyValue : TJSONValue;
+  JSONKeysIndex : Integer;
+  TempJSONString : String;
 begin
+  InsertJSONArray := TJSONArray.Create;
+  try
+    try
+      InsertJSONArray := TJSONArray(TJSONArray.ParseJSONValue(aJSONStringArray));
 
+      if Assigned(InsertJSONArray) then
+        if InsertJSONArray.Count <= 0 then
+          Raise Exception.Create(MORPH_MESSAGE_EMPTY_INSERT_JSON);
+
+      LineJSONObject := InsertJSONArray.Items[0] as TJSONObject;
+
+      for JSONKeysIndex := 0 to LineJSONObject.Count -1 do //Keys to Fields
+        FInsertTable.Fields.Add(TMorphField.New.SetName(LineJSONObject.Pairs[JSONKeysIndex].JsonString.Value));
+
+      for TempJSONLine in InsertJSONArray do //Lines:
+      begin
+        LineJSONObject := TempJSONLine as TJSONObject;
+
+        for JSONKeysIndex := 0 to LineJSONObject.Count -1 do //Values
+        begin
+          TempJSONKeyValue := LineJSONObject.Pairs[JSONKeysIndex].JsonValue;
+          {$REGION 'Saves value in table with correct type'}
+          if TempJSONKeyValue is TJSONNumber then
+          begin
+            if Pos('.', TempJSONKeyValue.ToString) > 0 then
+              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Double>)
+            else
+              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Integer>);
+          end
+          else if TempJSONKeyValue is TJSONBool then
+            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Boolean>)
+          else
+          begin
+            TempJSONString := TempJSONKeyValue.Value;
+            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONString);
+          end;
+          {$ENDREGION}
+        end;
+      end;
+
+    except on E : Exception do
+      if E.Message = MORPH_MESSAGE_EMPTY_INSERT_JSON then
+        Raise E
+      else
+        Raise Exception.Create(MORPH_MESSAGE_INVALID_JSON_OBJECT);
+    end;
+
+    Post;
+
+  finally
+    InsertJSONObject.Free;
+  end;
 end;
 
 constructor TMorph.Create;
@@ -544,14 +601,14 @@ begin
         end;
       end;
 
-      Post;
-
     except on E : Exception do
       if E.Message = MORPH_MESSAGE_EMPTY_INSERT_JSON then
         Raise E
       else
         Raise Exception.Create(MORPH_MESSAGE_INVALID_JSON_OBJECT);
     end;
+
+    Post;
 
   finally
     InsertJSONObject.Free;

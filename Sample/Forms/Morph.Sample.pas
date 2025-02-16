@@ -33,6 +33,7 @@ type
     BtnMphTableInsert: TButton;
     BtnJSONObjectInsert: TButton;
     BtnJSONArrayInsert: TButton;
+    BtnJSONStringInsert: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -43,6 +44,7 @@ type
     procedure BtnMphTableInsertClick(Sender: TObject);
     procedure BtnJSONObjectInsertClick(Sender: TObject);
     procedure BtnJSONArrayInsertClick(Sender: TObject);
+    procedure BtnJSONStringInsertClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -81,7 +83,7 @@ var
   LJSONLine : TJSONObject;
   LFieldsArray : TJSONArray;
 begin
-{
+
   LJSONLine := TJSONObject.Create;
   LFieldsArray := TJSONArray.Create;
   try
@@ -102,9 +104,7 @@ begin
     Morph.InsertInto.Table('SELLER').Content(LFieldsArray.ToJSON);
   finally
     LFieldsArray.Free;
-    LJSONLine.Free;
   end;
-  }
 end;
 
 procedure TSample.BtnJSONObjectInsertClick(Sender: TObject);
@@ -227,6 +227,106 @@ begin
   finally
     LFieldsArray.Free;
   end;
+end;
+
+procedure TSample.BtnJSONStringInsertClick(Sender: TObject);
+var
+  JSONString : String;
+begin
+  JSONString := '[                                              '+
+                    '   {                                         '+
+                    '       "ID":1,                               '+
+                    '       "DESCRIPTION":"Laptop",               '+
+                    '       "CATEGORY":"IT",                      '+
+                    '       "PRICE":4500.00                       '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":2,                               '+
+                    '       "DESCRIPTION":"Smartphone",           '+
+                    '       "CATEGORY":"Electronics",             '+
+                    '       "PRICE":3000.00                       '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":3,                               '+
+                    '       "DESCRIPTION":"T-Shirt",              '+
+                    '       "CATEGORY":"Clothing",                '+
+                    '       "PRICE":80.00                         '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":4,                               '+
+                    '       "DESCRIPTION":"Refrigerator",         '+
+                    '       "CATEGORY":"Appliances",              '+
+                    '       "PRICE":3200.00                       '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":5,                               '+
+                    '       "DESCRIPTION":"Gaming Chair",         '+
+                    '       "CATEGORY":"Furniture",               '+
+                    '       "PRICE":900.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":6,                               '+
+                    '       "DESCRIPTION":"Running Shoes",        '+
+                    '       "CATEGORY":"Sports",                  '+
+                    '       "PRICE":350.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":7,                               '+
+                    '       "DESCRIPTION":"Bluetooth Headphones", '+
+                    '       "CATEGORY":"Accessories",             '+
+                    '       "PRICE":250.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":8,                               '+
+                    '       "DESCRIPTION":"Technical Book",       '+
+                    '       "CATEGORY":"Books",                   '+
+                    '       "PRICE":120.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":9,                               '+
+                    '       "DESCRIPTION":"Smart Watch",          '+
+                    '       "CATEGORY":"Electronics",             '+
+                    '       "PRICE":600.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":10,                              '+
+                    '       "DESCRIPTION":"Bicycle",              '+
+                    '       "CATEGORY":"Sports",                  '+
+                    '       "PRICE":2200.00                       '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":11,                              '+
+                    '       "DESCRIPTION":"Mechanical Keyboard",  '+
+                    '       "CATEGORY":"IT",                      '+
+                    '       "PRICE":400.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":12,                              '+
+                    '       "DESCRIPTION":"Imported Perfume",     '+
+                    '       "CATEGORY":"Beauty",                  '+
+                    '       "PRICE":700.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":13,                              '+
+                    '       "DESCRIPTION":"School Backpack",      '+
+                    '       "CATEGORY":"Stationery",              '+
+                    '       "PRICE":150.00                        '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":14,                              '+
+                    '       "DESCRIPTION":"3-Seat Sofa",          '+
+                    '       "CATEGORY":"Furniture",               '+
+                    '       "PRICE":2500.00                       '+
+                    '   },                                        '+
+                    '   {                                         '+
+                    '       "ID":15,                              '+
+                    '       "DESCRIPTION":"12-Year Whisky",       '+
+                    '       "CATEGORY":"Beverages",               '+
+                    '       "PRICE":350.00                        '+
+                    '   }                                         '+
+                    ']                                            ';
+
+  Morph.InsertInto.Table('PRODUCT').Content(JSONString);
 end;
 
 procedure TSample.BtnLineInsertClick(Sender: TObject);
@@ -385,102 +485,8 @@ begin
 
   {$REGION 'Fields population'}
   //JSON Fields Insert with JSON pure string
-  {$REGION 'Building JSON'}
-  JSONString := '[                                              '+
-                  '   {                                         '+
-                  '       "ID":1,                               '+
-                  '       "DESCRIPTION":"Laptop",               '+
-                  '       "CATEGORY":"IT",                      '+
-                  '       "PRICE":4500.00                       '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":2,                               '+
-                  '       "DESCRIPTION":"Smartphone",           '+
-                  '       "CATEGORY":"Electronics",             '+
-                  '       "PRICE":3000.00                       '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":3,                               '+
-                  '       "DESCRIPTION":"T-Shirt",              '+
-                  '       "CATEGORY":"Clothing",                '+
-                  '       "PRICE":80.00                         '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":4,                               '+
-                  '       "DESCRIPTION":"Refrigerator",         '+
-                  '       "CATEGORY":"Appliances",              '+
-                  '       "PRICE":3200.00                       '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":5,                               '+
-                  '       "DESCRIPTION":"Gaming Chair",         '+
-                  '       "CATEGORY":"Furniture",               '+
-                  '       "PRICE":900.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":6,                               '+
-                  '       "DESCRIPTION":"Running Shoes",        '+
-                  '       "CATEGORY":"Sports",                  '+
-                  '       "PRICE":350.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":7,                               '+
-                  '       "DESCRIPTION":"Bluetooth Headphones", '+
-                  '       "CATEGORY":"Accessories",             '+
-                  '       "PRICE":250.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":8,                               '+
-                  '       "DESCRIPTION":"Technical Book",       '+
-                  '       "CATEGORY":"Books",                   '+
-                  '       "PRICE":120.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":9,                               '+
-                  '       "DESCRIPTION":"Smart Watch",          '+
-                  '       "CATEGORY":"Electronics",             '+
-                  '       "PRICE":600.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":10,                              '+
-                  '       "DESCRIPTION":"Bicycle",              '+
-                  '       "CATEGORY":"Sports",                  '+
-                  '       "PRICE":2200.00                       '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":11,                              '+
-                  '       "DESCRIPTION":"Mechanical Keyboard",  '+
-                  '       "CATEGORY":"IT",                      '+
-                  '       "PRICE":400.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":12,                              '+
-                  '       "DESCRIPTION":"Imported Perfume",     '+
-                  '       "CATEGORY":"Beauty",                  '+
-                  '       "PRICE":700.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":13,                              '+
-                  '       "DESCRIPTION":"School Backpack",      '+
-                  '       "CATEGORY":"Stationery",              '+
-                  '       "PRICE":150.00                        '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":14,                              '+
-                  '       "DESCRIPTION":"3-Seat Sofa",          '+
-                  '       "CATEGORY":"Furniture",               '+
-                  '       "PRICE":2500.00                       '+
-                  '   },                                        '+
-                  '   {                                         '+
-                  '       "ID":15,                              '+
-                  '       "DESCRIPTION":"12-Year Whisky",       '+
-                  '       "CATEGORY":"Beverages",               '+
-                  '       "PRICE":350.00                        '+
-                  '   }                                         '+
-                  ']                                            ';
-  {$ENDREGION}
 
-  Morph.InsertInto.Table('PRODUCT').Content(TMorph.JSONParse(JSONString));
+
 
   //TFDMemTable Table Insert
   {$REGION 'Populating TFDMemTable'}
