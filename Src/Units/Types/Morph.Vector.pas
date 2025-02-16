@@ -10,12 +10,9 @@ type
   private
     FArray : TArray<T>;
     FRecNo : Integer;
-
-    // Find
-    FValueToFind : TValue;
-    FValueToFindType : TMorphFieldTypes;
   public
     procedure Add(const anElement : T);
+    procedure AddEmptyValue;
     function ElementsCount : Integer;
     procedure First;
     procedure Last;
@@ -29,11 +26,7 @@ type
     function GetRecNo : Integer;
     procedure SetRecNo(const aValue : Integer);
     function Eof : Boolean;
-
-    // Find
-    function FindIndexOf(const anIntegerValue : Integer) : TMorphVector<T>; overload;
-    function FindIndexOf(const aStringValue : String) : TMorphVector<T>; overload;
-    function InProperty(const aPropertyName : String) : Integer;
+    procedure SetCurrentElement(const aValue: T);
 
     property Elements : TArray<T> read FArray write FArray;
     property RecNo : Integer read FRecNo write FRecNo;
@@ -50,9 +43,16 @@ begin
   FRecNo := High(FArray);
 end;
 
+procedure TMorphVector<T>.AddEmptyValue;
+begin
+  SetLength(FArray, Length(FArray) + 1);
+  FRecNo := High(FArray);
+end;
+
 procedure TMorphVector<T>.ClearVector;
 begin
-  SetLength(FArray, 0);
+  if Assigned(FArray) then
+    SetLength(FArray, 0);
 end;
 
 function TMorphVector<T>.CurrentElement: T;
@@ -92,20 +92,6 @@ begin
   Result := (FRecNo = High(FArray));
 end;
 
-function TMorphVector<T>.FindIndexOf(const anIntegerValue: Integer): TMorphVector<T>;
-begin
-  FValueToFind := anIntegerValue;
-  FValueToFindType := mphInteger;
-  Result := Self;
-end;
-
-function TMorphVector<T>.FindIndexOf(const aStringValue: String): TMorphVector<T>;
-begin
-  FValueToFind := aStringValue;
-  FValueToFindType := mphVarchar;
-  Result := Self;
-end;
-
 procedure TMorphVector<T>.First;
 begin
   FRecNo := 0;
@@ -121,59 +107,6 @@ begin
   Result := FRecNo;
 end;
 
-function TMorphVector<T>.InProperty(const aPropertyName: String): Integer;
-var
-  vValue: T;
-  LContext: TRttiContext;
-  LType: TRttiType;
-  LProp: TRttiProperty;
-  LItem: TValue;
-begin
-  Result := -1;
-  LContext := TRttiContext.Create;
-  LType := LContext.GetType(TypeInfo(T));
-  LProp := LType.GetProperty(aPropertyName);
-
-  if not Assigned(LProp) then
-    Raise Exception.Create(Format('Property %s not found', [aPropertyName]));
-
-  // Iterando sobre os itens em FArray
-  for vValue in FArray do
-  begin
-    LItem := LProp.GetValue(@vValue);
-
-    case FValueToFindType of
-      mphInteger:
-        begin
-          if LItem.IsType<Integer> then
-          begin
-            if LItem.AsInteger = FValueToFind.AsInteger then
-            begin
-              Result := FRecNo;
-              Break;
-            end;
-          end
-          else
-            Raise Exception.Create(Format(MORPH_MESSAGE_WRONG_PROPERTY_TYPE, [aPropertyName, 'Integer']));
-        end;
-
-      mphVarchar:
-        begin
-          if LItem.IsType<String> then
-          begin
-            if LItem.AsString = FValueToFind.AsString then
-            begin
-              Result := FRecNo;
-              Break;
-            end
-          end
-          else
-            Raise Exception.Create(Format(MORPH_MESSAGE_WRONG_PROPERTY_TYPE, [aPropertyName, 'String']));
-        end;
-    end;
-  end;
-end;
-
 procedure TMorphVector<T>.Last;
 begin
   FRecNo := High(FArray);
@@ -187,6 +120,11 @@ end;
 procedure TMorphVector<T>.Previous;
 begin
   Dec(FRecNo, 1);
+end;
+
+procedure TMorphVector<T>.SetCurrentElement(const aValue: T);
+begin
+  FArray[FRecNo] := aValue;
 end;
 
 procedure TMorphVector<T>.SetElements(const anArray: TArray<T>);

@@ -77,11 +77,20 @@ object Sample: TSample
   object BtnLineInsert: TButton
     Left = 329
     Top = 30
-    Width = 75
+    Width = 96
     Height = 25
     Caption = 'Line Insert'
     TabOrder = 5
     OnClick = BtnLineInsertClick
+  end
+  object BtnMphTableInsert: TButton
+    Left = 329
+    Top = 4
+    Width = 96
+    Height = 25
+    Caption = 'mphTable Insert'
+    TabOrder = 6
+    OnClick = BtnMphTableInsertClick
   end
   object FDCDB: TFDConnection
     Params.Strings = (

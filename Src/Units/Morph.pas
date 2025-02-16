@@ -47,7 +47,6 @@ type
       function Table(const aTableName : String) : TMorph;
       function Drop : TMorph;
       function ChangeNameTo(const aNewName : String) : TMorph;
-      function Field(const aField : String) : TMorph;
       function tInteger : TMorph;
       function tBoolean : TMorph;
       function tFloat : TMorph;
@@ -106,13 +105,16 @@ type
       function NullOrphanData : TMorph;
       function DeleteOrphanData : TMorph;
       function Delete : TMorph;
+      function Insert(const aMphTable : TMphTable) : TMorph;
+      function Field(const aField : String) : TMorph; overload;
+
     end;
 implementation
 
 uses
   Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common, System.TypInfo,
   System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5, 
-  Winapi.Windows;
+  Winapi.Windows, Morph.Messages;
 
 { TMorph }
 
@@ -477,6 +479,12 @@ begin
 
 end;
 
+function TMorph.Insert(const aMphTable: TMphTable): TMorph;
+begin
+  FInsertTable := aMphTable;
+  Post;
+end;
+
 function TMorph.InsertInto: TMorph;
 begin
   FStage := mpsInsert;
@@ -586,57 +594,60 @@ var
   LFieldCount, LValueCount : Integer;
   FPSQLInsertBase : String;
 begin
-  case FDBType of
-    FB2_5:;
-    FB5:
-    begin
-      FPSQLCommand:= PSQL_FB5_INSERT_INTO+PSQL_SPACE+FInsertTable.Name+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
-                    {INSERT INTO CLIENT              (                     }
-
-      FInsertTable.Fields.First;
-      for LFieldCount := 0 to FInsertTable.Fields.Count -1 do
+  try
+    case FDBType of
+      FB2_5:;
+      FB5:
       begin
-        if LFieldCount > 0 then
-          FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
+        FPSQLCommand:= PSQL_FB5_INSERT_INTO+PSQL_SPACE+FInsertTable.Name+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
+                      {INSERT INTO CLIENT              (                     }
 
-        FPSQLCommand:=FPSQLCommand+ FInsertTable.Fields.Elements[LFieldCount].Name;
-
-        if NOT FFieldsToProcess.Eof then
-          FFieldsToProcess.Next;
-      end;
-      {ID, NAME, EMAIL, PHONE}
-      FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_VALUES+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
-                                 {)                      VALUES          (}
-      FPSQLInsertBase := FPSQLCommand;
-
-      FInsertTable.Fields.First;
-      for LValueCount := 0 to FInsertTable.Fields.Elements[0].Values.ElementsCount -1 do //Values
-      begin
-
-        FPSQLCommand := FPSQLInsertBase;
-        for LFieldCount := 0 to FInsertTable.Fields.Count -1 do //Fields
+        FInsertTable.Fields.First;
+        for LFieldCount := 0 to FInsertTable.Fields.Count -1 do
         begin
           if LFieldCount > 0 then
             FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
-          
-          if FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].IsType<String> then          
-            FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)
-          else
-            FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
 
+          FPSQLCommand:=FPSQLCommand+ FInsertTable.Fields.Elements[LFieldCount].Name;
+
+          if NOT FFieldsToProcess.Eof then
+            FFieldsToProcess.Next;
         end;
-        {1, 'John Smith', 'john@email.com', '9999-1111');}
-        FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON; 
+        {ID, NAME, EMAIL, PHONE}
+        FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_VALUES+PSQL_SPACE+PSQL_OPEN_PARENTHESES;
+                                   {)                      VALUES          (}
+        FPSQLInsertBase := FPSQLCommand;
 
-        try
-          ExecutePSQL(FPSQLCommand);
-        finally
-          FPSQLCommand := '';  
+        FInsertTable.Fields.First;
+        for LValueCount := 0 to FInsertTable.Fields.Elements[0].Values.ElementsCount -1 do //Values
+        begin
+
+          FPSQLCommand := FPSQLInsertBase;
+          for LFieldCount := 0 to FInsertTable.Fields.Count -1 do //Fields
+          begin
+            if LFieldCount > 0 then
+              FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
+          
+            if FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].IsType<String> then
+              FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)
+            else
+              FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
+
+          end;
+          {1, 'John Smith', 'john@email.com', '9999-1111');}
+          FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
+
+          try
+            ExecutePSQL(FPSQLCommand);
+          finally
+            FPSQLCommand := '';
+          end;
         end;
       end;
     end;
+  finally
+    FInsertTable.Clear;
   end;
-
   Result := Self;
 end;
 
@@ -689,9 +700,13 @@ begin
   FDQResult.FetchOptions.Mode := fmAll;
   FDQResult.SQL.Text := aCommand;
 
-  case aQryAction of
-    Open: FDQResult.Open;
-    Execute: FDQResult.ExecSQL;
+  try
+    case aQryAction of
+      Open: FDQResult.Open;
+      Execute: FDQResult.ExecSQL;
+    end;
+  except on E : Exception do
+    Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
   end;
 end;
 
@@ -771,8 +786,6 @@ begin
    {$ENDIF}
   end;
 
-
-    
   Result := Self;
 end;
 

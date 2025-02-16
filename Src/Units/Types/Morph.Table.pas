@@ -12,8 +12,9 @@ type
     private
       FName : String;
       FFields : TMorphFields;
-      FCurrendFieldName : String;
-      function RegisteredField(const aFieldName : String) : Boolean;
+      FCurrentFieldName : String;
+    private
+      function ContainsField(const aFieldName : String) : Boolean;
     public
       constructor Create;
       destructor Destroy; override;
@@ -30,12 +31,12 @@ type
       function NewLine : TMphTable;
       function TypeString : TMphTable;
       function FieldByName(const aFieldName : String) : TMphTable;
-      function Post : TMorphField;
       function AsValue(const aValue : TValue) : TMphTable;
+      function FieldIdByName(const aFieldName : String) : Integer;
 
       //overloaded
-      function SetField(const aFieldID : Integer): TMphTable; overload;
-      function SetField(const aFieldName : String): TMphTable; overload;
+      function Field(const aFieldID : Integer): TMphTable; overload;
+      function Field(const aFieldName : String): TMphTable; overload;
 
       property Name : String read FName write FName;
       property Fields : TMorphFields read FFields write FFields;
@@ -58,10 +59,10 @@ uses
 
 function TMphTable.AddField(const aFieldName: String): TMphTable;
 begin
-  if RegisteredField(aFieldName) then
+  if ContainsField(aFieldName) then
     Raise Exception.Create(Format(MORPH_MESSAGE_FIELD_DUPLICATE, [aFieldName]));
 
-  FCurrendFieldName := aFieldName;
+  FCurrentFieldName := aFieldName;
   Result := Self;
 end;
 
@@ -77,17 +78,32 @@ end;
 
 function TMphTable.AsValue(const aValue: TValue): TMphTable;
 begin
-  FFields.CurrentField.AddValue(aValue);
+  FFields.CurrentField.Values.SetCurrentElement(aValue);
   Result := Self;
 end;
 
 procedure TMphTable.Clear;
 begin
   FName := '';
-  FCurrendFieldName := '';
+  FCurrentFieldName := '';
 
   if Assigned(FFields) then
-    FFields.Clear;
+    FFields.Clear
+  else
+    FFields := TMorphFields.Create;
+end;
+
+function TMphTable.ContainsField(const aFieldName: String): Boolean;
+var
+  LTempField : TMorphField;
+begin
+  Result := False;
+  for LTempField in Fields.Elements do
+    if LTempField.Name = aFieldName then
+    begin
+      Result := True;
+      Break;
+    end;
 end;
 
 constructor TMphTable.Create;
@@ -106,9 +122,44 @@ begin
 
 end;
 
+function TMphTable.Field(const aFieldName: String): TMphTable;
+var
+  LFieldID : Integer;
+begin
+  LFieldID := FieldIdByName(aFieldName);
+
+  if LFieldID < 0 then
+    Raise Exception.Create(Format(MORPH_MESSAGE_FIELD_NOT_FOUND, [aFieldName, FName]));
+
+  FFields.RecNo := LFieldID;
+  Result := Self;
+end;
+
+function TMphTable.Field(const aFieldID: Integer): TMphTable;
+begin
+  if (aFieldID > FFields.Count -1) OR (aFieldID < 0) then
+    Raise Exception.Create(Format(MORPH_MESSAGE_NOT_VALID_FIELD_IDENTIFICATOR, [IntToStr(aFieldID)]));
+
+  FFields.RecNo := aFieldID;
+  Result := Self;
+end;
+
 function TMphTable.FieldByName(const aFieldName: String): TMphTable;
 begin
 
+end;
+
+function TMphTable.FieldIdByName(const aFieldName: String): Integer;
+var
+  LFieldIndex : Integer;
+begin
+  Result := -1;
+  for LFieldIndex := 0 to FFields.ElementsCount -1 do
+    if FFields.Elements[LFieldIndex].Name = aFieldName then
+    begin
+      Result := LFieldIndex;
+      Break;
+    end;
 end;
 
 function TMphTable.ImportSettings(
@@ -134,50 +185,24 @@ begin
 end;
 
 function TMphTable.NewLine: TMphTable;
+var
+  LTempField : TMorphField;
 begin
+  for LTempField in FFields.Elements do
+    LTempField.Values.AddEmptyValue;
 
-end;
-
-function TMphTable.Post: TMorphField;
-begin
-
-end;
-
-function TMphTable.RegisteredField(const aFieldName: String): Boolean;
-begin
-  Result := False;
-  FFields.First;
-  while NOT FFields.Eof do
-  begin
-    if FFields.CurrentField.Name = aFieldName then
-    begin
-      Result := True;
-      Exit;
-    end;
-    FFields.Next;
-  end;
-end;
-
-function TMphTable.SetField(const aFieldName: String): TMphTable;
-begin
-
-end;
-
-function TMphTable.SetField(const aFieldID: Integer): TMphTable;
-begin
-  FFields.RecNo := aFieldID;
   Result := Self;
 end;
 
 function TMphTable.TypeInteger: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FCurrendFieldName).SetFieldType(mphInteger));
+  FFields.Add(TMorphField.New.SetName(FCurrentFieldName).SetFieldType(mphInteger));
   Result := Self;
 end;
 
 function TMphTable.TypeString: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FCurrendFieldName).SetFieldType(mphVarchar));
+  FFields.Add(TMorphField.New.SetName(FCurrentFieldName).SetFieldType(mphVarchar));
   Result := Self;
 end;
 

@@ -30,6 +30,7 @@ type
     BtnCreateTables: TButton;
     BtnDropTables: TButton;
     BtnLineInsert: TButton;
+    BtnMphTableInsert: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -37,6 +38,7 @@ type
     procedure BtnCreateTablesClick(Sender: TObject);
     procedure BtnDropTablesClick(Sender: TObject);
     procedure BtnLineInsertClick(Sender: TObject);
+    procedure BtnMphTableInsertClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -80,6 +82,93 @@ begin
   Morph.InsertInto.Table('CLIENT').Fields(['ID',   'NAME',   'EMAIL',  'PHONE'])
                                   .Values([5000,   'TEST',   'delete-meE@email.com', '0000-0000'])
                   .Post;
+end;
+
+procedure TSample.BtnMphTableInsertClick(Sender: TObject);
+var
+  ClientMorphTable : TMphTable;
+begin
+  ClientMorphTable := TMphTable.Create;
+  try
+    {$REGION 'Preparing Morph Table'}
+    ClientMorphTable.Clear;
+    ClientMorphTable.Name := 'CLIENT';
+
+    ClientMorphTable.AddField('ID').TypeInteger
+                    .AddField('NAME').TypeString
+                    .AddField('EMAIL').TypeString
+                    .AddField('PHONE').TypeString;
+
+    ClientMorphTable.NewLine
+                      .Field(0).AsValue(3)
+                      .Field(1).AsValue('Charles Brown')
+                      .Field(2).AsValue('charles@email.com')
+                      .Field(3).AsValue('9999-3333')
+                    .NewLine
+                      .Field('ID').AsValue(4)
+                      .Field('NAME').AsValue('Anna Davis')
+                      .Field('EMAIL').AsValue('anna@email.com')
+                      .Field('PHONE').AsValue('9999-4444')
+                    .NewLine
+                      .Field('ID').AsValue(5)
+                      .Field('NAME').AsValue('Peter Wilson')
+                      .Field('EMAIL').AsValue('peter@email.com')
+                      .Field('PHONE').AsValue('9999-5555')
+                    .NewLine
+                      .Field('ID').AsValue(6)
+                      .Field('NAME').AsValue('Laura Miller')
+                      .Field('EMAIL').AsValue('laura@email.com')
+                      .Field('PHONE').AsValue('9999-6666')
+                    .NewLine
+                      .Field('ID').AsValue(7)
+                      .Field('NAME').AsValue('Brian White')
+                      .Field('EMAIL').AsValue('brian@email.com')
+                      .Field('PHONE').AsValue('9999-7777')
+                    .NewLine
+                      .Field('ID').AsValue(8)
+                      .Field('NAME').AsValue('Paula Harris')
+                      .Field('EMAIL').AsValue('paula@email.com')
+                      .Field('PHONE').AsValue('9999-8888')
+                    .NewLine
+                      .Field('ID').AsValue(9)
+                      .Field('NAME').AsValue('Andrew Clark')
+                      .Field('EMAIL').AsValue('andrew@email.com')
+                      .Field('PHONE').AsValue('9999-9999')
+                    .NewLine
+                      .Field('ID').AsValue(10)
+                      .Field('NAME').AsValue('Sophia Lewis')
+                      .Field('EMAIL').AsValue('sophia@email.com')
+                      .Field('PHONE').AsValue('9999-0000')
+                    .NewLine
+                      .Field('ID').AsValue(11)
+                      .Field('NAME').AsValue('Thomas Young')
+                      .Field('EMAIL').AsValue('thomas@email.com')
+                      .Field('PHONE').AsValue('9999-1234')
+                    .NewLine
+                      .Field('ID').AsValue(12)
+                      .Field('NAME').AsValue('Vanessa Hall')
+                      .Field('EMAIL').AsValue('vanessa@email.com')
+                      .Field('PHONE').AsValue('9999-2345')
+                    .NewLine
+                      .Field('ID').AsValue(13)
+                      .Field('NAME').AsValue('Lucas Allen')
+                      .Field('EMAIL').AsValue('lucas@email.com')
+                      .Field('PHONE').AsValue('9999-3456')
+                    .NewLine
+                      .Field('ID').AsValue(14)
+                      .Field('NAME').AsValue('Daniel Scott')
+                      .Field('EMAIL').AsValue('daniel@email.com')
+                      .Field('PHONE').AsValue('9999-4567')
+                    .NewLine
+                      .Field('ID').AsValue(15)
+                      .Field('NAME').AsValue('Rachel King')
+                      .Field('EMAIL').AsValue('rachel@email.com')
+                      .Field('PHONE').AsValue('9999-5678');
+    {$ENDREGION}
+    Morph.Insert(ClientMorphTable);
+  finally
+    ClientMorphTable.Free;
+  end;
 end;
 
 procedure TSample.BtnRefrshyablesClick(Sender: TObject);
@@ -131,7 +220,6 @@ var
   Settings : TMorphSettings;
   InsertJSON : TJSONArray;
   ConfigString : String;
-  ClientMorphTable : TMphTable;
   Conteudo : String;
   JSONLine : TJSONObject;
   JSONString : String;
@@ -139,90 +227,6 @@ begin
  
 
   {$REGION 'Fields population'}
-  //MorphTable Insert
-  ClientMorphTable := TMphTable.Create;
-  try
-    {$REGION 'Preparing Morph Table'}
-    ClientMorphTable.Clear;
-    ClientMorphTable.Name := 'CLIENT';
-
-    ClientMorphTable.AddField('ID').TypeInteger
-                    .AddField('NAME').TypeString
-                    .AddField('EMAIL').TypeString
-                    .AddField('PHONE').TypeString;
-
-    ClientMorphTable.NewLine
-                        .SetField(0).AsValue(3)
-                        .SetField(1).AsValue('Charles Brown')
-                        .SetField(2).AsValue('charles@email.com')
-                        .SetField(3).AsValue('9999-3333')
-                    .NewLine
-                        .SetField('ID').AsValue(4)
-                        .SetField('NAME').AsValue('Anna Davis')
-                        .SetField('EMAIL').AsValue('anna@email.com')
-                        .SetField('PHONE').AsValue('9999-4444')
-                    .NewLine
-                        .SetField('ID').AsValue(5)
-                        .SetField('NAME').AsValue('Peter Wilson')
-                        .SetField('EMAIL').AsValue('peter@email.com')
-                        .SetField('PHONE').AsValue('9999-5555')
-                    .NewLine
-                        .SetField('ID').AsValue(6)
-                        .SetField('NAME').AsValue('Laura Miller')
-                        .SetField('EMAIL').AsValue('laura@email.com')
-                        .SetField('PHONE').AsValue('9999-6666')
-                    .NewLine
-                        .SetField('ID').AsValue(7)
-                        .SetField('NAME').AsValue('Brian White')
-                        .SetField('EMAIL').AsValue('brian@email.com')
-                        .SetField('PHONE').AsValue('9999-7777')
-                    .NewLine
-                        .SetField('ID').AsValue(8)
-                        .SetField('NAME').AsValue('Paula Harris')
-                        .SetField('EMAIL').AsValue('paula@email.com')
-                        .SetField('PHONE').AsValue('9999-8888')
-                    .NewLine
-                        .SetField('ID').AsValue(9)
-                        .SetField('NAME').AsValue('Andrew Clark')
-                        .SetField('EMAIL').AsValue('andrew@email.com')
-                        .SetField('PHONE').AsValue('9999-9999')
-                    .NewLine
-                        .SetField('ID').AsValue(10)
-                        .SetField('NAME').AsValue('Sophia Lewis')
-                        .SetField('EMAIL').AsValue('sophia@email.com')
-                        .SetField('PHONE').AsValue('9999-0000')
-                    .NewLine
-                        .SetField('ID').AsValue(11)
-                        .SetField('NAME').AsValue('Thomas Young')
-                        .SetField('EMAIL').AsValue('thomas@email.com')
-                        .SetField('PHONE').AsValue('9999-1234')
-                    .NewLine
-                        .SetField('ID').AsValue(12)
-                        .SetField('NAME').AsValue('Vanessa Hall')
-                        .SetField('EMAIL').AsValue('vanessa@email.com')
-                        .SetField('PHONE').AsValue('9999-2345')
-                    .NewLine
-                        .SetField('ID').AsValue(13)
-                        .SetField('NAME').AsValue('Lucas Allen')
-                        .SetField('EMAIL').AsValue('lucas@email.com')
-                        .SetField('PHONE').AsValue('9999-3456')
-                    .NewLine
-                        .SetField('ID').AsValue(14)
-                        .SetField('NAME').AsValue('Daniel Scott')
-                        .SetField('EMAIL').AsValue('daniel@email.com')
-                        .SetField('PHONE').AsValue('9999-4567')
-                    .NewLine
-                        .SetField('ID').AsValue(15)
-                        .SetField('NAME').AsValue('Rachel King')
-                        .SetField('EMAIL').AsValue('rachel@email.com')
-                        .SetField('PHONE').AsValue('9999-5678')
-                    .Post;
-    {$ENDREGION}
-    Morph.InsertInto.Table('CLIENT').Content(ClientMorphTable);
-  finally
-    ClientMorphTable.Free;
-  end;
-
   //JSON Fields Insert with TJSONObject
   InsertJSON := TJSONArray.Create;
   try
