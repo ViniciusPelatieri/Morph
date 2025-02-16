@@ -31,6 +31,8 @@ type
     BtnDropTables: TButton;
     BtnLineInsert: TButton;
     BtnMphTableInsert: TButton;
+    BtnJSONObjectInsert: TButton;
+    BtnJSONArrayInsert: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -39,6 +41,8 @@ type
     procedure BtnDropTablesClick(Sender: TObject);
     procedure BtnLineInsertClick(Sender: TObject);
     procedure BtnMphTableInsertClick(Sender: TObject);
+    procedure BtnJSONObjectInsertClick(Sender: TObject);
+    procedure BtnJSONArrayInsertClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -71,6 +75,159 @@ begin
     Morph.Table(TableName).Drop;
 end;
 
+
+procedure TSample.BtnJSONArrayInsertClick(Sender: TObject);
+var
+  LJSONLine : TJSONObject;
+  LFieldsArray : TJSONArray;
+begin
+{
+  LJSONLine := TJSONObject.Create;
+  LFieldsArray := TJSONArray.Create;
+  try
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 16);
+    LJSONLine.AddPair('NAME', 'Carlos Lincon');
+    LJSONLine.AddPair('EMAIL', 'icarli@mailme.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Code');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 17);
+    LJSONLine.AddPair('NAME', 'Victor Prippiat');
+    LJSONLine.AddPair('EMAIL', 'vic@mail.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Safety');
+    LFieldsArray.Add(LJSONLine);
+
+    Morph.InsertInto.Table('SELLER').Content(LFieldsArray.ToJSON);
+  finally
+    LFieldsArray.Free;
+    LJSONLine.Free;
+  end;
+  }
+end;
+
+procedure TSample.BtnJSONObjectInsertClick(Sender: TObject);
+var
+  LFieldsArray : TJSONArray;
+  LJSONInsert, LJSONLine : TJSONObject;
+begin
+  LFieldsArray := TJSONArray.Create;
+  LJSONInsert := TJSONObject.Create;
+  try
+    {$REGION 'Preparing JSON'}
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 1);
+    LJSONLine.AddPair('NAME', 'Fernanda Cruz');
+    LJSONLine.AddPair('EMAIL', 'fernanda@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Electronics');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 2);
+    LJSONLine.AddPair('NAME', 'Mark Green');
+    LJSONLine.AddPair('EMAIL', 'mark@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Clothing');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 3);
+    LJSONLine.AddPair('NAME', 'Julia Brown');
+    LJSONLine.AddPair('EMAIL', 'julia@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Food');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 4);
+    LJSONLine.AddPair('NAME', 'Diego Torres');
+    LJSONLine.AddPair('EMAIL', 'diego@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'IT');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 5);
+    LJSONLine.AddPair('NAME', 'Camila White');
+    LJSONLine.AddPair('EMAIL', 'camila@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Furniture');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 6);
+    LJSONLine.AddPair('NAME', 'Edward Miller');
+    LJSONLine.AddPair('EMAIL', 'edward@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Beauty');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 7);
+    LJSONLine.AddPair('NAME', 'Carla Moore');
+    LJSONLine.AddPair('EMAIL', 'carla@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Sports');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 8);
+    LJSONLine.AddPair('NAME', 'Gabriel Adams');
+    LJSONLine.AddPair('EMAIL', 'gabriel@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Automotive');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 9);
+    LJSONLine.AddPair('NAME', 'Maria Walker');
+    LJSONLine.AddPair('EMAIL', 'maria@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Stationery');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 10);
+    LJSONLine.AddPair('NAME', 'Alex Hill');
+    LJSONLine.AddPair('EMAIL', 'alex@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Accessories');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 11);
+    LJSONLine.AddPair('NAME', 'Paula Martin');
+    LJSONLine.AddPair('EMAIL', 'paula@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Home');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 12);
+    LJSONLine.AddPair('NAME', 'Robert Evans');
+    LJSONLine.AddPair('EMAIL', 'robert@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Tools');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 13);
+    LJSONLine.AddPair('NAME', 'Amanda Baker');
+    LJSONLine.AddPair('EMAIL', 'amanda@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Beverages');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 14);
+    LJSONLine.AddPair('NAME', 'Philip Perez');
+    LJSONLine.AddPair('EMAIL', 'philip@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Books');
+    LFieldsArray.Add(LJSONLine);
+
+    LJSONLine := TJSONObject.Create;
+    LJSONLine.AddPair('ID', 15);
+    LJSONLine.AddPair('NAME', 'Bianca Carter');
+    LJSONLine.AddPair('EMAIL', 'bianca@sales.com');
+    LJSONLine.AddPair('DEPARTMENT', 'Music');
+    LFieldsArray.Add(LJSONLine);
+    {$ENDREGION}
+
+    LJSONInsert.AddPair(TJSONPair.Create('SELLER', LFieldsArray));
+    Morph.Insert(LJSONInsert.ToJSON);
+  finally
+    LFieldsArray.Free;
+  end;
+end;
 
 procedure TSample.BtnLineInsertClick(Sender: TObject);
 begin
@@ -227,122 +384,6 @@ begin
  
 
   {$REGION 'Fields population'}
-  //JSON Fields Insert with TJSONObject
-  InsertJSON := TJSONArray.Create;
-  try
-    {$REGION 'Preparing JSON'}
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 1);
-    JSONLine.AddPair('NAME', 'Fernanda Cruz');
-    JSONLine.AddPair('EMAIL', 'fernanda@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Electronics');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 2);
-    JSONLine.AddPair('NAME', 'Mark Green');
-    JSONLine.AddPair('EMAIL', 'mark@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Clothing');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 3);
-    JSONLine.AddPair('NAME', 'Julia Brown');
-    JSONLine.AddPair('EMAIL', 'julia@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Food');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 4);
-    JSONLine.AddPair('NAME', 'Diego Torres');
-    JSONLine.AddPair('EMAIL', 'diego@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'IT');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 5);
-    JSONLine.AddPair('NAME', 'Camila White');
-    JSONLine.AddPair('EMAIL', 'camila@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Furniture');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 6);
-    JSONLine.AddPair('NAME', 'Edward Miller');
-    JSONLine.AddPair('EMAIL', 'edward@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Beauty');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 7);
-    JSONLine.AddPair('NAME', 'Carla Moore');
-    JSONLine.AddPair('EMAIL', 'carla@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Sports');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 8);
-    JSONLine.AddPair('NAME', 'Gabriel Adams');
-    JSONLine.AddPair('EMAIL', 'gabriel@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Automotive');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 9);
-    JSONLine.AddPair('NAME', 'Maria Walker');
-    JSONLine.AddPair('EMAIL', 'maria@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Stationery');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 10);
-    JSONLine.AddPair('NAME', 'Alex Hill');
-    JSONLine.AddPair('EMAIL', 'alex@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Accessories');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 11);
-    JSONLine.AddPair('NAME', 'Paula Martin');
-    JSONLine.AddPair('EMAIL', 'paula@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Home');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 12);
-    JSONLine.AddPair('NAME', 'Robert Evans');
-    JSONLine.AddPair('EMAIL', 'robert@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Tools');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 13);
-    JSONLine.AddPair('NAME', 'Amanda Baker');
-    JSONLine.AddPair('EMAIL', 'amanda@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Beverages');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 14);
-    JSONLine.AddPair('NAME', 'Philip Perez');
-    JSONLine.AddPair('EMAIL', 'philip@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Books');
-    InsertJSON.Add(JSONLine);
-
-    JSONLine := TJSONObject.Create;
-    JSONLine.AddPair('ID', 15);
-    JSONLine.AddPair('NAME', 'Bianca Carter');
-    JSONLine.AddPair('EMAIL', 'bianca@sales.com');
-    JSONLine.AddPair('DEPARTMENT', 'Music');
-    InsertJSON.Add(JSONLine);
-    {$ENDREGION}
-
-    Morph.InsertInto.Table('SELLER').Content(TMorph.JSONParse(InsertJSON.ToJSON));
-  finally
-    InsertJSON.Free;
-    JSONLine.Free;
-  end;
-
   //JSON Fields Insert with JSON pure string
   {$REGION 'Building JSON'}
   JSONString := '[                                              '+

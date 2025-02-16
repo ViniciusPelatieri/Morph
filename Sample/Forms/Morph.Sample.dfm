@@ -92,6 +92,24 @@ object Sample: TSample
     TabOrder = 6
     OnClick = BtnMphTableInsertClick
   end
+  object BtnJSONObjectInsert: TButton
+    Left = 431
+    Top = 30
+    Width = 106
+    Height = 25
+    Caption = 'JSON Object Insert'
+    TabOrder = 7
+    OnClick = BtnJSONObjectInsertClick
+  end
+  object BtnJSONArrayInsert: TButton
+    Left = 431
+    Top = 4
+    Width = 106
+    Height = 25
+    Caption = 'JSONArray Insert'
+    TabOrder = 8
+    OnClick = BtnJSONArrayInsertClick
+  end
   object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'
