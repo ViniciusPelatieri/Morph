@@ -100,6 +100,7 @@ begin
   FNoOrphanData := False;
   FIdentity := False;
   FSize := 0;
+  FieldType := mphUndefined;
 end;
 
 destructor TMorphField.Destroy;

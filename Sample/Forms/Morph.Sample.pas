@@ -34,6 +34,7 @@ type
     BtnJSONObjectInsert: TButton;
     BtnJSONArrayInsert: TButton;
     BtnJSONStringInsert: TButton;
+    BtnTFDMemtableInsert: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -45,6 +46,7 @@ type
     procedure BtnJSONObjectInsertClick(Sender: TObject);
     procedure BtnJSONArrayInsertClick(Sender: TObject);
     procedure BtnJSONStringInsertClick(Sender: TObject);
+    procedure BtnTFDMemtableInsertClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -334,7 +336,7 @@ begin
   Morph.InsertInto.Table('CLIENT').Fields(['ID', 'NAME',         'EMAIL',          'PHONE'])
                                   .Values([1,    'John Smith',   'John@email.com', '9999-1111'])
                                   .Values([2,    'Mary Johnson', 'mary@email.com', '9999-2222'])
-                                  .Post;
+                  .Post;
 
   Morph.InsertInto.Table('CLIENT').Fields(['ID',   'NAME',   'EMAIL',  'PHONE'])
                                   .Values([5000,   'TEST',   'delete-meE@email.com', '0000-0000'])
@@ -433,63 +435,9 @@ begin
   LoadTablesInComboBox;
 end;
 
-procedure TSample.BtnCreateTablesClick(Sender: TObject);
+procedure TSample.BtnTFDMemtableInsertClick(Sender: TObject);
 begin
-  Morph.Table('CLIENT')
-          .Field('ID').tInteger.PrimaryKey.NotNull
-          .Field('NAME').tVarchar(100).NotNull
-          .Field('EMAIL').tVarchar(100).NotNull.Unique
-          .Field('PHONE').tVarchar(15).NotNull.Unique
-        .CreateTable;
-
-   Morph.Table('SELLER')
-          .Field('ID').tInteger.PrimaryKey.NotNull
-          .Field('NAME').tVarchar(100).NotNull
-          .Field('EMAIL').tVarchar(100).NotNull.Unique
-          .Field('DEPARTMENT').tVarchar(30)
-       .CreateTable;
-
-  Morph.Table('PRODUCT')
-          .Field('ID').tInteger.PrimaryKey.NotNull
-          .Field('DESCRIPTION').tVarchar(100).NotNull
-          .Field('CATEGORY').tVarchar(15).NotNull
-          .Field('PRICE').tFloat.NotNull
-        .CreateTable;
-
-  Morph.Table('ORDERS')
-          .Field('ID').tInteger.PrimaryKey.NotNull
-          .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').FKName('FK_ORDER_CLIENT').DeleteOrphanData
-          .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').FKName('FK_ORDER_SELLER').NullOrphanData
-          .Field('PRODUCT_ID').tInteger.ForeignKey.References.Table('PRODUCT').Field('ID').FKName('FK_ORDER_PRODUCT').NoOrphanData
-          .Field('QUANTITY').tFloat.NotNull
-          .Field('ORDER_DATE').tDate.NotNull
-        .CreateTable;
-end;
-
-procedure TSample.CBTableChange(Sender: TObject);
-begin
-  LoadTableData;
-end;
-
-procedure TSample.RunChanges;
-var
-  MorphTableArrange : TMphTableArrange;
-  Settings : TMorphSettings;
-  InsertJSON : TJSONArray;
-  ConfigString : String;
-  Conteudo : String;
-  JSONLine : TJSONObject;
-  JSONString : String;
-begin
- 
-
-  {$REGION 'Fields population'}
-  //JSON Fields Insert with JSON pure string
-
-
-
-  //TFDMemTable Table Insert
-  {$REGION 'Populating TFDMemTable'}
+ {$REGION 'Populating TFDMemTable'}
   FDMTInsertOrder.Open;
 
   FDMTInsertOrder.Append;
@@ -613,8 +561,57 @@ begin
   FDMTInsertOrder.Post;
   {$ENDREGION}
 
-  Morph.InserFDMEMtableInto('ORDER').FDMemTable(FDMTInsertOrder);
-  {$ENDREGION}
+  Morph.InsertInto.Table('ORDERS').Content(FDMTInsertOrder);
+end;
+
+procedure TSample.BtnCreateTablesClick(Sender: TObject);
+begin
+  Morph.Table('CLIENT')
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('NAME').tVarchar(100).NotNull
+          .Field('EMAIL').tVarchar(100).NotNull.Unique
+          .Field('PHONE').tVarchar(15).NotNull.Unique
+        .CreateTable;
+
+   Morph.Table('SELLER')
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('NAME').tVarchar(100).NotNull
+          .Field('EMAIL').tVarchar(100).NotNull.Unique
+          .Field('DEPARTMENT').tVarchar(30)
+       .CreateTable;
+
+  Morph.Table('PRODUCT')
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('DESCRIPTION').tVarchar(100).NotNull
+          .Field('CATEGORY').tVarchar(15).NotNull
+          .Field('PRICE').tFloat.NotNull
+        .CreateTable;
+
+  Morph.Table('ORDERS')
+          .Field('ID').tInteger.PrimaryKey.NotNull
+          .Field('CLIENT_ID').tInteger.ForeignKey.References.Table('CLIENT').Field('ID').FKName('FK_ORDER_CLIENT').DeleteOrphanData
+          .Field('SELLER_ID').tInteger.ForeignKey.References.Table('SELLER').Field('ID').FKName('FK_ORDER_SELLER').NullOrphanData
+          .Field('PRODUCT_ID').tInteger.ForeignKey.References.Table('PRODUCT').Field('ID').FKName('FK_ORDER_PRODUCT').NoOrphanData
+          .Field('QUANTITY').tFloat.NotNull
+          .Field('ORDER_DATE').tDate.NotNull
+        .CreateTable;
+end;
+
+procedure TSample.CBTableChange(Sender: TObject);
+begin
+  LoadTableData;
+end;
+
+procedure TSample.RunChanges;
+var
+  MorphTableArrange : TMphTableArrange;
+  Settings : TMorphSettings;
+  InsertJSON : TJSONArray;
+  ConfigString : String;
+  Conteudo : String;
+  JSONLine : TJSONObject;
+  JSONString : String;
+begin
 
   {$REGION 'Dropping entire columns'}
   Morph.Table('SELLER').Field('EMAIL').Drop;

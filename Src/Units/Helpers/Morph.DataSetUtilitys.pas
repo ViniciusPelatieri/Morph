@@ -20,8 +20,6 @@ uses
 
 { TMorphDSUtls }
 
-
-
 class procedure TMorphDSUtls.DataSetToClientDS(ADataSet: TDataSet;
   AClientDataSet: TClientDataSet);
 var

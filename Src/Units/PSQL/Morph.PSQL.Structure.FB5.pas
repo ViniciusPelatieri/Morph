@@ -28,6 +28,7 @@ const PSQL_FB5_UPDATE = 'UPDATE';
 const PSQL_FB5_CASCADE = 'CASCADE';
 const PSQL_FB5_INSERT_INTO = 'INSERT INTO';
 const PSQL_FB5_VALUES = 'VALUES';
+const PSQL_FB5_CAST = 'CAST';
 
 implementation
 

@@ -5,9 +5,9 @@ interface
 uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, System.JSON,
-  Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings,
-  System.Generics.Collections, Morph.Vector, Datasnap.DBClient, System.Rtti;
+  FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Comp.Client, System.JSON,
+  Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings, Morph.Vector, Datasnap.DBClient, System.Rtti,
+  System.Generics.Collections, Data.DB;
 
 type
   TMorph = class
@@ -24,6 +24,7 @@ type
 
       FFB2_5FieldTypeNames : TDictionary<Integer, String>;
       FFB5FieldTypeNames : TDictionary<Integer, String>;
+      FFDMTTypeToMphFieldType : TDictionary<TFieldType, TMorphFieldTypes>;
 
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
     public
@@ -66,8 +67,6 @@ type
       function Values(const aValues : TArray<TValue>) : TMorph;
       function InsertJSON(const aJSONString : String) : TMorph;
       function JSONContent(const aJSONString : String) : TMorph;
-      function InserFDMEMtableInto(const aTableName : String) : TMorph;
-      function FDMemTable(const aFDMemTable : TFDMemTable) : TMorph;
       function ImportSettings(const aConfigJSONString : String) : TMorph;
       function Update : TMorph;
       function SetField(const aFieldName : String) : TMorph;
@@ -79,7 +78,6 @@ type
       function References : TMorph;
       function NoOrphaData : TMorph;
       function Post : TMorph;
-      function Content(const aJSONStringArray : String) : TMorph;
       class function JSONParse(const aJSONString : String) : TMphTable;
       function Equals<T>(const aValue : T) : TMorph;
       function IsBiggerThan<T>(const aValue : T) : TMorph;
@@ -106,17 +104,22 @@ type
       function DeleteOrphanData : TMorph;
       function Delete : TMorph;
       function Field(const aField : String) : TMorph; overload;
+      function FDMTableFieldTypeConvert(const aFieldType : TFieldType) : TMorphFieldTypes;
+      function GetBasicType(const aValue : TValue) : TMorphBasicTypes;
 
       //overloaded
       function Insert(const aMphTable : TMphTable) : TMorph; overload;
       function Insert(const aJSONInsert : String) : TMorph; overload;
+
+      function Content(const aJSONStringArray : String) : TMorph; overload;
+      function Content(const aFDMemtable : TFDMemTable) : TMorph; overload;
     end;
 implementation
 
 uses
-  Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common, System.TypInfo,
-  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5, 
-  Winapi.Windows, Morph.Messages;
+  Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common,
+  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5,
+  Winapi.Windows, Morph.Messages, System.TypInfo;
 
 { TMorph }
 
@@ -198,6 +201,41 @@ begin
   Result := Self;
 end;
 
+function TMorph.Content(const aFDMemtable: TFDMemTable): TMorph;
+var
+  LFieldsIndex, LLinesIndex : Integer;
+begin
+  aFDMemTable.DisableControls;
+  try
+    for LFieldsIndex := 0 to aFDMemTable.Fields.Count -1 do //Fields
+      FInsertTable.Fields.Add(TMorphField.New.SetName(aFDMemTable.Fields[LFieldsIndex].FieldName).SetFieldType(FDMTableFieldTypeConvert(aFDMemtable.Fields[LFieldsIndex].DataType)));
+
+
+    aFDMemtable.First;
+    for LLinesIndex := 0 to aFDMemtable.RecordCount -1 do //Values
+    begin
+      for LFieldsIndex := 0 to aFDMemtable.Fields.Count -1 do //Values
+      begin
+        case FInsertTable.Fields.Elements[LFieldsIndex].FieldType of
+          mphInteger: FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsInteger);
+          mphVarchar:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsString);
+          mphFloat:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsFloat);
+          mphDate:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsDateTime);
+          mphBoolean:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsBoolean);
+          mphTXTBlob:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsString);
+          mphBinaryBlob:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsString);
+        end;
+      end;
+
+      aFDMemTable.Next;
+    end;
+
+    Post;
+  finally
+    aFDMemTable.EnableControls;
+  end;
+end;
+
 function TMorph.Content(const aJSONStringArray : String): TMorph;
 var
   InsertJSONObject, LineJSONObject : TJSONObject;
@@ -227,22 +265,32 @@ begin
         for JSONKeysIndex := 0 to LineJSONObject.Count -1 do //Values
         begin
           TempJSONKeyValue := LineJSONObject.Pairs[JSONKeysIndex].JsonValue;
-          {$REGION 'Saves value in table with correct type'}
-          if TempJSONKeyValue is TJSONNumber then
-          begin
-            if Pos('.', TempJSONKeyValue.ToString) > 0 then
-              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Double>)
+           {$REGION 'Saves value in table with correct type'}
+            if TempJSONKeyValue is TJSONNumber then
+            begin
+              if Pos('.', TempJSONKeyValue.ToString) > 0 then
+              begin
+                FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphFloat;
+                FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Double>);
+              end
+              else
+              begin
+                FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphFloat;
+                FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Integer>);
+              end;
+            end
+            else if TempJSONKeyValue is TJSONBool then
+            begin
+              FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphBoolean;
+              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Boolean>);
+            end
             else
-              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Integer>);
-          end
-          else if TempJSONKeyValue is TJSONBool then
-            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Boolean>)
-          else
-          begin
-            TempJSONString := TempJSONKeyValue.Value;
-            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONString);
-          end;
-          {$ENDREGION}
+            begin
+              FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphVarchar;
+              TempJSONString := TempJSONKeyValue.Value;
+              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONString);
+            end;
+           {$ENDREGION}
         end;
       end;
 
@@ -262,6 +310,7 @@ end;
 
 constructor TMorph.Create;
 begin
+  {$REGION 'FFB5FieldTypeNames'}
   FFB5FieldTypeNames := TDictionary<Integer, String>.Create;
   FFB5FieldTypeNames.Add(Ord(mphInteger), PSQL_FB5_TYPE_INTEGER);
   FFB5FieldTypeNames.Add(Ord(mphVarchar), PSQL_FB5_TYPE_VARCHAR);
@@ -270,6 +319,67 @@ begin
   FFB5FieldTypeNames.Add(Ord(mphBoolean), PSQL_FB5_TYPE_BOOLEAN);
   FFB5FieldTypeNames.Add(Ord(mphTXTBlob), PSQL_FB5_TYPE_TXTBLOB);
   FFB5FieldTypeNames.Add(Ord(mphBinaryBlob), PSQL_FB5_TYPE_BINBLOB);
+  {$ENDREGION}
+
+  {$REGION 'TFDMemtable types to TMorphField types reference'}
+  FFDMTTypeToMphFieldType := TDictionary<TFieldType, TMorphFieldTypes>.Create;
+
+  // Int
+  FFDMTTypeToMphFieldType.Add(ftSmallint, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftInteger, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftWord, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftAutoInc, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftLargeint, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftShortint, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftByte, mphInteger);
+  FFDMTTypeToMphFieldType.Add(ftLongWord, mphInteger);
+
+  // Float/Decimal
+  FFDMTTypeToMphFieldType.Add(ftFloat, mphFloat);
+  FFDMTTypeToMphFieldType.Add(ftCurrency, mphFloat);
+  FFDMTTypeToMphFieldType.Add(ftBCD, mphFloat);
+  FFDMTTypeToMphFieldType.Add(ftFMTBcd, mphFloat);
+  //FFDMTTypeToMphFieldType.Add(ftSingle, mphFloat);
+  //FFDMTTypeToMphFieldType.Add(ftExtended, mphFloat);
+
+  // txt
+  FFDMTTypeToMphFieldType.Add(ftString, mphVarchar);
+  FFDMTTypeToMphFieldType.Add(ftWideString, mphVarchar);
+  FFDMTTypeToMphFieldType.Add(ftFixedChar, mphVarchar);
+  FFDMTTypeToMphFieldType.Add(ftFixedWideChar, mphVarchar);
+
+  // Time / Date
+  FFDMTTypeToMphFieldType.Add(ftDate, mphDate);
+  FFDMTTypeToMphFieldType.Add(ftTime, mphDate);
+  FFDMTTypeToMphFieldType.Add(ftDateTime, mphDate);
+  FFDMTTypeToMphFieldType.Add(ftTimeStamp, mphDate);
+  FFDMTTypeToMphFieldType.Add(ftTimeStampOffset, mphDate);
+
+  // Boolean
+  FFDMTTypeToMphFieldType.Add(ftBoolean, mphBoolean);
+
+  // txt BLOB
+  FFDMTTypeToMphFieldType.Add(ftMemo, mphTXTBlob);
+  FFDMTTypeToMphFieldType.Add(ftFmtMemo, mphTXTBlob);
+  FFDMTTypeToMphFieldType.Add(ftWideMemo, mphTXTBlob);
+  FFDMTTypeToMphFieldType.Add(ftOraClob, mphTXTBlob);
+
+  // Binary BLOB
+  FFDMTTypeToMphFieldType.Add(ftBlob, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftBytes, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftVarBytes, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftGraphic, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftTypedBinary, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftOraBlob, mphBinaryBlob);
+  FFDMTTypeToMphFieldType.Add(ftStream, mphBinaryBlob);
+
+  //Others
+  //FFDMTTypeToMphFieldType.Add(ftGuid, mphGUID);
+  //FFDMTTypeToMphFieldType.Add(ftVariant, mphVariant);
+  //FFDMTTypeToMphFieldType.Add(ftObject, mphObject);
+  //FFDMTTypeToMphFieldType.Add(ftArray, mphArray);
+  //FFDMTTypeToMphFieldType.Add(ftDataSet, mphDataSet);
+  {$ENDREGION}
 
   FFieldsToProcess := TMorphFields.Create;
   FStage := mpsCreate;
@@ -379,6 +489,7 @@ destructor TMorph.Destroy;
 begin
   FFieldsToProcess.Free;
   FInsertTable.Free;
+  FFDMTTypeToMphFieldType.Free;
   inherited;
 end;
 
@@ -417,9 +528,11 @@ begin
 
 end;
 
-function TMorph.FDMemTable(const aFDMemTable: TFDMemTable): TMorph;
+function TMorph.FDMTableFieldTypeConvert(
+  const aFieldType: TFieldType): TMorphFieldTypes;
 begin
-
+  if NOT FFDMTTypeToMphFieldType.TryGetValue(aFieldType, Result) then
+    Raise Exception.Create(Format(MORPH_MESSAGE_UNSUPORTED_FIELD_TYPE, [GetEnumName(TypeInfo(TFieldType), Ord(aFieldType))]));
 end;
 
 function TMorph.Field(const aField: String): TMorph;
@@ -487,6 +600,22 @@ begin
   Result := Self;
 end;
 
+function TMorph.GetBasicType(const aValue: TValue): TMorphBasicTypes;
+begin
+  if aValue.IsEmpty then
+    Result := mbtString
+  else if aValue.IsType<Integer> or aValue.IsType<Single> or aValue.IsType<Double> or aValue.IsType<Currency> then
+    Result := mbtNumber
+  else if aValue.IsType<string> then
+    Result := mbtString
+  else if aValue.IsType<TDateTime> then
+    Result := mbtDate
+  else if aValue.IsType<Boolean> then
+    Result := mbtBoolean
+  else
+    Raise Exception.Create(Format(MORPH_MESSAGE_COULD_NOT_DETTECT_TYPE, [aValue.ToString]));
+end;
+
 function TMorph.GetFB2_5FieldTypeName: String;
 begin
 
@@ -533,11 +662,6 @@ begin
 
 end;
 
-function TMorph.InserFDMEMtableInto(const aTableName: String): TMorph;
-begin
-
-end;
-
 function TMorph.Insert(const aMphTable: TMphTable): TMorph;
 begin
   FInsertTable := aMphTable;
@@ -555,7 +679,8 @@ begin
   InsertJSONObject := TJSONObject.Create;
   InsertJSONArray := TJSONArray.Create;
   try
-    FInsertTable.Clear;
+      FInsertTable.Free;
+      FInsertTable := TMphTable.Create;
     try
       InsertJSONObject := TJSONObject(TJSONObject.ParseJSONValue(aJSONInsert));
 
@@ -586,14 +711,24 @@ begin
           if TempJSONKeyValue is TJSONNumber then
           begin
             if Pos('.', TempJSONKeyValue.ToString) > 0 then
-              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Double>)
+            begin
+              FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphFloat;
+              FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Double>);
+            end
             else
+            begin
+              FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphFloat;
               FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Integer>);
+            end;
           end
           else if TempJSONKeyValue is TJSONBool then
-            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Boolean>)
+          begin
+            FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphBoolean;
+            FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONKeyValue.AsType<Boolean>);
+          end
           else
           begin
+            FInsertTable.Fields.Elements[JSONKeysIndex].FieldType := mphVarchar;
             TempJSONString := TempJSONKeyValue.Value;
             FInsertTable.Fields.Elements[JSONKeysIndex].AddValue(TempJSONString);
           end;
@@ -757,12 +892,14 @@ begin
           begin
             if LFieldCount > 0 then
               FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE;
-          
-            if FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].IsType<String> then
-              FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)
-            else
-              FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
 
+            case FInsertTable.Fields.Elements[LFieldCount].FieldType of
+              mphVarchar, mphUndefined:FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString);
+              mphDate:FPSQLCommand:=FPSQLCommand+PSQL_FB5_CAST+PSQL_OPEN_PARENTHESES+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)+PSQL_SPACE+PSQL_AS+PSQL_SPACE+PSQL_FB5_TYPE_DATE+PSQL_CLOSED_PARENTHESES;
+                                                 {CAST         (                    '16.02.2025'                                                                                           AS                 DATE               )}
+              else
+                FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
+            end;
           end;
           {1, 'John Smith', 'john@email.com', '9999-1111');}
           FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
@@ -909,11 +1046,15 @@ var
 begin
   for LFieldsCount := 0 to High(aValues) do
   begin
+    if FInsertTable.Fields.Elements[LFieldsCount].FieldType = mphUndefined then
+      case GetBasicType(aValues[LFieldsCount]) of
+        mbtNumber:  FInsertTable.Fields.Elements[LFieldsCount].FieldType := mphFloat;
+        mbtString: FInsertTable.Fields.Elements[LFieldsCount].FieldType := mphVarchar;
+        mbtDate: FInsertTable.Fields.Elements[LFieldsCount].FieldType := mphDate;
+        mbtBoolean: FInsertTable.Fields.Elements[LFieldsCount].FieldType := mphBoolean;
+      end;
+
     FInsertTable.Fields.Elements[LFieldsCount].Values.Add(aValues[LFieldsCount]);
-    
-   {$IFDEF DEBUG} 
-   OutputDebugString(PChar('Campo: '+FInsertTable.Fields.Elements[LFieldsCount].Name+' Valor: '+aValues[LFieldsCount].ToString));
-   {$ENDIF}
   end;
 
   Result := Self;
