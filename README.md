@@ -23,48 +23,59 @@ Morph is a powerful Query Builder for Delphi that allows developers to build and
 3. Start using Morph in your application!
 
 ## 📌 Example Usage
-
 ### 🔹 CRUD Operations
-
 #### 🟢 CREATE
-
 ```delphi
 Morph.Table('CLIENT').Field('ID').tInteger.PrimaryKey.NotNull.CreateTable;
 ```
-
-#### 🔵 READ
-
+🔵 READ
 ```delphi
 Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Integer>(5);
-         
 ```
-
-#### 🟣 INSERT
+🟣 INSERT
+```delphi
+//Using Line Insert:
+MORPH.INSERTINTO.TABLE('CLIENT').FIELDS(['ID', 'NAME',         'EMAIL',          'PHONE'])
+                                .VALUES([1,    'JOHN SMITH',   'JOHN@EMAIL.COM', '9999-1111'])
+                                .VALUES([2,    'MARY JOHNSON', 'MARY@EMAIL.COM', '9999-2222'])
+                .Post;
+```
+```delphi
+//Using JSONObject
+JSONString := '{                                          '+
+              '  "PRODUCT":[                              '+
+              '              {	                          '+
+              '                "ID":2,                    '+
+              '                "DESCRIPTION":"Smartphone",'+
+              '                "CATEGORY":"Electronics",  '+
+              '                "PRICE":3000.00            '+
+              '              }                            '+
+              '            ]                              '+
+              '}                                          ';
+ 
+Morph.InsertInto.Table('PRODUCT').Content(JSONString);
+```
 
 ```delphi
-  Morph.InsertInto.Table('CLIENT').Fields(['ID', 'NAME',         'EMAIL',          'PHONE'])
-                                  .Values([1,    'John Smith',   'John@email.com', '9999-1111'])
-                                  .Values([2,    'Mary Johnson', 'mary@email.com', '9999-2222'])
-                                  .Post;
-
+//Using TFDMemTable
+  FDMTInsertOrder.Append;
+  FDMTInsertOrderID.AsInteger := 1;
+  FDMTInsertOrderCLIENT_ID.AsInteger := 1;
+  FDMTInsertOrderPRODUCT_ID.AsInteger := 2;
+  FDMTInsertOrder.Post;
+  
+  Morph.InsertInto.Table('ORDERS').Content(FDMTInsertOrder);
 ```
 
-#### 🟠 UPDATE
-
+🟠 UPDATE
 ```delphi
 Morph.Update.Table('CLIENT').SetField('CREDIT').NewValue<Extended>(200)
      .Where.Field('CREDIT').IsBiggerThan<Integer>(500);
 ```
-
-#### 🔴 DELETE
-
+🔴 DELETE
 ```delphi
 Morph.Delete.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
 ```
-
-## 📜 License
-
-Morph is open-source and available under the MIT License.
 
 ## 📧 Contact
 
