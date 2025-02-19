@@ -12,105 +12,79 @@ uses
 type
   TMorph = class
     private
-      FTableName : String;
-      FFieldsToProcess : TMorphFields;
-      FStage : TMorphStages;
+      FTableName,
       FPSQLCommand : String;
-      FDBType : TMorphDBType;
-      FFDConnection : TFDConnection;
-      FDQResult : TFDQuery;
-      FTempConnection : TFDConnection;
-      FInsertTable : TMphTable;
 
+      FFB5FieldTypeNames,
       FFB2_5FieldTypeNames : TDictionary<Integer, String>;
-      FFB5FieldTypeNames : TDictionary<Integer, String>;
-      FFDMTTypeToMphFieldType : TDictionary<TFieldType, TMorphFieldTypes>;
 
-      procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
+      FFDConnection,
+      FTempConnection : TFDConnection;
+
+      FDQResult : TFDQuery;
+      FStage : TMorphStages;
+      FDBType : TMorphDBType;
+
+      FInsertTable : TMphTable;
+      FFieldsToProcess : TMorphFields;
+      FFDMTTypeToMphFieldType : TDictionary<TFieldType, TMorphFieldTypes>;
     public
       constructor Create;
       destructor Destroy; override;
-      function tVarchar(const aSize : Integer) : TMorph;
-      function Config : TMorph;
-      function DatabaseType(const aDBType : TMorphDBType) : TMorph;
-      function Connection(const aConnection : TFDConnection) : TMorph;
-      function OutputFDMemTable(const anOutputTable : TFDMemTable) : TMorph;
-      function OutputMorphTable(const aMorphTable : TMphTable) : TMorph;
-      function IgnoreCreatedStructure : TMorph;
-      function DoNotRaiseOnRedundances : TMorph;
-      function RunFindInAnOtherThread : TMorph;
-      function LoadSettings(const aMorphSettings : TMorphSettings) : TMorph;
-      function ExportSettings : TJSONObject;
-      function Return : TMorph;
-      function AsMorphTable : TMphTable;
-      function AsJSONString : String;
-      function AsTFDMemTable : TFDMemTable;
-      function Table(const aTableName : String) : TMorph;
+
+      procedure ExecutePSQL(const aCommand : String);
+      procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
+
+      function Add : TMorph;
+      function All : TMorph;
       function Drop : TMorph;
-      function ChangeNameTo(const aNewName : String) : TMorph;
+      function Post : TMorph;
+      function tDate : TMorph;
+      function Delete : TMorph;
+      function Unique : TMorph;
+      function tFloat : TMorph;
+      function Config : TMorph;
+      function Select : TMorph;
+      function NotNull : TMorph;
+      function Identity : TMorph;
       function tInteger : TMorph;
       function tBoolean : TMorph;
-      function tFloat : TMorph;
-      function tDate : TMorph;
-      function tBinaryBlob : TMorph;
-      function PrimaryKey : TMorph;
-      function Identity : TMorph;
-      function NotNull : TMorph;
-      function Unique : TMorph;
-      function Add : TMorph;
-      function FieldsInfo : TMorphTableFieldsInfo;
-      function FieldInfo : TMorphTableFieldInfo;
       function InsertInto : TMorph;
-      function InsertJSONStringInto : TMorph;
-      function Value<T>(const aValue : T) : TMorph;
-      function Fields(const aFieldNames : TArray<String>) : TMorph;
-      function Values(const aValues : TArray<TValue>) : TMorph;
-      function InsertJSON(const aJSONString : String) : TMorph;
-      function JSONContent(const aJSONString : String) : TMorph;
-      function ImportSettings(const aConfigJSONString : String) : TMorph;
-      function Update : TMorph;
-      function SetField(const aFieldName : String) : TMorph;
-      function NewValue<T>(const aNewValue : T) : TMorph;
-      function Where : TMorph;
-      function SetFields(const Fields : TArray<String>) : TMorph;
-      function NewValues(const NewValues : TArray<String>) : TMorph;
       function ForeignKey : TMorph;
-      function References : TMorph;
-      function NoOrphaData : TMorph;
-      function Post : TMorph;
-      class function JSONParse(const aJSONString : String) : TMphTable;
-      function Equals<T>(const aValue : T) : TMorph;
-      function IsBiggerThan<T>(const aValue : T) : TMorph;
-      function _And : TMorph;
-      function IsSmallerThen<T>(const aValue : T) : TMorph;
-      function Select : TMorph;
-      function All : TMorph;
-      function From(const aTableName : String) : TMorph;
-      function IsBiggerOrEqualThen<T>(const aValue : T) : TMorph;
-      function _Or : TMorph;
-      function IsSmallerOrEqualThen<T>(const aValue : T) : TMorph;
       function CreateTable : TMorph;
-      function CurrentPSQL(Out anOutVar : String) : TMorph;
-      function GetPSQLTypeName : String;
-      function GetFB5FieldTypeName : String;
-      function GetFB2_5FieldTypeName : String;
-      procedure ExecutePSQL(const aCommand : String);
-      function GetTableNames : TMorphVector<String>;
-      function AsTClientDataSet : TClientDataSet;
-      function OpenPSQL(const aCommand: String) : TMorph;
-      function FKName(const aFKName : String) : TMorph;
+      function References : TMorph;
+      function PrimaryKey : TMorph;
+      function tBinaryBlob : TMorph;
+      function NoOrphaData : TMorph;
       function NoOrphanData : TMorph;
       function NullOrphanData : TMorph;
       function DeleteOrphanData : TMorph;
-      function Delete : TMorph;
-      function Field(const aField : String) : TMorph; overload;
-      function FDMTableFieldTypeConvert(const aFieldType : TFieldType) : TMorphFieldTypes;
+      function GetPSQLTypeName : String;
+      function AsTFDMemTable : TFDMemTable;
+      function ExportSettings : TJSONObject;
+      function GetFB5FieldTypeName : String;
+      function GetFB2_5FieldTypeName : String;
+      function AsTClientDataSet: TClientDataSet;
+      function DoNotRaiseOnRedundances : TMorph;
+      function Equals<T>(const aValue : T) : TMorph;
+      function GetTableNames : TMorphVector<String>;
+      function Field(const aField : String) : TMorph;
+      function FKName(const aFKName : String) : TMorph;
+      function From(const aTableName : String) : TMorph;
+      function tVarchar(const aSize : Integer) : TMorph;
+      function Table(const aTableName : String) : TMorph;
+      function OpenPSQL(const aCommand: String) : TMorph;
+      function CurrentPSQL(Out anOutVar : String) : TMorph;
+      function Values(const aValues : TArray<TValue>) : TMorph;
+      function Fields(const aFieldNames : TArray<String>) : TMorph;
+      function DatabaseType(const aDBType : TMorphDBType) : TMorph;
+      function Connection(const aConnection : TFDConnection) : TMorph;
       function GetBasicType(const aValue : TValue) : TMorphBasicTypes;
+      function FDMTableFieldTypeConvert(const aFieldType : TFieldType) : TMorphFieldTypes;
 
       //overloaded
       function Insert(const aMphTable : TMphTable) : TMorph; overload;
       function Insert(const aJSONInsert : String) : TMorph; overload;
-
       function Content(const aJSONStringArray : String) : TMorph; overload;
       function Content(const aFDMemtable : TFDMemTable) : TMorph; overload;
     end;
@@ -136,16 +110,6 @@ begin
   end;
 
   Result := Self;
-end;
-
-function TMorph.AsJSONString: String;
-begin
-
-end;
-
-function TMorph.AsMorphTable: TMphTable;
-begin
-
 end;
 
 function TMorph.AsTClientDataSet: TClientDataSet;
@@ -174,19 +138,14 @@ end;
 
 function TMorph.tBoolean: TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphBoolean;
+  FFieldsToProcess.Current.FieldType := mphBoolean;
   Result := Self;
 end;
 
 function TMorph.tBinaryBlob: TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphBinaryBlob;
+  FFieldsToProcess.Current.FieldType := mphBinaryBlob;
   Result := Self;
-end;
-
-function TMorph.ChangeNameTo(const aNewName: String): TMorph;
-begin
-
 end;
 
 function TMorph.Config: TMorph;
@@ -399,15 +358,15 @@ begin
   FFieldsToProcess.First;
   for vFieldCount := 0 to FFieldsToProcess.Count -1 do
   begin
-    vField := FFieldsToProcess.Fields[vFieldCount];
+    vField := FFieldsToProcess.Elements[vFieldCount];
 
     if vFieldCount > 0 then
       FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
 
     FPSQLCommand:=FPSQLCommand+ vField.Name+PSQL_SPACE+GetPSQLTypeName;
 
-    if FFieldsToProcess.CurrentField.FieldType = mphVarchar then
-      FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.CurrentField.Size)+PSQL_CLOSED_PARENTHESES;
+    if FFieldsToProcess.Current.FieldType = mphVarchar then
+      FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.Current.Size)+PSQL_CLOSED_PARENTHESES;
 
     if vField.Identity then
       FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_IDENTITY;
@@ -428,7 +387,7 @@ begin
   FFieldsToProcess.First;
   for vFieldCount := 0 to FFieldsToProcess.Count -1 do   //FK
   begin
-    vField := FFieldsToProcess.Fields[vFieldCount];
+    vField := FFieldsToProcess.Elements[vFieldCount];
     if vField.ForeignKey then
     begin
       {FK_<SourceTable>_<DesntinationTable>}
@@ -469,7 +428,7 @@ end;
 
 function TMorph.tDate: TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphDate;
+  FFieldsToProcess.Current.FieldType := mphDate;
   Result := Self;
 end;
 
@@ -480,7 +439,7 @@ end;
 
 function TMorph.DeleteOrphanData: TMorph;
 begin
-  FFieldsToProcess.CurrentField.RelationsBehavior := mrbDeleteOrphanData;
+  FFieldsToProcess.Current.RelationsBehavior := mrbDeleteOrphanData;
   FStage := mpsCreate;
   Result := Self;
 end;
@@ -541,20 +500,15 @@ begin
     mpsCreate:
     begin
       FFieldsToProcess.Add(TMorphField.Create);
-      FFieldsToProcess.CurrentField.Name := aField;
+      FFieldsToProcess.Current.Name := aField;
     end;
     mpsReference:
     begin
-      FFieldsToProcess.CurrentField.ReferencedField := aField;
+      FFieldsToProcess.Current.ReferencedField := aField;
     end;
   end;
 
   Result := Self;
-end;
-
-function TMorph.FieldInfo: TMorphTableFieldInfo;
-begin
-
 end;
 
 function TMorph.Fields(const aFieldNames: TArray<String>): TMorph;
@@ -567,26 +521,21 @@ begin
   Result := Self;
 end;
 
-function TMorph.FieldsInfo: TMorphTableFieldsInfo;
-begin
-
-end;
-
 function TMorph.FKName(const aFKName: String): TMorph;
 begin
-  FFieldsToProcess.CurrentField.FKName := aFKName;
+  FFieldsToProcess.Current.FKName := aFKName;
   Result := Self;
 end;
 
 function TMorph.tFloat: TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphFloat;
+  FFieldsToProcess.Current.FieldType := mphFloat;
   Result := Self;
 end;
 
 function TMorph.ForeignKey: TMorph;
 begin
-  FFieldsToProcess.CurrentField.ForeignKey := True;
+  FFieldsToProcess.Current.ForeignKey := True;
   Result := Self;
 end;
 
@@ -623,7 +572,7 @@ end;
 
 function TMorph.GetFB5FieldTypeName: String;
 begin
-  FFB5FieldTypeNames.TryGetValue(Ord(FFieldsToProcess.CurrentField.FieldType), Result);
+  FFB5FieldTypeNames.TryGetValue(Ord(FFieldsToProcess.Current.FieldType), Result);
 end;
 
 function TMorph.GetPSQLTypeName: String;
@@ -648,18 +597,8 @@ end;
 
 function TMorph.Identity: TMorph;
 begin
-  FFieldsToProcess.CurrentField.Identity := True;
+  FFieldsToProcess.Current.Identity := True;
   Result := Self;
-end;
-
-function TMorph.IgnoreCreatedStructure: TMorph;
-begin
-
-end;
-
-function TMorph.ImportSettings(const aConfigJSONString: String): TMorph;
-begin
-
 end;
 
 function TMorph.Insert(const aMphTable: TMphTable): TMorph;
@@ -679,8 +618,7 @@ begin
   InsertJSONObject := TJSONObject.Create;
   InsertJSONArray := TJSONArray.Create;
   try
-      FInsertTable.Free;
-      FInsertTable := TMphTable.Create;
+    FInsertTable.Clear;
     try
       InsertJSONObject := TJSONObject(TJSONObject.ParseJSONValue(aJSONInsert));
 
@@ -756,102 +694,37 @@ begin
   Result := Self;
 end;
 
-function TMorph.InsertJSON(const aJSONString: String): TMorph;
-begin
-
-end;
-
-function TMorph.InsertJSONStringInto: TMorph;
-begin
-
-end;
-
 function TMorph.tInteger: TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphInteger;
+  FFieldsToProcess.Current.FieldType := mphInteger;
   Result := Self;
-end;
-
-function TMorph.IsBiggerOrEqualThen<T>(const aValue: T): TMorph;
-begin
-
-end;
-
-function TMorph.IsBiggerThan<T>(const aValue: T): TMorph;
-begin
-
-end;
-
-function TMorph.IsSmallerOrEqualThen<T>(const aValue: T): TMorph;
-begin
-
-end;
-
-function TMorph.IsSmallerThen<T>(const aValue: T): TMorph;
-begin
-
-end;
-
-function TMorph.JSONContent(const aJSONString: String): TMorph;
-begin
-
-end;
-
-class function TMorph.JSONParse(const aJSONString: String): TMphTable;
-begin
-
-end;
-
-function TMorph.LoadSettings(const aMorphSettings : TMorphSettings): TMorph;
-begin
-
-end;
-
-function TMorph.NewValue<T>(const aNewValue: T): TMorph;
-begin
-
-end;
-
-function TMorph.NewValues(const NewValues: TArray<String>): TMorph;
-begin
-
 end;
 
 function TMorph.NoOrphaData: TMorph;
 begin
-  FFieldsToProcess.CurrentField.NoOrphaData := True;
+  FFieldsToProcess.Current.NoOrphaData := True;
   Result := Self;
 end;
 
 function TMorph.NoOrphanData: TMorph;
 begin
-  FFieldsToProcess.CurrentField.RelationsBehavior := mrbNoOrphanData;
+  FFieldsToProcess.Current.RelationsBehavior := mrbNoOrphanData;
   FStage := mpsCreate;
   Result := Self;
 end;
 
 function TMorph.NotNull: TMorph;
 begin
-  FFieldsToProcess.CurrentField.NotNull := True;
+  FFieldsToProcess.Current.NotNull := True;
   FStage := mpsCreate;
   Result := Self;
 end;
 
 function TMorph.NullOrphanData: TMorph;
 begin
-  FFieldsToProcess.CurrentField.RelationsBehavior := mrbNullOrphanData;
+  FFieldsToProcess.Current.RelationsBehavior := mrbNullOrphanData;
   FStage := mpsCreate;
   Result := Self;
-end;
-
-function TMorph.OutputFDMemTable(const anOutputTable: TFDMemTable): TMorph;
-begin
-
-end;
-
-function TMorph.OutputMorphTable(const aMorphTable: TMphTable): TMorph;
-begin
-
 end;
 
 function TMorph.Post: TMorph;
@@ -884,7 +757,7 @@ begin
         FPSQLInsertBase := FPSQLCommand;
 
         FInsertTable.Fields.First;
-        for LValueCount := 0 to FInsertTable.Fields.Elements[0].Values.ElementsCount -1 do //Values
+        for LValueCount := 0 to FInsertTable.Fields.Elements[0].Values.Count -1 do //Values
         begin
 
           FPSQLCommand := FPSQLInsertBase;
@@ -920,7 +793,7 @@ end;
 
 function TMorph.PrimaryKey: TMorph;
 begin
-  FFieldsToProcess.CurrentField.PrimaryKey := True;
+  FFieldsToProcess.Current.PrimaryKey := True;
   Result := Self;
 end;
 
@@ -928,16 +801,6 @@ function TMorph.References: TMorph;
 begin
   FStage := mpsReference;
   Result := Self;
-end;
-
-function TMorph.Return: TMorph;
-begin
-
-end;
-
-function TMorph.RunFindInAnOtherThread: TMorph;
-begin
-
 end;
 
 procedure TMorph.RunPSQL(const aCommand: String;
@@ -992,16 +855,6 @@ begin
   Result := Self;
 end;
 
-function TMorph.SetField(const aFieldName: String): TMorph;
-begin
-
-end;
-
-function TMorph.SetFields(const Fields: TArray<String>): TMorph;
-begin
-
-end;
-
 function TMorph.Table(const aTableName: String): TMorph;
 begin
   case FStage of
@@ -1011,7 +864,7 @@ begin
       FFieldsToProcess.Clear;
     end;
 
-    mpsReference: FFieldsToProcess.CurrentField.ReferencedTable := aTableName;
+    mpsReference: FFieldsToProcess.Current.ReferencedTable := aTableName;
 
     mpsInsert:
     begin
@@ -1026,18 +879,8 @@ end;
 
 function TMorph.Unique: TMorph;
 begin
-  FFieldsToProcess.CurrentField.Unique := True;
+  FFieldsToProcess.Current.Unique := True;
   Result := Self;
-end;
-
-function TMorph.Update: TMorph;
-begin
-
-end;
-
-function TMorph.Value<T>(const aValue: T): TMorph;
-begin
-
 end;
 
 function TMorph.Values(const aValues: TArray<TValue>): TMorph;
@@ -1062,24 +905,9 @@ end;
 
 function TMorph.tVarchar(const aSize: Integer): TMorph;
 begin
-  FFieldsToProcess.CurrentField.FieldType := mphVarchar;
-  FFieldsToProcess.CurrentField.Size := aSize;
+  FFieldsToProcess.Current.FieldType := mphVarchar;
+  FFieldsToProcess.Current.Size := aSize;
   Result := Self;
-end;
-
-function TMorph.Where: TMorph;
-begin
-
-end;
-
-function TMorph._And: TMorph;
-begin
-
-end;
-
-function TMorph._Or: TMorph;
-begin
-
 end;
 
 end.

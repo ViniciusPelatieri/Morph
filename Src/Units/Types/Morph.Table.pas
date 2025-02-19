@@ -12,27 +12,24 @@ type
     private
       FName : String;
       FFields : TMorphFields;
-      FCurrentFieldName : String;
-    private
-      function ContainsField(const aFieldName : String) : Boolean;
+
+      function SetName(const aName: String): TMphTable; //clone
+      function SetFields(const aFields: TMorphFields): TMphTable; //clone
     public
       constructor Create;
       destructor Destroy; override;
-      function ImportSettings(const aJSONSettings : TMorphSettings) : TMphTable;
-      function ExportSettings : TMorphSettings;
-      function InsertInto(const aTableName : String) : TMphTable;
-      function AsFDMemtable : TFDMemTable;
-      function AsJSONString : String;
-      function LoadFromFDMemtable(const aMemtable : TFDMemTable) : TMphTable;
-      function LoadFromJSONString(const aJSONString : String) : TMphTable;
+
       procedure Clear;
-      function AddField(const aFieldName : String) : TMphTable;
-      function TypeInteger : TMphTable;
+
+      class function New : TMphTable;
+      function Clone : TMphTable;
       function NewLine : TMphTable;
       function TypeString : TMphTable;
-      function FieldByName(const aFieldName : String) : TMphTable;
+      function TypeInteger : TMphTable;
       function AsValue(const aValue : TValue) : TMphTable;
+      function AddField(const aFieldName : String) : TMphTable;
       function FieldIdByName(const aFieldName : String) : Integer;
+      function ContainsField(const aFieldName : String) : Boolean;
 
       //overloaded
       function Field(const aFieldID : Integer): TMphTable; overload;
@@ -42,14 +39,6 @@ type
       property Fields : TMorphFields read FFields write FFields;
   end;
 
-  TMphTableArrange = class
-    private
-    public
-      function ImportSettings(const aJSONSettings : TMorphSettings) : TMphTableArrange;
-      function ExportSettings : TMorphSettings;
-      function Name(const aTableName : String) : TMphTable;
-  end;
-
 implementation
 
 uses
@@ -57,40 +46,35 @@ uses
 
 { TMphTable }
 
+class function TMphTable.New : TMphTable;
+begin
+  Result := Self.Create;
+end;
+
 function TMphTable.AddField(const aFieldName: String): TMphTable;
 begin
   if ContainsField(aFieldName) then
     Raise Exception.Create(Format(MORPH_MESSAGE_FIELD_DUPLICATE, [aFieldName]));
 
-  FCurrentFieldName := aFieldName;
+  FFields.Add(TMorphField.New.SetName(aFieldName));
   Result := Self;
-end;
-
-function TMphTable.AsFDMemtable: TFDMemTable;
-begin
-
-end;
-
-function TMphTable.AsJSONString: String;
-begin
-
 end;
 
 function TMphTable.AsValue(const aValue: TValue): TMphTable;
 begin
-  FFields.CurrentField.Values.SetCurrentElement(aValue);
+  FFields.Current.Values.SetCurrentElement(aValue);
   Result := Self;
 end;
 
 procedure TMphTable.Clear;
 begin
   FName := '';
-  FCurrentFieldName := '';
+  FFields.Clear;
+end;
 
-  if Assigned(FFields) then
-    FFields.Clear
-  else
-    FFields := TMorphFields.Create;
+function TMphTable.Clone: TMphTable;
+begin
+  Result := TMphTable.New.SetName(FName).SetFields(FFields.Clone);
 end;
 
 function TMphTable.ContainsField(const aFieldName: String): Boolean;
@@ -117,18 +101,13 @@ begin
   inherited;
 end;
 
-function TMphTable.ExportSettings: TMorphSettings;
-begin
-
-end;
-
 function TMphTable.Field(const aFieldName: String): TMphTable;
 var
   LFieldID : Integer;
 begin
   LFieldID := FieldIdByName(aFieldName);
 
-  if LFieldID < 0 then
+  if (LFieldID < 0) OR (LFieldID > High(FFields.Elements)) then
     Raise Exception.Create(Format(MORPH_MESSAGE_FIELD_NOT_FOUND, [aFieldName, FName]));
 
   FFields.RecNo := LFieldID;
@@ -137,16 +116,11 @@ end;
 
 function TMphTable.Field(const aFieldID: Integer): TMphTable;
 begin
-  if (aFieldID > FFields.Count -1) OR (aFieldID < 0) then
+  if (aFieldID < 0) OR (aFieldID > High(FFields.Elements)) then
     Raise Exception.Create(Format(MORPH_MESSAGE_NOT_VALID_FIELD_IDENTIFICATOR, [IntToStr(aFieldID)]));
 
   FFields.RecNo := aFieldID;
   Result := Self;
-end;
-
-function TMphTable.FieldByName(const aFieldName: String): TMphTable;
-begin
-
 end;
 
 function TMphTable.FieldIdByName(const aFieldName: String): Integer;
@@ -154,34 +128,12 @@ var
   LFieldIndex : Integer;
 begin
   Result := -1;
-  for LFieldIndex := 0 to FFields.ElementsCount -1 do
+  for LFieldIndex := 0 to FFields.Count -1 do
     if FFields.Elements[LFieldIndex].Name = aFieldName then
     begin
       Result := LFieldIndex;
       Break;
     end;
-end;
-
-function TMphTable.ImportSettings(
-  const aJSONSettings: TMorphSettings): TMphTable;
-begin
-
-end;
-
-function TMphTable.InsertInto(const aTableName: String): TMphTable;
-begin
-
-end;
-
-function TMphTable.LoadFromFDMemtable(
-  const aMemtable: TFDMemTable): TMphTable;
-begin
-
-end;
-
-function TMphTable.LoadFromJSONString(const aJSONString: String): TMphTable;
-begin
-
 end;
 
 function TMphTable.NewLine: TMphTable;
@@ -194,34 +146,29 @@ begin
   Result := Self;
 end;
 
+function TMphTable.SetFields(const aFields: TMorphFields): TMphTable; //clone
+begin
+  FFields := aFields;
+  Result := Self;
+end;
+
+function TMphTable.SetName(const aName: String): TMphTable; //clone
+begin
+  FName := aName;
+  Result := Self;
+end;
+
 function TMphTable.TypeInteger: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FCurrentFieldName).SetFieldType(mphInteger));
+  FFields.Add(TMorphField.New.SetName(FFields.Current.Name).SetFieldType(mphInteger));
   Result := Self;
 end;
 
 function TMphTable.TypeString: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FCurrentFieldName).SetFieldType(mphVarchar));
+  FFields.Add(TMorphField.New.SetName(FFields.Current.Name).SetFieldType(mphVarchar));
   Result := Self;
 end;
 
-{ TMphTableArrange }
-
-function TMphTableArrange.ExportSettings: TMorphSettings;
-begin
-
-end;
-
-function TMphTableArrange.ImportSettings(
-  const aJSONSettings: TMorphSettings): TMphTableArrange;
-begin
-
-end;
-
-function TMphTableArrange.Name(const aTableName: String): TMphTable;
-begin
-
-end;
 
 end.

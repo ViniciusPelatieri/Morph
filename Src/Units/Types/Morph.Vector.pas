@@ -11,24 +11,30 @@ type
     FArray : TArray<T>;
     FRecNo : Integer;
   public
-    procedure Add(const anElement : T);
-    procedure AddEmptyValue;
-    function ElementsCount : Integer;
-    procedure First;
+    constructor Create;
+    destructor Destroy; override;
+
     procedure Last;
     procedure Next;
-    procedure Previous;
+    procedure First;
     procedure Delete;
-    function CurrentElement : T;
-    procedure ClearVector;
-    function GetElements : TArray<T>;
-    procedure SetElements(const anArray : TArray<T>);
-    function GetRecNo : Integer;
-    procedure SetRecNo(const aValue : Integer);
-    function Eof : Boolean;
+    procedure Previous;
+    procedure Clear;
+    procedure AddEmptyValue;
+    procedure Add(const anElement : T);
     procedure SetCurrentElement(const aValue: T);
 
-    property Elements : TArray<T> read FArray write FArray;
+    class function New : TMorphVector<T>;
+    function Eof : Boolean;
+    function Current : T;
+    function GetRecNo : Integer;
+    function GetElements : TArray<T>;
+    function Count : Integer;
+    function Clone : TMorphVector<T>;
+    function SetRecNo(const aValue: Integer): TMorphVector<T>;
+    function SetElements(const anArray: TArray<T>): TMorphVector<T>;
+
+    property Elements: TArray<T> read FArray write FArray;
     property RecNo : Integer read FRecNo write FRecNo;
   end;
 
@@ -49,13 +55,25 @@ begin
   FRecNo := High(FArray);
 end;
 
-procedure TMorphVector<T>.ClearVector;
+procedure TMorphVector<T>.Clear;
 begin
   if Assigned(FArray) then
     SetLength(FArray, 0);
+
+  FRecNo := -1;
 end;
 
-function TMorphVector<T>.CurrentElement: T;
+function TMorphVector<T>.Clone: TMorphVector<T>;
+begin
+  Result := TMorphVector<T>.New.SetElements(Copy(FArray, 0, Length(FArray))).SetRecNo(FRecNo);
+end;
+
+constructor TMorphVector<T>.Create;
+begin
+  Clear;
+end;
+
+function TMorphVector<T>.Current: T;
 begin
   Result := FArray[FRecNo];
 end;
@@ -82,7 +100,13 @@ begin
   FArray := AuxArray;
 end;
 
-function TMorphVector<T>.ElementsCount: Integer;
+destructor TMorphVector<T>.Destroy;
+begin
+  Clear;
+  inherited;
+end;
+
+function TMorphVector<T>.Count: Integer;
 begin
   Result := Length(FArray);
 end;
@@ -94,7 +118,10 @@ end;
 
 procedure TMorphVector<T>.First;
 begin
-  FRecNo := 0;
+  if Length(FArray) > 0 then
+    FRecNo := 0
+  else
+    FRecNo := -1;
 end;
 
 function TMorphVector<T>.GetElements: TArray<T>;
@@ -112,6 +139,11 @@ begin
   FRecNo := High(FArray);
 end;
 
+class function TMorphVector<T>.New: TMorphVector<T>;
+begin
+  Result := TMorphVector<T>.Create;
+end;
+
 procedure TMorphVector<T>.Next;
 begin
   Inc(FRecNo, 1);
@@ -127,14 +159,16 @@ begin
   FArray[FRecNo] := aValue;
 end;
 
-procedure TMorphVector<T>.SetElements(const anArray: TArray<T>);
+function TMorphVector<T>.SetElements(const anArray: TArray<T>): TMorphVector<T>;
 begin
   FArray := anArray;
+  Result := Self;
 end;
 
-procedure TMorphVector<T>.SetRecNo(const aValue: Integer);
+function TMorphVector<T>.SetRecNo(const aValue: Integer): TMorphVector<T>;
 begin
   FRecNo := aValue;
+  Result := Self;
 end;
 
 end.

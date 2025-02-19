@@ -604,7 +604,6 @@ end;
 
 procedure TSample.RunChanges;
 var
-  MorphTableArrange : TMphTableArrange;
   Settings : TMorphSettings;
   InsertJSON : TJSONArray;
   ConfigString : String;
@@ -632,6 +631,7 @@ begin
   {$REGION 'Update'}
 
   {$REGION 'Equals'}
+  {
    Morph.Update.Table('CLIENT')
 
        .SetField('LAST_VISIT').NewValue<TDateTime>(EncodeDate(2025, 2, 1))
@@ -693,10 +693,11 @@ begin
        .SetField('LAST_VISIT').NewValue<TDateTime>(EncodeDate(2025, 2, 7))
        .SetField('CREDIT').NewValue<Extended>(1025.00)
        .Where.Field('ID').Equals<Integer>(15);
+       }
   {$ENDREGION}
 
   {$REGION 'BigerThan / SmallerThan'}
-  Morph.Update.Table('CLIENT').SetField('CREDIT').NewValue<Extended>(200)
+ { Morph.Update.Table('CLIENT').SetField('CREDIT').NewValue<Extended>(200)
        .Where.Field('CREDIT').IsBiggerThan<Integer>(500)
          ._And.Field('LAST_VISIT').IsSmallerThen<TDateTime>(EncodeDate(2025, 1, 1));
 
@@ -705,18 +706,19 @@ begin
 
   Morph.Update.Table('SELLER').SetField('OBS').NewValue<TMorphEmptyType>(Empty)
   .Where.Field('ACTIVE').Equals<Boolean>(False);
+  }
   {$ENDREGION}
 
   {$REGION 'Delete Line'}
-  Morph.Delete.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
+//  Morph.Delete.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
   {$ENDREGION}
 
   {$ENDREGION}
 
   {$REGION 'Select'}
-  Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Integer>(5)
+  {Morph.Select.All.From('ORDER').Where.Field('CLIENT_ID').IsBiggerOrEqualThen<Integer>(5)
                                   ._Or.Field('CLIENT').IsSmallerOrEqualThen<Integer>(9)
-       .AsTFDMemTable;
+       .AsTFDMemTable;}
   {$ENDREGION}
 //=======================================================================================================
   {
@@ -873,7 +875,7 @@ begin
       CBTable.ItemIndex := 0;
   end;
 
-  if TableNames.ElementsCount > 0 then
+  if TableNames.Count > 0 then
     LoadTableData;
 end;
 
