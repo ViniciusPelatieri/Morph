@@ -53,7 +53,7 @@ JSONString := '{                                          '+
               '            ]                              '+
               '}                                          ';
  
-Morph.InsertInto.Table('PRODUCT').Content(JSONString);
+Morph.Insert(JSONString);
 ```
 
 ```delphi
