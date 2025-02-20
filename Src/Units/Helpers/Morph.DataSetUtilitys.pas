@@ -3,7 +3,7 @@ unit Morph.DataSetUtilitys;
 interface
 
 uses
-  Data.DB, Datasnap.DBClient, FireDAC.Comp.Client;
+  Data.DB, Datasnap.DBClient, FireDAC.Comp.Client, Morph.EnumeratedTypes;
 
 type
   TMorphDSUtls = class
@@ -11,6 +11,7 @@ type
       class procedure DataSetToClientDS(ADataSet: TDataSet; AClientDataSet: TClientDataSet);
       class procedure FDQryToClientDS(aFDQuery : TFDQuery; AClientDataSet: TClientDataSet);
       class procedure FDQryToFDMemtable(aFDQuery : TFDQuery; aFDMemTable : TFDMemtable);
+      class function  UsrDateToDBDate(const aStringDate: String; const anEntryOrientation: TMorphDateOrientation) : String;
   end;
 
 implementation
@@ -74,6 +75,22 @@ begin
   AFDMemTable.Close;
   AFDMemTable.CopyDataSet(AFDQuery, [coStructure, coRestart, coAppend]);
   aFDMemTable.Open;
+end;
+
+class function TMorphDSUtls.UsrDateToDBDate(const aStringDate: String;
+  const anEntryOrientation: TMorphDateOrientation): String;
+begin
+  case anEntryOrientation of
+    mdoDD_MM_AAAA: Result := Copy(aStringDate, 7, 4)+'/'+
+                             Copy(aStringDate, 4, 2)+'/'+
+                             Copy(aStringDate, 0, 2);
+
+    mdoMM_DD_AAAA: Result := Copy(aStringDate, 7, 4)+'/'+
+                             Copy(aStringDate, 0, 2)+'/'+
+                             Copy(aStringDate, 4, 2);
+
+    mdoAAAA_MM_DD: Result := aStringDate;
+  end;
 end;
 
 end.

@@ -13,21 +13,23 @@ type
   TMorph = class
     private
       FTableName,
-      FPSQLCommand : String;
+      FPSQLCommand: String;
 
       FFB5FieldTypeNames,
-      FFB2_5FieldTypeNames : TDictionary<Integer, String>;
+      FFB2_5FieldTypeNames: TDictionary<Integer, String>;
 
       FFDConnection,
-      FTempConnection : TFDConnection;
+      FTempConnection: TFDConnection;
 
-      FDQResult : TFDQuery;
-      FStage : TMorphStages;
-      FDBType : TMorphDBType;
+      FDQResult: TFDQuery;
+      FStage: TMorphStages;
+      FDBType: TMorphDBType;
+      FInsertTable: TMphTable;
+      FFieldsToProcess: TMorphFields;
+      FDataOrientation: TMorphDateOrientation;
+      FFDMTTypeToMphFieldType: TDictionary<TFieldType, TMorphFieldTypes>;
 
-      FInsertTable : TMphTable;
-      FFieldsToProcess : TMorphFields;
-      FFDMTTypeToMphFieldType : TDictionary<TFieldType, TMorphFieldTypes>;
+
     public
       constructor Create;
       destructor Destroy; override;
@@ -35,52 +37,53 @@ type
       procedure ExecutePSQL(const aCommand : String);
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
 
-      function Add : TMorph;
-      function All : TMorph;
-      function Drop : TMorph;
-      function Post : TMorph;
-      function tDate : TMorph;
-      function Delete : TMorph;
-      function Unique : TMorph;
-      function tFloat : TMorph;
-      function Config : TMorph;
-      function Select : TMorph;
-      function NotNull : TMorph;
-      function Identity : TMorph;
-      function tInteger : TMorph;
-      function tBoolean : TMorph;
-      function InsertInto : TMorph;
-      function ForeignKey : TMorph;
-      function CreateTable : TMorph;
-      function References : TMorph;
-      function PrimaryKey : TMorph;
-      function tBinaryBlob : TMorph;
-      function NoOrphaData : TMorph;
-      function NoOrphanData : TMorph;
-      function NullOrphanData : TMorph;
-      function DeleteOrphanData : TMorph;
-      function GetPSQLTypeName : String;
-      function AsTFDMemTable : TFDMemTable;
-      function ExportSettings : TJSONObject;
-      function GetFB5FieldTypeName : String;
-      function GetFB2_5FieldTypeName : String;
+      function Add: TMorph;
+      function All: TMorph;
+      function Drop: TMorph;
+      function Post: TMorph;
+      function tDate: TMorph;
+      function Delete: TMorph;
+      function Unique: TMorph;
+      function tFloat: TMorph;
+      function Config: TMorph;
+      function Select: TMorph;
+      function NotNull: TMorph;
+      function Identity: TMorph;
+      function tInteger: TMorph;
+      function tBoolean: TMorph;
+      function InsertInto: TMorph;
+      function ForeignKey: TMorph;
+      function References: TMorph;
+      function PrimaryKey: TMorph;
+      function tBinaryBlob: TMorph;
+      function CreateTable: TMorph;
+      function NoOrphaData: TMorph;
+      function NoOrphanData: TMorph;
+      function NullOrphanData: TMorph;
+      function DeleteOrphanData: TMorph;
+      function GetPSQLTypeName: String;
+      function AsTFDMemTable: TFDMemTable;
+      function ExportSettings: TJSONObject;
+      function GetFB5FieldTypeName: String;
+      function GetFB2_5FieldTypeName: String;
       function AsTClientDataSet: TClientDataSet;
-      function DoNotRaiseOnRedundances : TMorph;
-      function Equals<T>(const aValue : T) : TMorph;
-      function GetTableNames : TMorphVector<String>;
-      function Field(const aField : String) : TMorph;
-      function FKName(const aFKName : String) : TMorph;
-      function From(const aTableName : String) : TMorph;
-      function tVarchar(const aSize : Integer) : TMorph;
-      function Table(const aTableName : String) : TMorph;
-      function OpenPSQL(const aCommand: String) : TMorph;
-      function CurrentPSQL(Out anOutVar : String) : TMorph;
-      function Values(const aValues : TArray<TValue>) : TMorph;
-      function Fields(const aFieldNames : TArray<String>) : TMorph;
-      function DatabaseType(const aDBType : TMorphDBType) : TMorph;
-      function Connection(const aConnection : TFDConnection) : TMorph;
-      function GetBasicType(const aValue : TValue) : TMorphBasicTypes;
-      function FDMTableFieldTypeConvert(const aFieldType : TFieldType) : TMorphFieldTypes;
+      function DoNotRaiseOnRedundances: TMorph;
+      function Equals<T>(const aValue: T): TMorph;
+      function GetTableNames: TMorphVector<String>;
+      function Field(const aField: String): TMorph;
+      function FKName(const aFKName: String): TMorph;
+      function From(const aTableName: String): TMorph;
+      function tVarchar(const aSize: Integer): TMorph;
+      function Table(const aTableName: String): TMorph;
+      function OpenPSQL(const aCommand: String): TMorph;
+      function CurrentPSQL(Out anOutVar: String): TMorph;
+      function Values(const aValues: TArray<TValue>): TMorph;
+      function Fields(const aFieldNames: TArray<String>): TMorph;
+      function DatabaseType(const aDBType: TMorphDBType): TMorph;
+      function Connection(const aConnection: TFDConnection): TMorph;
+      function GetBasicType(const aValue: TValue): TMorphBasicTypes;
+      function DateOrientation(const anOrientation: TMorphDateOrientation): TMorph;
+      function FDMTableFieldTypeConvert(const aFieldType: TFieldType): TMorphFieldTypes;
 
       //overloaded
       function Insert(const aMphTable : TMphTable) : TMorph; overload;
@@ -169,7 +172,6 @@ begin
     for LFieldsIndex := 0 to aFDMemTable.Fields.Count -1 do //Fields
       FInsertTable.Fields.Add(TMorphField.New.SetName(aFDMemTable.Fields[LFieldsIndex].FieldName).SetFieldType(FDMTableFieldTypeConvert(aFDMemtable.Fields[LFieldsIndex].DataType)));
 
-
     aFDMemtable.First;
     for LLinesIndex := 0 to aFDMemtable.RecordCount -1 do //Values
     begin
@@ -185,7 +187,6 @@ begin
           mphBinaryBlob:FInsertTable.Fields.Elements[LFieldsIndex].AddValue(aFDMemTable.Fields[LFieldsIndex].AsString);
         end;
       end;
-
       aFDMemTable.Next;
     end;
 
@@ -426,6 +427,13 @@ begin
   Result := Self;
 end;
 
+function TMorph.DateOrientation(
+  const anOrientation: TMorphDateOrientation): TMorph;
+begin
+  FDataOrientation := anOrientation;
+  Result := Self;
+end;
+
 function TMorph.tDate: TMorph;
 begin
   FFieldsToProcess.Current.FieldType := mphDate;
@@ -603,7 +611,7 @@ end;
 
 function TMorph.Insert(const aMphTable: TMphTable): TMorph;
 begin
-  FInsertTable := aMphTable;
+  FInsertTable := aMphTable.Clone;
   Post;
 end;
 
@@ -768,8 +776,8 @@ begin
 
             case FInsertTable.Fields.Elements[LFieldCount].FieldType of
               mphVarchar, mphUndefined:FPSQLCommand:=FPSQLCommand+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString);
-              mphDate:FPSQLCommand:=FPSQLCommand+PSQL_FB5_CAST+PSQL_OPEN_PARENTHESES+QuotedStr(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString)+PSQL_SPACE+PSQL_AS+PSQL_SPACE+PSQL_FB5_TYPE_DATE+PSQL_CLOSED_PARENTHESES;
-                                                 {CAST         (                    '16.02.2025'                                                                                           AS                 DATE               )}
+              mphDate:FPSQLCommand:=FPSQLCommand+PSQL_FB5_CAST+PSQL_OPEN_PARENTHESES+QuotedStr(TMorphDSUtls.UsrDateToDBDate(FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString, FDataOrientation))+PSQL_SPACE+PSQL_AS+PSQL_SPACE+PSQL_FB5_TYPE_DATE+PSQL_CLOSED_PARENTHESES;
+                                                 {CAST         (                              '2025/12/01'                                                                                           AS                 DATE               )}
               else
                 FPSQLCommand:=FPSQLCommand+FInsertTable.Fields.Elements[LFieldCount].Values.Elements[LValueCount].ToString;
             end;

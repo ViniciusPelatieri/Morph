@@ -838,7 +838,10 @@ procedure TSample.FormCreate(Sender: TObject);
 begin
    Morph := TMorph.Create;
 
-   Morph.Config.DatabaseType(FB5).Connection(FDCDB);
+   Morph.Config
+          .DatabaseType(FB5)
+          .Connection(FDCDB)
+          .DateOrientation(mdoDD_MM_AAAA);
 end;
 
 procedure TSample.FormDestroy(Sender: TObject);

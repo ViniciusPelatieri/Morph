@@ -160,13 +160,13 @@ end;
 
 function TMphTable.TypeInteger: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FFields.Current.Name).SetFieldType(mphInteger));
+  FFields.Current.FieldType := mphInteger;
   Result := Self;
 end;
 
 function TMphTable.TypeString: TMphTable;
 begin
-  FFields.Add(TMorphField.New.SetName(FFields.Current.Name).SetFieldType(mphVarchar));
+  FFields.Current.FieldType := mphVarchar;
   Result := Self;
 end;
 
