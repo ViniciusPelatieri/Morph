@@ -192,6 +192,7 @@ begin
 
     Post;
   finally
+    FStage := mpsCreate;
     aFDMemTable.EnableControls;
   end;
 end;
@@ -354,64 +355,68 @@ var
   vFieldCount : Integer;
   vField : TMorphField;
 begin
-  FPSQLCommand := PSQL_FB5_CREATE_TABLE+PSQL_SPACE+FTableName+PSQL_SPACE+PSQL_OPEN_PARENTHESES+PSQL_SPACE;
+  try
+    FPSQLCommand := PSQL_FB5_CREATE_TABLE+PSQL_SPACE+FTableName+PSQL_SPACE+PSQL_OPEN_PARENTHESES+PSQL_SPACE;
 
-  FFieldsToProcess.First;
-  for vFieldCount := 0 to FFieldsToProcess.Count -1 do
-  begin
-    vField := FFieldsToProcess.Elements[vFieldCount];
-
-    if vFieldCount > 0 then
-      FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
-
-    FPSQLCommand:=FPSQLCommand+ vField.Name+PSQL_SPACE+GetPSQLTypeName;
-
-    if FFieldsToProcess.Current.FieldType = mphVarchar then
-      FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.Current.Size)+PSQL_CLOSED_PARENTHESES;
-
-    if vField.Identity then
-      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_IDENTITY;
-
-    if vField.PrimaryKey then
-      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_PRIMARY_KEY;
-
-    if vField.NotNull then
-      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_NOT_NULL;
-
-    if vField.Unique then
-      FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_UNIQUE;
-
-    if NOT FFieldsToProcess.Eof then
-      FFieldsToProcess.Next;
-  end;
-
-  FFieldsToProcess.First;
-  for vFieldCount := 0 to FFieldsToProcess.Count -1 do   //FK
-  begin
-    vField := FFieldsToProcess.Elements[vFieldCount];
-    if vField.ForeignKey then
+    FFieldsToProcess.First;
+    for vFieldCount := 0 to FFieldsToProcess.Count -1 do
     begin
-      {FK_<SourceTable>_<DesntinationTable>}
-      FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE+PSQL_FB5_CONSTRAINT+PSQL_SPACE+vField.FKName+PSQL_SPACE+PSQL_FB5_FOREIGN_KEY+PSQL_SPACE+PSQL_OPEN_PARENTHESES+vField.Name+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_REFERENCES+PSQL_SPACE+vField.ReferencedTable+PSQL_OPEN_PARENTHESES+vField.ReferencedField+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_ON;
-                                           {CONSTRAINT                      FK_ORDER_CLIENT                    FOREIGN KEY                     (                      CLIENT_ID  )                                  REFERENCES          CLIENT                 (                     ID                     )                                  ON}
-      case vField.RelationsBehavior of
-        mrbNoOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
-        mrbNullOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_SET+PSQL_SPACE+PSQL_FB5_NULL+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
-        mrbDeleteOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_CASCADE+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
-      end;
+      vField := FFieldsToProcess.Elements[vFieldCount];
 
+      if vFieldCount > 0 then
+        FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
+
+      FPSQLCommand:=FPSQLCommand+ vField.Name+PSQL_SPACE+GetPSQLTypeName;
+
+      if FFieldsToProcess.Current.FieldType = mphVarchar then
+        FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.Current.Size)+PSQL_CLOSED_PARENTHESES;
+
+      if vField.Identity then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_IDENTITY;
+
+      if vField.PrimaryKey then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_PRIMARY_KEY;
+
+      if vField.NotNull then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_NOT_NULL;
+
+      if vField.Unique then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_UNIQUE;
+
+      if NOT FFieldsToProcess.Eof then
+        FFieldsToProcess.Next;
     end;
 
-    if NOT FFieldsToProcess.Eof then
-      FFieldsToProcess.Next;
-  end;
+    FFieldsToProcess.First;
+    for vFieldCount := 0 to FFieldsToProcess.Count -1 do   //FK
+    begin
+      vField := FFieldsToProcess.Elements[vFieldCount];
+      if vField.ForeignKey then
+      begin
+        {FK_<SourceTable>_<DesntinationTable>}
+        FPSQLCommand:=FPSQLCommand+PSQL_COMMA+PSQL_SPACE+PSQL_FB5_CONSTRAINT+PSQL_SPACE+vField.FKName+PSQL_SPACE+PSQL_FB5_FOREIGN_KEY+PSQL_SPACE+PSQL_OPEN_PARENTHESES+vField.Name+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_REFERENCES+PSQL_SPACE+vField.ReferencedTable+PSQL_OPEN_PARENTHESES+vField.ReferencedField+PSQL_CLOSED_PARENTHESES+PSQL_SPACE+PSQL_FB5_ON;
+                                             {CONSTRAINT                      FK_ORDER_CLIENT                    FOREIGN KEY                     (                      CLIENT_ID  )                                  REFERENCES          CLIENT                 (                     ID                     )                                  ON}
+        case vField.RelationsBehavior of
+          mrbNoOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+          mrbNullOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_SET+PSQL_SPACE+PSQL_FB5_NULL+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+          mrbDeleteOrphanData: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_DELETE+PSQL_SPACE+PSQL_FB5_CASCADE+PSQL_SPACE+PSQL_FB5_ON+PSQL_SPACE+PSQL_FB5_UPDATE+PSQL_SPACE+PSQL_FB5_CASCADE;
+        end;
 
-  FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
+      end;
 
-  try
-    ExecutePSQL(FPSQLCommand);
+      if NOT FFieldsToProcess.Eof then
+        FFieldsToProcess.Next;
+    end;
+
+    FPSQLCommand:=FPSQLCommand+PSQL_CLOSED_PARENTHESES+PSQL_SEMICOLON;
+
+    try
+      ExecutePSQL(FPSQLCommand);
+    finally
+      FPSQLCommand := '';
+    end;
   finally
-    FPSQLCommand := '';
+    FFieldsToProcess.Clear;
   end;
 end;
 
@@ -468,8 +473,21 @@ end;
 function TMorph.Drop: TMorph;
 begin
   case FDBType of
-    FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_FB2_5_DROP_TABLE+PSQL_SPACE+FTableName;
-    FB5: FPSQLCommand:=FPSQLCommand+PSQL_FB5_DROP_TABLE+PSQL_SPACE+FTableName;
+    FB2_5: FPSQLCommand:=PSQL_FB2_5_DROP_TABLE+PSQL_SPACE+FTableName;
+
+    FB5:
+    begin
+      if FFieldsToProcess.Count = 0 then //Drop Table
+        FPSQLCommand:=PSQL_FB5_DROP_TABLE+PSQL_SPACE+FTableName
+      else //Drop Field
+      begin
+        try
+          FPSQLCommand:=PSQL_FB5_ALTER_TABLE+PSQL_SPACE+FTableName+PSQL_SPACE+PSQL_FB5_DROP+PSQL_SPACE+FFieldsToProcess.Current.Name;
+        finally
+          FFieldsToProcess.Clear;
+        end;
+      end;
+    end;
   end;
 
   try
@@ -794,7 +812,9 @@ begin
       end;
     end;
   finally
+    FFieldsToProcess.Clear;
     FInsertTable.Clear;
+    FStage := mpsCreate;
   end;
   Result := Self;
 end;
@@ -818,34 +838,31 @@ begin
     FDQResult.Free;
 
   if Assigned(FTempConnection) then
-  begin
-    FTempConnection.Close;
     FTempConnection.Free;
-  end;
 
   FDQResult := TFDQuery.Create(Nil);
   FTempConnection := TFDConnection.Create(Nil);
 
-  FTempConnection.Params.DriverID := FFDConnection.Params.DriverID;
-  FTempConnection.Params.Database := FFDConnection.Params.Database;
-  FTempConnection.Params.UserName := FFDConnection.Params.UserName;
-  FTempConnection.Params.Password := FFDConnection.Params.Password;
-  FTempConnection.TxOptions.AutoCommit := True;
-  FTempConnection.LoginPrompt := False;
-  FTempConnection.Open;
+    FTempConnection.Params.DriverID := FFDConnection.Params.DriverID;
+    FTempConnection.Params.Database := FFDConnection.Params.Database;
+    FTempConnection.Params.UserName := FFDConnection.Params.UserName;
+    FTempConnection.Params.Password := FFDConnection.Params.Password;
+    FTempConnection.TxOptions.AutoCommit := True;
+    FTempConnection.LoginPrompt := False;
+    FTempConnection.Open;
 
-  FDQResult.Connection := FTempConnection;
-  FDQResult.FetchOptions.Mode := fmAll;
-  FDQResult.SQL.Text := aCommand;
+    FDQResult.Connection := FTempConnection;
+    FDQResult.FetchOptions.Mode := fmAll;
+    FDQResult.SQL.Text := aCommand;
 
-  try
-    case aQryAction of
-      Open: FDQResult.Open;
-      Execute: FDQResult.ExecSQL;
+    try
+      case aQryAction of
+        Open: FDQResult.Open;
+        Execute: FDQResult.ExecSQL;
+      end;
+    except on E : Exception do
+      Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
     end;
-  except on E : Exception do
-    Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
-  end;
 end;
 
 procedure TMorph.ExecutePSQL(const aCommand: String);

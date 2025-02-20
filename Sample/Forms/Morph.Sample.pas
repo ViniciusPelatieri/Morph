@@ -35,6 +35,7 @@ type
     BtnJSONArrayInsert: TButton;
     BtnJSONStringInsert: TButton;
     BtnTFDMemtableInsert: TButton;
+    BtnDropColumns: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -47,6 +48,7 @@ type
     procedure BtnJSONArrayInsertClick(Sender: TObject);
     procedure BtnJSONStringInsertClick(Sender: TObject);
     procedure BtnTFDMemtableInsertClick(Sender: TObject);
+    procedure BtnDropColumnsClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -67,6 +69,12 @@ uses
   Morph.Vector;
 
 {$R *.dfm}
+
+procedure TSample.BtnDropColumnsClick(Sender: TObject);
+begin
+  Morph.Table('ORDERS').Field('ORDER_DATE').Drop;
+  Morph.Table('SELLER').Field('EMAIL').Drop;
+end;
 
 procedure TSample.BtnDropTablesClick(Sender: TObject);
 var
@@ -611,11 +619,6 @@ var
   JSONLine : TJSONObject;
   JSONString : String;
 begin
-
-  {$REGION 'Dropping entire columns'}
-  Morph.Table('SELLER').Field('EMAIL').Drop;
-  Morph.Table('ORDER').Field('ORDER_DATE').Drop;
-  {$ENDREGION}
 
   {$REGION 'Add fields on existing tables'}
   Morph.Table('CLIENT').Field('LAST_VISIT').tDate

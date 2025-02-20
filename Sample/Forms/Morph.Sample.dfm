@@ -128,6 +128,15 @@ object Sample: TSample
     TabOrder = 10
     OnClick = BtnTFDMemtableInsertClick
   end
+  object BtnDropColumns: TButton
+    Left = 655
+    Top = 30
+    Width = 105
+    Height = 25
+    Caption = 'Drop Columns'
+    TabOrder = 11
+    OnClick = BtnDropColumnsClick
+  end
   object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'
