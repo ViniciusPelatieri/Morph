@@ -3,6 +3,7 @@
 </p>
 
 # Morph - Query Builder for Delphi
+## 🚧This project is under construction and not yet ready for use.🚧
 
 Morph is a powerful Query Builder for Delphi that allows developers to build and manipulate SQL queries dynamically, eliminating the need to write raw SQL within the code.
 
