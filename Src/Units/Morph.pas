@@ -101,8 +101,54 @@ uses
 { TMorph }
 
 function TMorph.Add: TMorph;
+var
+  vFieldCount : Integer;
+  vField : TMorphField;
 begin
+  try
+    FPSQLCommand := PSQL_FB5_ALTER_TABLE+PSQL_SPACE+FTableName;
 
+    FFieldsToProcess.First;
+    for vFieldCount := 0 to FFieldsToProcess.Count -1 do
+    begin
+      vField := FFieldsToProcess.Elements[vFieldCount];
+
+      if vFieldCount > 0 then
+        FPSQLCommand:=FPSQLCommand+ PSQL_COMMA;
+
+      FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_ADD+PSQL_SPACE+vField.Name+PSQL_SPACE+GetPSQLTypeName;
+
+      if FFieldsToProcess.Current.FieldType = mphVarchar then
+        FPSQLCommand:=FPSQLCommand+ PSQL_OPEN_PARENTHESES+IntToStr(FFieldsToProcess.Current.Size)+PSQL_CLOSED_PARENTHESES;
+
+      if vField.Identity then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_IDENTITY;
+
+      if vField.PrimaryKey then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_PRIMARY_KEY;
+
+      if vField.NotNull then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_NOT_NULL;
+
+      if vField.Unique then
+        FPSQLCommand:=FPSQLCommand+ PSQL_SPACE+PSQL_FB5_UNIQUE;
+
+      if NOT FFieldsToProcess.Eof then
+        FFieldsToProcess.Next;
+    end;
+
+    FPSQLCommand:=FPSQLCommand+PSQL_SEMICOLON;
+
+    try
+      ExecutePSQL(FPSQLCommand);
+    finally
+      FPSQLCommand := '';
+    end;
+
+  finally
+    FFieldsToProcess.Clear;
+    FStage := mpsCreate;
+  end;
 end;
 
 function TMorph.All: TMorph;

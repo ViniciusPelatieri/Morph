@@ -36,6 +36,7 @@ type
     BtnJSONStringInsert: TButton;
     BtnTFDMemtableInsert: TButton;
     BtnDropColumns: TButton;
+    BtnAddFieldsInTable: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -49,6 +50,7 @@ type
     procedure BtnJSONStringInsertClick(Sender: TObject);
     procedure BtnTFDMemtableInsertClick(Sender: TObject);
     procedure BtnDropColumnsClick(Sender: TObject);
+    procedure BtnAddFieldsInTableClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -572,6 +574,18 @@ begin
   Morph.InsertInto.Table('ORDERS').Content(FDMTInsertOrder);
 end;
 
+procedure TSample.BtnAddFieldsInTableClick(Sender: TObject);
+begin
+  Morph.Table('CLIENT').Field('LAST_VISIT').tDate
+                       .Field('CREDIT').tFloat
+        .Add;
+
+  Morph.Table('SELLER').Field('COMISSION').tFloat
+                       .Field('OBS').tVarchar(50)
+                       .Field('ACTIVE').tBoolean.NotNull
+        .Add;
+end;
+
 procedure TSample.BtnCreateTablesClick(Sender: TObject);
 begin
   Morph.Table('CLIENT')
@@ -619,18 +633,6 @@ var
   JSONLine : TJSONObject;
   JSONString : String;
 begin
-
-  {$REGION 'Add fields on existing tables'}
-  Morph.Table('CLIENT').Field('LAST_VISIT').tDate
-                       .Field('CREDIT').tFloat
-
-       .Table('SELLER').Field('COMISSION').tFloat
-                       .Field('OBS').tVarchar(50)
-       .Add;
-
-  Morph.Table('SELLER').Field('ACTIVE').tBoolean.NotNull.Add;
-  {$ENDREGION}
-
   {$REGION 'Update'}
 
   {$REGION 'Equals'}
@@ -713,7 +715,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'Delete Line'}
-//  Morph.Delete.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
+//  Morph.DeleteIn.Table('CLIENT').Where.Field('NAME').Equals<String>('TEST');
   {$ENDREGION}
 
   {$ENDREGION}

@@ -31,6 +31,7 @@ const PSQL_FB5_VALUES = 'VALUES';
 const PSQL_FB5_CAST = 'CAST';
 const PSQL_FB5_ALTER_TABLE = 'ALTER TABLE';
 const PSQL_FB5_DROP = 'DROP';
+const PSQL_FB5_ADD = 'ADD';
 
 implementation
 

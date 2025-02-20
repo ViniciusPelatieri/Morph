@@ -129,13 +129,22 @@ object Sample: TSample
     OnClick = BtnTFDMemtableInsertClick
   end
   object BtnDropColumns: TButton
-    Left = 655
+    Left = 653
     Top = 30
-    Width = 105
+    Width = 113
     Height = 25
     Caption = 'Drop Columns'
     TabOrder = 11
     OnClick = BtnDropColumnsClick
+  end
+  object BtnAddFieldsInTable: TButton
+    Left = 653
+    Top = 4
+    Width = 113
+    Height = 25
+    Caption = 'Add Fields in Table'
+    TabOrder = 12
+    OnClick = BtnAddFieldsInTableClick
   end
   object FDCDB: TFDConnection
     Params.Strings = (
