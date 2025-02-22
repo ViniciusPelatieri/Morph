@@ -9,7 +9,8 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Comp.DataSet, Vcl.StdCtrls,
-  Vcl.Grids, Vcl.DBGrids, FireDAC.Phys.FB, FireDAC.Phys.FBDef, Datasnap.DBClient;
+  Vcl.Grids, Vcl.DBGrids, FireDAC.Phys.FB, FireDAC.Phys.FBDef, Datasnap.DBClient,
+  Vcl.CheckLst;
 
 type
   TSample = class(TForm)
@@ -37,6 +38,21 @@ type
     BtnTFDMemtableInsert: TButton;
     BtnDropColumns: TButton;
     BtnAddFieldsInTable: TButton;
+    BtnSelect: TButton;
+    CheckListBox1: TCheckListBox;
+    LbFrom: TLabel;
+    ComboBox1: TComboBox;
+    LbWhere: TLabel;
+    CheckListBox2: TCheckListBox;
+    ComboBox2: TComboBox;
+    Edit1: TEdit;
+    ComboBox3: TComboBox;
+    LbField: TLabel;
+    LbComparison: TLabel;
+    LbValue: TLabel;
+    Label1: TLabel;
+    BtnSelectTes: TButton;
+    FDMTInsertOrderSELLER_ID: TIntegerField;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure BtnRefrshyablesClick(Sender: TObject);
@@ -51,6 +67,7 @@ type
     procedure BtnTFDMemtableInsertClick(Sender: TObject);
     procedure BtnDropColumnsClick(Sender: TObject);
     procedure BtnAddFieldsInTableClick(Sender: TObject);
+    procedure BtnSelectTesClick(Sender: TObject);
   private
     { Private declarations }
       Morph : TMorph;
@@ -68,7 +85,7 @@ implementation
 
 uses
   Morph.EnumeratedTypes, Morph.Table, Morph.Settings, System.JSON,
-  Morph.Vector;
+  Morph.Vector, Morph.Where;
 
 {$R *.dfm}
 
@@ -445,6 +462,13 @@ begin
   LoadTablesInComboBox;
 end;
 
+procedure TSample.BtnSelectTesClick(Sender: TObject);
+begin
+  Morph.Select.All.From('ORDERS').Where(W('NAME').Equals('Marcos'))
+                                   ._Or
+                                   .Where(W('NAME').Equals('Fernando'));
+end;
+
 procedure TSample.BtnTFDMemtableInsertClick(Sender: TObject);
 begin
  {$REGION 'Populating TFDMemTable'}
@@ -455,7 +479,8 @@ begin
   FDMTInsertOrderCLIENT_ID.AsInteger := 1;
   FDMTInsertOrderPRODUCT_ID.AsInteger := 2;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
-  FDMTInsertOrderORDER_DATE.AsDateTime :=  EncodeDate(2025, 2, 1);
+  FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 1);
+  FDMTInsertOrderSELLER_ID.AsInteger := 1;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -464,6 +489,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 5;
   FDMTInsertOrderQUANTITY.AsFloat := 2;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 2);
+  FDMTInsertOrderSELLER_ID.AsInteger := 2;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -472,6 +498,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 8;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 3);
+  FDMTInsertOrderSELLER_ID.AsInteger := 3;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -480,6 +507,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 10;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 4);
+  FDMTInsertOrderSELLER_ID.AsInteger := 4;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -488,6 +516,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 15;
   FDMTInsertOrderQUANTITY.AsFloat := 3;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 5);
+  FDMTInsertOrderSELLER_ID.AsInteger := 5;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -496,6 +525,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 7;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 6);
+  FDMTInsertOrderSELLER_ID.AsInteger := 6;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -504,6 +534,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 12;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 7);
+  FDMTInsertOrderSELLER_ID.AsInteger := 7;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -512,6 +543,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 3;
   FDMTInsertOrderQUANTITY.AsFloat := 5;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 8);
+  FDMTInsertOrderSELLER_ID.AsInteger := 8;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -520,6 +552,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 6;
   FDMTInsertOrderQUANTITY.AsFloat := 2;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 9);
+  FDMTInsertOrderSELLER_ID.AsInteger := 9;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -528,6 +561,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 1;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 10);
+  FDMTInsertOrderSELLER_ID.AsInteger := 10;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -536,6 +570,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 14;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 11);
+  FDMTInsertOrderSELLER_ID.AsInteger := 11;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -544,6 +579,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 4;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 12);
+  FDMTInsertOrderSELLER_ID.AsInteger := 12;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -552,6 +588,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 11;
   FDMTInsertOrderQUANTITY.AsFloat := 2;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 13);
+  FDMTInsertOrderSELLER_ID.AsInteger := 13;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -560,6 +597,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 9;
   FDMTInsertOrderQUANTITY.AsFloat := 1;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 14);
+  FDMTInsertOrderSELLER_ID.AsInteger := 14;
   FDMTInsertOrder.Post;
 
   FDMTInsertOrder.Append;
@@ -568,6 +606,7 @@ begin
   FDMTInsertOrderPRODUCT_ID.AsInteger := 13;
   FDMTInsertOrderQUANTITY.AsFloat := 3;
   FDMTInsertOrderORDER_DATE.AsDateTime := EncodeDate(2025, 2, 15);
+  FDMTInsertOrderSELLER_ID.AsInteger := 15;
   FDMTInsertOrder.Post;
   {$ENDREGION}
 

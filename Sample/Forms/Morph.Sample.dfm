@@ -2,7 +2,7 @@ object Sample: TSample
   Left = 0
   Top = 0
   Caption = 'Sample'
-  ClientHeight = 637
+  ClientHeight = 714
   ClientWidth = 1002
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,6 +19,60 @@ object Sample: TSample
     Width = 28
     Height = 15
     Caption = 'Table'
+  end
+  object LbFrom: TLabel
+    Left = 218
+    Top = 442
+    Width = 44
+    Height = 21
+    Caption = 'FROM'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+  end
+  object LbWhere: TLabel
+    Left = 414
+    Top = 444
+    Width = 52
+    Height = 21
+    Caption = 'WHERE'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+  end
+  object LbField: TLabel
+    Left = 472
+    Top = 423
+    Width = 25
+    Height = 15
+    Caption = 'Field'
+  end
+  object LbComparison: TLabel
+    Left = 599
+    Top = 423
+    Width = 65
+    Height = 15
+    Caption = 'Comparison'
+  end
+  object LbValue: TLabel
+    Left = 750
+    Top = 423
+    Width = 28
+    Height = 15
+    Caption = 'Value'
+  end
+  object Label1: TLabel
+    Left = 877
+    Top = 423
+    Width = 34
+    Height = 15
+    Caption = 'Label1'
   end
   object CBTable: TComboBox
     Left = 8
@@ -47,7 +101,7 @@ object Sample: TSample
     Left = 8
     Top = 61
     Width = 986
-    Height = 568
+    Height = 356
     DataSource = DSTable
     TabOrder = 2
     TitleFont.Charset = DEFAULT_CHARSET
@@ -146,13 +200,77 @@ object Sample: TSample
     TabOrder = 12
     OnClick = BtnAddFieldsInTableClick
   end
+  object BtnSelect: TButton
+    Left = 8
+    Top = 439
+    Width = 75
+    Height = 25
+    Caption = 'Select'
+    TabOrder = 13
+  end
+  object CheckListBox1: TCheckListBox
+    Left = 89
+    Top = 439
+    Width = 121
+    Height = 234
+    ItemHeight = 17
+    TabOrder = 14
+  end
+  object ComboBox1: TComboBox
+    Left = 271
+    Top = 444
+    Width = 135
+    Height = 23
+    TabOrder = 15
+    Text = 'ComboBox1'
+  end
+  object CheckListBox2: TCheckListBox
+    Left = 472
+    Top = 444
+    Width = 121
+    Height = 77
+    ItemHeight = 17
+    TabOrder = 16
+  end
+  object ComboBox2: TComboBox
+    Left = 599
+    Top = 444
+    Width = 145
+    Height = 23
+    TabOrder = 17
+    Text = 'ComboBox2'
+  end
+  object Edit1: TEdit
+    Left = 750
+    Top = 444
+    Width = 121
+    Height = 23
+    TabOrder = 18
+    Text = 'Edit1'
+  end
+  object ComboBox3: TComboBox
+    Left = 877
+    Top = 444
+    Width = 83
+    Height = 23
+    TabOrder = 19
+    Text = 'ComboBox3'
+  end
+  object BtnSelectTes: TButton
+    Left = 752
+    Top = 544
+    Width = 129
+    Height = 25
+    Caption = 'BtnSelect Test'
+    TabOrder = 20
+    OnClick = BtnSelectTesClick
+  end
   object FDCDB: TFDConnection
     Params.Strings = (
       'Database=C:\debug\MORPH_SAMPLE_DB_FB5.FDB'
       'User_Name=SYSDBA'
       'Password=1234#ioje'
       'DriverID=FB')
-    Connected = True
     LoginPrompt = False
     Left = 192
     Top = 168
@@ -170,8 +288,8 @@ object Sample: TSample
     UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
-    Left = 384
-    Top = 472
+    Left = 264
+    Top = 168
     object FDMTInsertOrderID: TIntegerField
       FieldName = 'ID'
     end
@@ -186,6 +304,9 @@ object Sample: TSample
     end
     object FDMTInsertOrderORDER_DATE: TDateField
       FieldName = 'ORDER_DATE'
+    end
+    object FDMTInsertOrderSELLER_ID: TIntegerField
+      FieldName = 'SELLER_ID'
     end
   end
   object FDMTTable: TFDMemTable

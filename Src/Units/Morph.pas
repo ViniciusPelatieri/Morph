@@ -7,7 +7,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Comp.Client, System.JSON,
   Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings, Morph.Vector, Datasnap.DBClient, System.Rtti,
-  System.Generics.Collections, Data.DB;
+  System.Generics.Collections, Data.DB, Morph.Where;
 
 type
   TMorph = class
@@ -37,8 +37,10 @@ type
       procedure ExecutePSQL(const aCommand : String);
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
 
+      function _Or: TMorph;
       function Add: TMorph;
       function All: TMorph;
+      function _And: TMorph;
       function Drop: TMorph;
       function Post: TMorph;
       function tDate: TMorph;
@@ -60,6 +62,7 @@ type
       function NoOrphaData: TMorph;
       function NoOrphanData: TMorph;
       function NullOrphanData: TMorph;
+      function GetDBType : TMorphDBType;
       function DeleteOrphanData: TMorph;
       function GetPSQLTypeName: String;
       function AsTFDMemTable: TFDMemTable;
@@ -78,6 +81,7 @@ type
       function OpenPSQL(const aCommand: String): TMorph;
       function CurrentPSQL(Out anOutVar: String): TMorph;
       function Values(const aValues: TArray<TValue>): TMorph;
+      function Where(const aWhereInstruction : W) : TMorph;
       function Fields(const aFieldNames: TArray<String>): TMorph;
       function DatabaseType(const aDBType: TMorphDBType): TMorph;
       function Connection(const aConnection: TFDConnection): TMorph;
@@ -637,6 +641,11 @@ begin
     Raise Exception.Create(Format(MORPH_MESSAGE_COULD_NOT_DETTECT_TYPE, [aValue.ToString]));
 end;
 
+function TMorph.GetDBType: TMorphDBType;
+begin
+  Result := FDBType;
+end;
+
 function TMorph.GetFB2_5FieldTypeName: String;
 begin
 
@@ -971,6 +980,21 @@ begin
     FInsertTable.Fields.Elements[LFieldsCount].Values.Add(aValues[LFieldsCount]);
   end;
 
+  Result := Self;
+end;
+
+function TMorph.Where(const aWhereInstruction: W): TMorph;
+begin
+
+end;
+
+function TMorph._And: TMorph;
+begin
+  Result := Self;
+end;
+
+function TMorph._Or: TMorph;
+begin
   Result := Self;
 end;
 

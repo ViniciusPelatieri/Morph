@@ -310,6 +310,7 @@
         <DCCReference Include="Units\Helpers\Morph.DataSetUtilitys.pas"/>
         <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.FB2_5.pas"/>
         <DCCReference Include="Units\Morph.Messages.pas"/>
+        <DCCReference Include="Units\Types\Morph.Where.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
