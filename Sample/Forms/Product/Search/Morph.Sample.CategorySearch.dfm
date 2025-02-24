@@ -1,9 +1,9 @@
-object FrmPeopleSearch: TFrmPeopleSearch
+object FrmCategorySearch: TFrmCategorySearch
   Left = 0
   Top = 0
-  Caption = 'Search'
-  ClientHeight = 827
-  ClientWidth = 733
+  Caption = 'Category'
+  ClientHeight = 495
+  ClientWidth = 597
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -2959,89 +2959,37 @@ object FrmPeopleSearch: TFrmPeopleSearch
     C104134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104
     134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104134C
     30C104134CB0FF1FEDFF03ECFC843D6DE2421E0000000049454E44AE426082}
-  Visible = True
-  StyleElements = []
+  Menu = Menu
+  Position = poDesigned
   TextHeight = 15
   object PnBase: TPanel
     Left = 0
     Top = 0
-    Width = 733
-    Height = 827
+    Width = 597
+    Height = 495
     Align = alClient
     TabOrder = 0
-    object PnCliSearch: TPanel
+    object PnSearchFilters: TPanel
       Left = 1
       Top = 1
-      Width = 731
-      Height = 208
+      Width = 595
+      Height = 152
       Align = alTop
       TabOrder = 0
-      object LbCountry: TLabel
-        Left = 16
-        Top = 102
-        Width = 43
-        Height = 15
-        Caption = 'Country'
-      end
-      object LbEdtStatus: TLabel
-        Left = 428
-        Top = 102
-        Width = 32
-        Height = 15
-        Caption = 'Status'
-      end
-      object LbRegistrationType: TLabel
-        Left = 539
-        Top = 102
-        Width = 91
-        Height = 15
-        Caption = 'Registration Type'
-      end
-      object LbPostalCode: TLabel
-        Left = 16
-        Top = 155
-        Width = 63
-        Height = 15
-        Caption = 'Postal Code'
-      end
-      object LbState: TLabel
-        Left = 131
-        Top = 155
-        Width = 26
-        Height = 15
-        Caption = 'State'
-      end
-      object LbCity: TLabel
-        Left = 247
-        Top = 155
-        Width = 21
-        Height = 15
-        Caption = 'City'
-      end
-      object LbDistrict: TLabel
-        Left = 389
-        Top = 155
-        Width = 37
-        Height = 15
-        Caption = 'District'
-      end
-      object LbStrteet: TLabel
-        Left = 503
-        Top = 155
-        Width = 30
-        Height = 15
-        Caption = 'Street'
-      end
-      object LbNumber: TLabel
-        Left = 621
-        Top = 155
-        Width = 44
-        Height = 15
-        Caption = 'Number'
+      object LbEdtGlobalSearch: TLabeledEdit
+        Left = 10
+        Top = 27
+        Width = 535
+        Height = 23
+        EditLabel.Width = 72
+        EditLabel.Height = 15
+        EditLabel.Caption = 'Global Search'
+        TabOrder = 0
+        Text = ''
       end
       object BtnShowHideFilters: TButton
-        Left = 687
-        Top = 21
+        Left = 553
+        Top = 25
         Width = 27
         Height = 25
         Caption = #55357#56636
@@ -3051,158 +2999,62 @@ object FrmPeopleSearch: TFrmPeopleSearch
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 0
-      end
-      object LbEdtGlobalSearch: TLabeledEdit
-        Left = 16
-        Top = 24
-        Width = 657
-        Height = 23
-        EditLabel.Width = 72
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Global Search'
         TabOrder = 1
-        Text = ''
       end
-      object LbEdtCode: TLabeledEdit
-        Left = 16
-        Top = 73
-        Width = 41
+      object Obs: TLabeledEdit
+        Left = 11
+        Top = 121
+        Width = 578
         Height = 23
-        EditLabel.Width = 28
+        EditLabel.Width = 21
         EditLabel.Height = 15
-        EditLabel.Caption = 'Code'
+        EditLabel.Caption = 'Obs'
         TabOrder = 2
         Text = ''
       end
+      object LbEdtID: TLabeledEdit
+        Left = 11
+        Top = 74
+        Width = 34
+        Height = 23
+        EditLabel.Width = 11
+        EditLabel.Height = 15
+        EditLabel.Caption = 'ID'
+        TabOrder = 3
+        Text = ''
+      end
       object LbEdtName: TLabeledEdit
-        Left = 63
-        Top = 73
-        Width = 466
+        Left = 51
+        Top = 74
+        Width = 234
         Height = 23
         EditLabel.Width = 32
         EditLabel.Height = 15
         EditLabel.Caption = 'Name'
-        TabOrder = 3
-        Text = ''
-      end
-      object LbEdtPhone: TLabeledEdit
-        Left = 535
-        Top = 73
-        Width = 138
-        Height = 23
-        EditLabel.Width = 34
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Phone'
         TabOrder = 4
         Text = ''
       end
-      object LbSocialNumber: TLabeledEdit
-        Left = 151
-        Top = 120
-        Width = 145
-        Height = 23
-        EditLabel.Width = 78
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Social Number'
-        TabOrder = 5
-        Text = ''
-      end
-      object CbCountry: TComboBox
-        Left = 16
-        Top = 120
-        Width = 129
-        Height = 23
-        TabOrder = 6
-      end
-      object LbEdtCreditLimit: TLabeledEdit
-        Left = 303
-        Top = 120
-        Width = 113
-        Height = 23
-        EditLabel.Width = 62
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Credit Limit'
-        TabOrder = 7
-        Text = ''
-      end
-      object CbStatus: TComboBox
-        Left = 425
-        Top = 120
-        Width = 101
-        Height = 23
-        TabOrder = 8
-      end
-      object CbRegistrationType: TComboBox
-        Left = 539
-        Top = 120
-        Width = 134
-        Height = 23
-        TabOrder = 9
-      end
-      object CbPostalCode: TComboBox
-        Left = 15
-        Top = 171
-        Width = 110
-        Height = 23
-        TabOrder = 10
-      end
-      object CbState: TComboBox
-        Left = 131
-        Top = 171
-        Width = 110
-        Height = 23
-        TabOrder = 11
-      end
-      object CbCity: TComboBox
-        Left = 247
-        Top = 171
-        Width = 136
-        Height = 23
-        TabOrder = 12
-      end
-      object CbDistrict: TComboBox
-        Left = 389
-        Top = 171
-        Width = 108
-        Height = 23
-        TabOrder = 13
-      end
-      object CbStreet: TComboBox
-        Left = 503
-        Top = 171
-        Width = 108
-        Height = 23
-        TabOrder = 14
-      end
-      object CbNumber: TComboBox
-        Left = 619
-        Top = 171
-        Width = 54
-        Height = 23
-        TabOrder = 15
-      end
     end
-    object PnGridClients: TPanel
+    object DGGridCategories: TDBGrid
       Left = 1
-      Top = 209
-      Width = 731
-      Height = 617
+      Top = 153
+      Width = 595
+      Height = 341
       Align = alClient
       TabOrder = 1
-      object DBGridClients: TDBGrid
-        Left = 1
-        Top = 1
-        Width = 729
-        Height = 615
-        Align = alClient
-        TabOrder = 0
-        TitleFont.Charset = DEFAULT_CHARSET
-        TitleFont.Color = clWindowText
-        TitleFont.Height = -12
-        TitleFont.Name = 'Segoe UI'
-        TitleFont.Style = []
-      end
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -12
+      TitleFont.Name = 'Segoe UI'
+      TitleFont.Style = []
+    end
+  end
+  object Menu: TMainMenu
+    Left = 304
+    Top = 272
+    object MenuNewCategory: TMenuItem
+      Caption = 'New Category'
+      OnClick = MenuNewCategoryClick
     end
   end
 end

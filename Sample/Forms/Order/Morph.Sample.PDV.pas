@@ -38,6 +38,7 @@ type
     procedure MenuOrdersClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure MenuClientsClick(Sender: TObject);
+    procedure MenuReportsClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -78,6 +79,11 @@ end;
 procedure TFrmPdv.MenuProductsClick(Sender: TObject);
 begin
   FrmLogo.ProductsSeachShow;
+end;
+
+procedure TFrmPdv.MenuReportsClick(Sender: TObject);
+begin
+  FrmLogo.ReportsShow;
 end;
 
 end.

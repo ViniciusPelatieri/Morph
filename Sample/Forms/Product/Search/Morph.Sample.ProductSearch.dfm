@@ -2,7 +2,7 @@ object FrmProductSearch: TFrmProductSearch
   Left = 0
   Top = 0
   Caption = 'Product'
-  ClientHeight = 827
+  ClientHeight = 807
   ClientWidth = 733
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -2959,12 +2959,13 @@ object FrmProductSearch: TFrmProductSearch
     C104134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104
     134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104134C
     30C104134CB0FF1FEDFF03ECFC843D6DE2421E0000000049454E44AE426082}
+  Menu = Menu
   TextHeight = 15
   object PnBase: TPanel
     Left = 0
     Top = 0
     Width = 733
-    Height = 827
+    Height = 807
     Align = alClient
     TabOrder = 0
     object PnProdSearch: TPanel
@@ -3062,16 +3063,14 @@ object FrmProductSearch: TFrmProductSearch
       Left = 1
       Top = 153
       Width = 731
-      Height = 673
+      Height = 653
       Align = alClient
       TabOrder = 1
-      ExplicitTop = 249
-      ExplicitHeight = 577
       object DBGridProducts: TDBGrid
         Left = 1
         Top = 1
         Width = 729
-        Height = 671
+        Height = 651
         Align = alClient
         TabOrder = 0
         TitleFont.Charset = DEFAULT_CHARSET
@@ -3080,6 +3079,18 @@ object FrmProductSearch: TFrmProductSearch
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
       end
+    end
+  end
+  object Menu: TMainMenu
+    Left = 281
+    Top = 377
+    object MenuNewRegister: TMenuItem
+      Caption = 'New Product'
+      OnClick = MenuNewRegisterClick
+    end
+    object MenuCategories: TMenuItem
+      Caption = 'Categories'
+      OnClick = MenuCategoriesClick
     end
   end
 end

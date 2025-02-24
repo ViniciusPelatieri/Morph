@@ -2959,6 +2959,7 @@ object FrmOrdersSearch: TFrmOrdersSearch
     C104134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104
     134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104134C
     30C104134CB0FF1FEDFF03ECFC843D6DE2421E0000000049454E44AE426082}
+  Menu = Menu
   TextHeight = 15
   object PnBase: TPanel
     Left = 0
@@ -3158,8 +3159,6 @@ object FrmOrdersSearch: TFrmOrdersSearch
       Height = 534
       Align = alClient
       TabOrder = 1
-      ExplicitTop = 249
-      ExplicitHeight = 577
       object DBGridOrders: TDBGrid
         Left = 1
         Top = 1
@@ -3173,6 +3172,17 @@ object FrmOrdersSearch: TFrmOrdersSearch
         TitleFont.Name = 'Segoe UI'
         TitleFont.Style = []
       end
+    end
+  end
+  object Menu: TMainMenu
+    Left = 553
+    Top = 436
+    object MenuStatus: TMenuItem
+      Caption = 'Status'
+      OnClick = MenuStatusClick
+    end
+    object MeuPaymentMethod: TMenuItem
+      Caption = 'Payment Method'
     end
   end
 end

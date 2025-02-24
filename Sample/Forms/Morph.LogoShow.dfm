@@ -15,6 +15,7 @@ object FrmLogo: TFrmLogo
   Position = poMainFormCenter
   Visible = True
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   object ImgMorphLogo: TImage
     Left = 0

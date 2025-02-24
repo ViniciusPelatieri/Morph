@@ -16,7 +16,8 @@ uses
   Morph.DataSetUtilitys in 'Units\Helpers\Morph.DataSetUtilitys.pas',
   Morph.PSQL.Structure.FB2_5 in 'Units\PSQL\Morph.PSQL.Structure.FB2_5.pas',
   Morph.Messages in 'Units\Morph.Messages.pas',
-  Morph.Where in 'Units\Types\Morph.Where.pas';
+  Morph.Where in 'Units\Types\Morph.Where.pas',
+  Morph.InstructionSegment in 'Units\Types\Morph.InstructionSegment.pas';
 
 {$R *.res}
 

@@ -131,32 +131,84 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Forms\Morph.Sample.pas">
-            <Form>Sample</Form>
-        </DCCReference>
-        <DCCReference Include="Frames\Morph.Frame.Where.pas">
-            <Form>FrameWhere</Form>
+        <DCCReference Include="Forms\Order\Search\Morph.Sample.OrdersSearch.pas">
+            <Form>FrmOrdersSearch</Form>
             <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Forms\Morph.Sample.PDV.pas">
+        <DCCReference Include="Forms\Order\Morph.Sample.PDV.pas">
             <Form>FrmPdv</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Forms\Morph.Sample.PeopleSearch.pas">
+        <DCCReference Include="Forms\People\Info\Morph.Sample.AddressInfo.pas">
+            <Form>FrmAddressInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Info\Morph.Sample.DepartmentInfo.pas">
+            <Form>FrmDepartmentInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Info\Morph.Sample.PeopleInfo.pas">
+            <Form>FrmPeopleInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Info\Morph.Sample.RegisterStatusInfo.pas">
+            <Form>FrmRegisterStatusInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Info\Morph.Sample.RegistrationTypeInfo.pas">
+            <Form>FrmRegistrationTypeInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Search\Morph.Sample.AddressSearch.pas">
+            <Form>FrmAddresstSearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Search\Morph.Sample.DepartmentSearch.pas">
+            <Form>FrmDepartmentSearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Search\Morph.Sample.PeopleSearch.pas">
             <Form>FrmPeopleSearch</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Forms\Morph.Sample.ProductSearch.pas">
+        <DCCReference Include="Forms\People\Search\Morph.Sample.RegisterStatusSearch.pas">
+            <Form>FrmRegisterStatusSearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\People\Search\Morph.Sample.RegistrationType.pas">
+            <Form>FrmRegistrationType</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Product\Info\Morph.Sample.CategoryInfo.pas">
+            <Form>FrmcategoryInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Product\Info\Morph.Sample.ProductInfo.pas">
+            <Form>FrmProductInfo</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Product\Search\Morph.Sample.CategorySearch.pas">
+            <Form>FrmCategorySearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Product\Search\Morph.Sample.ProductSearch.pas">
             <Form>FrmProductSearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Report\Morph.Sample.Reports.pas">
+            <Form>FrmReports</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Forms\Morph.LogoShow.pas">
             <Form>FrmLogo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Forms\Morph.Sample.OrdersSearch.pas">
-            <Form>FrmOrdersSearch</Form>
+        <DCCReference Include="Forms\Order\Search\Morph.Sample.OrderStatusSearch.pas">
+            <Form>FrmOrderStatusSearch</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Forms\Order\Info\Morph.Sample.OrderStatusInfo.pas">
+            <Form>FrmOrderStatusInfo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

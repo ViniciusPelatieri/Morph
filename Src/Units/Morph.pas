@@ -34,6 +34,7 @@ type
       constructor Create;
       destructor Destroy; override;
 
+      procedure Clear;
       procedure ExecutePSQL(const aCommand : String);
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
 
@@ -80,8 +81,9 @@ type
       function Table(const aTableName: String): TMorph;
       function OpenPSQL(const aCommand: String): TMorph;
       function CurrentPSQL(Out anOutVar: String): TMorph;
-      function Values(const aValues: TArray<TValue>): TMorph;
       function Where(const aWhereInstruction : W) : TMorph;
+      function Values(const aValues: TArray<TValue>): TMorph;
+      function AlterSegment(const aSegmentID: Integer): TMorph;
       function Fields(const aFieldNames: TArray<String>): TMorph;
       function DatabaseType(const aDBType: TMorphDBType): TMorph;
       function Connection(const aConnection: TFDConnection): TMorph;
@@ -165,6 +167,11 @@ begin
   Result := Self;
 end;
 
+function TMorph.AlterSegment(const aSegmentID: Integer): TMorph;
+begin
+
+end;
+
 function TMorph.AsTClientDataSet: TClientDataSet;
 begin
   try
@@ -199,6 +206,11 @@ function TMorph.tBinaryBlob: TMorph;
 begin
   FFieldsToProcess.Current.FieldType := mphBinaryBlob;
   Result := Self;
+end;
+
+procedure TMorph.Clear;
+begin
+
 end;
 
 function TMorph.Config: TMorph;

@@ -14,3 +14,6 @@ Src/__history/MorphProject.dpr.~3~
 Src/__history/
 Src/Units/Helpers/__history/
 Sample/Forms/__recovery/
+Sample/Forms/Order/Search/__history/
+*.identcache
+*.local
