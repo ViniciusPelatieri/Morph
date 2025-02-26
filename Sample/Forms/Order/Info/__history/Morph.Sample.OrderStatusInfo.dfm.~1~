@@ -19,6 +19,8 @@ object FrmOrderStatusInfo: TFrmOrderStatusInfo
     Align = alTop
     Caption = 'Order Status'
     TabOrder = 0
+    ExplicitLeft = 1
+    ExplicitTop = 1
     object Obs: TLabeledEdit
       Left = 11
       Top = 70

@@ -11,7 +11,7 @@ uses
   Morph.Sample.RegistrationType, Morph.Sample.RegistrationTypeInfo,
   Morph.Sample.AddressInfo, Morph.Sample.RegisterStatusInfo,
   Morph.Sample.RegisterStatusSearch, Morph.Sample.CategoryInfo,
-  Morph.Sample.DepartmentInfo;
+  Morph.Sample.DepartmentInfo, Morph.Sample.OrderStatusInfo;
 
 type
   TFrmLogo = class(TForm)
@@ -36,6 +36,8 @@ type
       FCategoryInfoEdit: TFrmcategoryInfo;
       FNewDepartment,
       FDepartmentEdit: TFrmDepartmentInfo;
+      FNewOrderStatus,
+      FOrderStatusEdit: TFrmOrderStatusInfo;
     public
       procedure OrdersSearchShow;
       procedure ClientsSearchShow;
@@ -74,7 +76,8 @@ var
 implementation
 
 uses Morph.Sample.Reports, Morph.Sample.AddressSearch,
-  Morph.Sample.CategorySearch, Morph.Sample.DepartmentSearch;
+  Morph.Sample.CategorySearch, Morph.Sample.DepartmentSearch,
+  Morph.Sample.OrderStatusSearch;
 
 {$R *.dfm}
 
@@ -173,6 +176,12 @@ begin
 
   if Assigned(FDepartmentEdit) then
     FDepartmentEdit.Free;
+
+  if Assigned(FNewOrderStatus) then
+    FNewOrderStatus.Free;
+
+  if Assigned(FOrderStatusEdit) then
+    FOrderStatusEdit.Free;
 end;
 
 procedure TFrmLogo.NewAddress;
@@ -213,7 +222,11 @@ end;
 
 procedure TFrmLogo.NewOrderStatus;
 begin
-d
+  if NOT Assigned(FNewOrderStatus) then
+    FNewOrderStatus := TFrmOrderStatusInfo.Create(Self);
+
+  FNewOrderStatus.Show;
+  FNewOrderStatus.NewRegister;
 end;
 
 procedure TFrmLogo.NewProductShow;
@@ -262,12 +275,19 @@ end;
 
 procedure TFrmLogo.OrderStatusEdit(const anOrderStatusID: Integer);
 begin
-        d
+  if NOT Assigned(FOrderStatusEdit) then
+    FOrderStatusEdit := TFrmOrderStatusInfo.Create(Self);
+
+  FOrderStatusEdit.Show;
+  FOrderStatusEdit.NewRegister;
 end;
 
 procedure TFrmLogo.OrderStatusSearch;
 begin
-     d
+  if NOT Assigned(FrmOrderStatusSearch) then
+    Application.CreateForm(TFrmOrderStatusSearch, FrmOrderStatusSearch);
+
+  FrmOrderStatusSearch.Show;
 end;
 
 procedure TFrmLogo.AddressEdit(const anAddressID: Integer);

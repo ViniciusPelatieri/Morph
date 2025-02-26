@@ -22,8 +22,6 @@ type
     { Private declarations }
   public
     { Public declarations }
-    procedure NewRegister;
-    procedure Edit(const anOrderStatusID: Integer);
   end;
 
 var
@@ -32,17 +30,5 @@ var
 implementation
 
 {$R *.dfm}
-
-{ TFrmOrderStatusInfo }
-
-procedure TFrmOrderStatusInfo.Edit(const anOrderStatusID: Integer);
-begin
-  Self.Caption := 'Edit Order Status';
-end;
-
-procedure TFrmOrderStatusInfo.NewRegister;
-begin
-  Self.Caption := 'New Order Status';
-end;
 
 end.
