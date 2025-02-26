@@ -33,6 +33,8 @@ type
     Menu: TMainMenu;
     MenuStatus: TMenuItem;
     MeuPaymentMethod: TMenuItem;
+    LbPaymentMethod: TLabel;
+    CbPaymentMethod: TComboBox;
     procedure MenuStatusClick(Sender: TObject);
   private
     { Private declarations }

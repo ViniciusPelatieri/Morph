@@ -2989,6 +2989,13 @@ object FrmOrdersSearch: TFrmOrdersSearch
         Height = 15
         Caption = 'OrderStatus'
       end
+      object LbPaymentMethod: TLabel
+        Left = 295
+        Top = 50
+        Width = 92
+        Height = 15
+        Caption = 'Payment Method'
+      end
       object BtnShowHideFilters: TButton
         Left = 687
         Top = 21
@@ -3150,6 +3157,13 @@ object FrmOrdersSearch: TFrmOrdersSearch
         Width = 110
         Height = 23
         TabOrder = 14
+      end
+      object CbPaymentMethod: TComboBox
+        Left = 295
+        Top = 66
+        Width = 106
+        Height = 23
+        TabOrder = 15
       end
     end
     object PnGridOrders: TPanel
