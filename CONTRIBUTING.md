@@ -35,6 +35,7 @@ Once you’re happy with the changes, commit them with a clear and concise messa
 git add .
 git commit -m "Add feature/fix bug/modify documentation"
 ```
+You can also see out [commit convetions.](https://github.com/ViniciusPelatieri/Morph/blob/main/COMMIT_CONVENTION.md)
 
 ### 7. Push Your Changes ⬆️
 Push your changes back to your fork:
