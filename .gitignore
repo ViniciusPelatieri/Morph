@@ -17,3 +17,7 @@ Sample/Forms/__recovery/
 Sample/Forms/Order/Search/__history/
 *.identcache
 *.local
+Sample/DataModule/__history/
+Sample/Forms/Order/__history/
+Sample/Frames/Orders/__history/Morph.Sample.ProductButton.pas.~1~
+Sample/Frames/Orders/__history/
