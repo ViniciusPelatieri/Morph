@@ -21,6 +21,12 @@ type
       FFDConnection,
       FTempConnection: TFDConnection;
 
+      FIgnoreCreatedStructure: Boolean;
+
+                                    {Table               Field   Exists or
+                                     name                name    not      }
+      FTablesStructure : TDictionary<String, TDictionary<String, Boolean>>;
+
       FDQResult: TFDQuery;
       FStage: TMorphStages;
       FDBType: TMorphDBType;
@@ -28,14 +34,13 @@ type
       FFieldsToProcess: TMorphFields;
       FDataOrientation: TMorphDateOrientation;
       FFDMTTypeToMphFieldType: TDictionary<TFieldType, TMorphFieldTypes>;
-
-
     public
       constructor Create;
       destructor Destroy; override;
 
       procedure Clear;
       procedure ExecutePSQL(const aCommand : String);
+      procedure ReloadDBTablesAndFieldsList;
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
 
       function _Or: TMorph;
@@ -70,6 +75,7 @@ type
       function ExportSettings: TJSONObject;
       function GetFB5FieldTypeName: String;
       function GetFB2_5FieldTypeName: String;
+      function IgnoreCreatedStructure: TMorph;
       function AsTClientDataSet: TClientDataSet;
       function DoNotRaiseOnRedundances: TMorph;
       function Equals<T>(const aValue: T): TMorph;
@@ -407,6 +413,7 @@ begin
   FFieldsToProcess := TMorphFields.Create;
   FStage := mpsCreate;
   FPSQLCommand := '';
+  FIgnoreCreatedStructure := False;
 
   FDQResult := TFDQuery.Create(Nil);
   FInsertTable := TMphTable.Create;
@@ -694,6 +701,11 @@ begin
   Result := Self;
 end;
 
+function TMorph.IgnoreCreatedStructure: TMorph;
+begin
+  FIgnoreCreatedStructure := True;
+end;
+
 function TMorph.Insert(const aMphTable: TMphTable): TMorph;
 begin
   FInsertTable := aMphTable.Clone;
@@ -896,6 +908,17 @@ function TMorph.References: TMorph;
 begin
   FStage := mpsReference;
   Result := Self;
+end;
+
+procedure TMorph.ReloadDBTablesAndFieldsList;
+begin
+  OpenPSQL(PSQL_FB5_LIST_TABLES_AND_FIELDS);
+  try
+    FTablesVector.Clear;
+    FTablesVector.Add
+  finally
+    FDQResult.Free;
+  end;
 end;
 
 procedure TMorph.RunPSQL(const aCommand: String;

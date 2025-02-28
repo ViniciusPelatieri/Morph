@@ -33,6 +33,20 @@ const PSQL_FB5_ALTER_TABLE = 'ALTER TABLE';
 const PSQL_FB5_DROP = 'DROP';
 const PSQL_FB5_ADD = 'ADD';
 
+{$REGION 'PSQL_FB5_LIST_TABLES_AND_FIELDS'}
+const PSQL_FB5_LIST_TABLES_AND_FIELDS = 'SELECT '+
+                                          'R.RDB$RELATION_NAME AS Tabela, '+
+                                          'F.RDB$FIELD_NAME AS Campo '+
+                                        'FROM '+
+                                          'RDB$RELATIONS R '+
+                                        'JOIN '+
+                                          'RDB$RELATION_FIELDS F ON R.RDB$RELATION_NAME = F.RDB$RELATION_NAME '+
+                                        'WHERE '+
+                                          'R.RDB$SYSTEM_FLAG = 0 '+
+                                        'ORDER BY '+
+                                          'R.RDB$RELATION_NAME, F.RDB$FIELD_POSITION;'
+{$ENDREGION}
+
 implementation
 
 end.

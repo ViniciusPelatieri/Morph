@@ -7,7 +7,6 @@ uses
   Morph.EnumeratedTypes, Morph.Vector, Morph.Field;
 
 type
-
   TMphTable = class
     private
       FName : String;
@@ -38,6 +37,8 @@ type
       property Name : String read FName write FName;
       property Fields : TMorphFields read FFields write FFields;
   end;
+
+  TMphTablesVector = TMorphVector<TMphTable>;
 
 implementation
 
