@@ -211,6 +211,16 @@
             <Form>FrmOrderStatusInfo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Frames\Orders\Morph.Sample.ProductButton.pas">
+            <Form>TFrameProductButton</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="DataModule\Morph.Sample.MorphInit.pas">
+            <Form>DMMorphInit</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -2986,10 +2986,6 @@ object FrmPdv: TFrmPdv
         Height = 586
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 208
-        ExplicitTop = 184
-        ExplicitWidth = 185
-        ExplicitHeight = 41
         object GridPnProducts: TGridPanel
           Left = 0
           Top = 0
@@ -2998,28 +2994,32 @@ object FrmPdv: TFrmPdv
           Align = alTop
           ColumnCollection = <
             item
-              Value = 23.548624050562210000
+              SizeStyle = ssAbsolute
+              Value = 159.000000000000000000
             end
             item
-              Value = 39.351766752657030000
+              SizeStyle = ssAbsolute
+              Value = 159.000000000000000000
             end
             item
-              Value = 37.099609196780760000
+              SizeStyle = ssAbsolute
+              Value = 159.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 159.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 159.000000000000000000
             end>
           ControlCollection = <>
           ExpandStyle = emAddColumns
           RowCollection = <
             item
-              Value = 50.000000000000000000
-            end
-            item
-              Value = 50.000000000000000000
+              Value = 100.000000000000000000
             end>
           TabOrder = 0
-          ExplicitLeft = 256
-          ExplicitTop = 272
-          ExplicitWidth = 185
-          ExplicitHeight = 41
         end
       end
     end

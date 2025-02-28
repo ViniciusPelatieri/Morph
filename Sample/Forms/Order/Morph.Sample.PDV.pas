@@ -32,6 +32,8 @@ type
     procedure MenuReportsClick(Sender: TObject);
   private
     { Private declarations }
+    procedure AddProductToGrid(const aCodProduto: Integer);
+    procedure ClearGrid;
   public
     { Public declarations }
   end;
@@ -46,6 +48,16 @@ uses
 
 {$R *.dfm}
 
+
+procedure TFrmPdv.AddProductToGrid(const aCodProduto: Integer);
+begin
+
+end;
+
+procedure TFrmPdv.ClearGrid;
+begin
+
+end;
 
 procedure TFrmPdv.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

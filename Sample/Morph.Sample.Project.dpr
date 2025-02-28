@@ -22,7 +22,9 @@ uses
   Morph.Sample.Reports in 'Forms\Report\Morph.Sample.Reports.pas' {FrmReports},
   Morph.LogoShow in 'Forms\Morph.LogoShow.pas' {FrmLogo},
   Morph.Sample.OrderStatusSearch in 'Forms\Order\Search\Morph.Sample.OrderStatusSearch.pas' {FrmOrderStatusSearch},
-  Morph.Sample.OrderStatusInfo in 'Forms\Order\Info\Morph.Sample.OrderStatusInfo.pas' {FrmOrderStatusInfo};
+  Morph.Sample.OrderStatusInfo in 'Forms\Order\Info\Morph.Sample.OrderStatusInfo.pas' {FrmOrderStatusInfo},
+  Morph.Sample.ProductButton in 'Frames\Orders\Morph.Sample.ProductButton.pas' {TFrameProductButton: TFrame},
+  Morph.Sample.MorphInit in 'DataModule\Morph.Sample.MorphInit.pas' {DMMorphInit: TDataModule};
 
 {$R *.res}
 
@@ -32,5 +34,6 @@ begin
   Application.CreateForm(TFrmLogo, FrmLogo);
   Application.CreateForm(TFrmOrderStatusSearch, FrmOrderStatusSearch);
   Application.CreateForm(TFrmOrderStatusInfo, FrmOrderStatusInfo);
+  Application.CreateForm(TDMMorphInit, DMMorphInit);
   Application.Run;
 end.
