@@ -31,9 +31,7 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TFrmLogo, FrmLogo);
-  Application.CreateForm(TFrmOrderStatusSearch, FrmOrderStatusSearch);
-  Application.CreateForm(TFrmOrderStatusInfo, FrmOrderStatusInfo);
   Application.CreateForm(TDMMorphInit, DMMorphInit);
+  Application.CreateForm(TFrmLogo, FrmLogo);
   Application.Run;
 end.
