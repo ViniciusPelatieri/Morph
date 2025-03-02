@@ -19,6 +19,7 @@ type
     procedure CreateDBStructure;
   public
     { Public declarations }
+    function GetConnection: TFDConnection;
   end;
 
 var
@@ -57,12 +58,18 @@ end;
 procedure TDMMorphInit.DataModuleCreate(Sender: TObject);
 begin
   FMorph := TMorph.Create;
+  FMorph.Connection(FDCModelo);
   CreateDBStructure;
 end;
 
 procedure TDMMorphInit.DataModuleDestroy(Sender: TObject);
 begin
   FMorph.Free;
+end;
+
+function TDMMorphInit.GetConnection: TFDConnection;
+begin
+  Result := FDCModelo;
 end;
 
 end.
