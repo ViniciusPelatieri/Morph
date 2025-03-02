@@ -307,11 +307,12 @@
         <DCCReference Include="Units\Types\Morph.Vector.pas"/>
         <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.FB5.pas"/>
         <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.Common.pas"/>
-        <DCCReference Include="Units\Helpers\Morph.DataSetUtilitys.pas"/>
+        <DCCReference Include="Units\Helpers\Morph.DataSetUtilities.pas"/>
         <DCCReference Include="Units\PSQL\Morph.PSQL.Structure.FB2_5.pas"/>
         <DCCReference Include="Units\Morph.Messages.pas"/>
         <DCCReference Include="Units\Types\Morph.Where.pas"/>
         <DCCReference Include="Units\Types\Morph.InstructionSegment.pas"/>
+        <DCCReference Include="Units\Helpers\Morph.DataConvertionsUtilities.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

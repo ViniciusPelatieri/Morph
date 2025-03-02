@@ -11,10 +11,6 @@ object TFrameProductButton: TTFrameProductButton
     Height = 218
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 104
-    ExplicitTop = 96
-    ExplicitWidth = 185
-    ExplicitHeight = 41
     object PnImage: TPanel
       AlignWithMargins = True
       Left = 16
@@ -49,9 +45,9 @@ object TFrameProductButton: TTFrameProductButton
       Margins.Top = 15
       Margins.Right = 15
       Align = alTop
+      Color = clWhitesmoke
+      ParentBackground = False
       TabOrder = 1
-      ExplicitLeft = 4
-      ExplicitWidth = 152
       object SkLbName: TSkLabel
         Left = 1
         Top = 1
@@ -86,17 +82,5 @@ object TFrameProductButton: TTFrameProductButton
         ExplicitWidth = 55
       end
     end
-  end
-  object SkAnPBFlash: TSkAnimatedPaintBox
-    Left = 0
-    Top = 0
-    Width = 160
-    Height = 218
-    Align = alClient
-    Opacity = 0
-    ExplicitLeft = 8
-    ExplicitTop = 144
-    ExplicitWidth = 50
-    ExplicitHeight = 50
   end
 end

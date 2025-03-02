@@ -8,6 +8,8 @@ uses
   Vcl.ExtCtrls, System.Types;
 
 type
+  TProcedureWithIntParam = procedure(AValue: Integer) of object;
+
   TTFrameProductButton = class(TFrame)
     PnBase: TPanel;
     PnImage: TPanel;
@@ -15,31 +17,54 @@ type
     SkPBProductImage: TSkPaintBox;
     SkLbName: TSkLabel;
     SkLbPrice: TSkLabel;
-    SkAnPBFlash: TSkAnimatedPaintBox;
+    procedure SkAnimpPBFlashAnimationDraw(ASender: TObject;
+      const ACanvas: ISkCanvas; const ADest: TRectF; const AProgress: Double;
+      const AOpacity: Single);
     procedure SkPBProductImageDraw(ASender: TObject; const ACanvas: ISkCanvas;
       const ADest: TRectF; const AOpacity: Single);
   private
     { Private declarations }
     FDoingFlash: Boolean;
+    FProductID: Integer;
     FProductImage: ISkImage;
+    FFlashOpacity: Extended;
+    FCallBackProcedure: TProcedureWithIntParam;
     procedure LoadDefaultImage;
+    procedure Clicked(Sender: TObject);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     class function New(AOwner: TComponent) : TTFrameProductButton;
     function SetImage(const anImageBytes: TBytes): TTFrameProductButton;
     function SetName(const aName: String): TTFrameProductButton;
     function SetPrice(const aPrice: Extended): TTFrameProductButton;
-    function Flash: TTFrameProductButton;
+    function CallBack(const ACallBackProcedure: TProcedureWithIntParam): TTFrameProductButton;
+    function ProductID(const AProductID: Integer): TTFrameProductButton;
   end;
 
 implementation
 
-uses System.Threading;
+uses System.Threading, System.UITypes;
 
 {$R *.dfm}
 
 { TTFrameProductButton }
+
+function TTFrameProductButton.CallBack(
+  const ACallBackProcedure: TProcedureWithIntParam): TTFrameProductButton;
+begin
+  FCallBackProcedure := ACallBackProcedure;
+  Result := Self;
+end;
+
+procedure TTFrameProductButton.Clicked(Sender: TObject);
+begin
+  if (NOT Assigned(FCallBackProcedure)) OR (FProductID < 0) then
+    Raise Exception.Create('Bad callback configuration. - Blank callback procedure or product ID');
+
+  FCallBackProcedure(FProductID);
+end;
 
 constructor TTFrameProductButton.Create(AOwner: TComponent);
 begin
@@ -47,34 +72,11 @@ begin
   LoadDefaultImage;
 end;
 
-function TTFrameProductButton.Flash: TTFrameProductButton;
-const
-  COpacityJump = 5;
-var
-  FOpacity: Integer;
+destructor TTFrameProductButton.Destroy;
 begin
-  TTask.Run(
-  procedure
-  begin
-    if FDoingFlash then
-      Exit;
-
-    FDoingFlash := True;
-    FOpacity := 0;
-    while FOpacity < 255 do
-    begin
-      SkAnPBFlash.Opacity := FOpacity;
-      Inc(FOpacity, COpacityJump);
-    end;
-    FOpacity := 255;
-      while FOpacity > 0 do
-    begin
-      SkAnPBFlash.Opacity := FOpacity;
-      Dec(FOpacity, COpacityJump);
-    end;
-    FOpacity := 0;
-    FDoingFlash := False;
-  end);
+  if Assigned(FCallBackProcedure) then
+    FCallBackProcedure := Nil;
+  inherited;
 end;
 
 procedure TTFrameProductButton.LoadDefaultImage;
@@ -85,6 +87,13 @@ end;
 class function TTFrameProductButton.New(AOwner: TComponent): TTFrameProductButton;
 begin
   Result := Self.Create(AOwner);
+end;
+
+function TTFrameProductButton.ProductID(
+  const AProductID: Integer): TTFrameProductButton;
+begin
+  FProductID := AProductID;
+  Result := Self;
 end;
 
 function TTFrameProductButton.SetImage(
@@ -104,7 +113,7 @@ begin
     LStream.Position := 0;
 
     FProductImage := TSkImage.MakeFromEncodedStream(LStream);
-    SkPBProductImage.Repaint;
+    SkPBProductImage.Redraw;
   finally
     LStream.Free;
   end;
@@ -126,11 +135,26 @@ begin
   Result := Self;
 end;
 
+procedure TTFrameProductButton.SkAnimpPBFlashAnimationDraw(ASender: TObject;
+  const ACanvas: ISkCanvas; const ADest: TRectF; const AProgress: Double;
+  const AOpacity: Single);
+var
+  LPaint: ISKPaint;
+begin
+  LPaint := TSKPaint.Create;
+  LPaint.Color := TAlphaColors.Blue;
+  LPaint.AlphaF := FFlashOpacity;
+
+  ACanvas.DrawRect(ADest, LPaint);
+end;
+
 procedure TTFrameProductButton.SkPBProductImageDraw(ASender: TObject;
   const ACanvas: ISkCanvas; const ADest: TRectF; const AOpacity: Single);
 begin
   if Assigned(FProductImage) then
-    ACanvas.DrawImage(FProductImage, 50, 50);
+  begin
+    ACanvas.DrawImage(FProductImage, 0, 0);
+  end;
 end;
 
 end.

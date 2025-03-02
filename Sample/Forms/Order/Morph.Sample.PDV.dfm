@@ -2961,6 +2961,8 @@ object FrmPdv: TFrmPdv
     30C104134CB0FF1FEDFF03ECFC843D6DE2421E0000000049454E44AE426082}
   Menu = Menu
   OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   object PnBase: TPanel
     Left = 0
@@ -2970,9 +2972,10 @@ object FrmPdv: TFrmPdv
     Align = alClient
     TabOrder = 0
     object PnProducts: TPanel
+      AlignWithMargins = True
       Left = 21
       Top = 21
-      Width = 800
+      Width = 823
       Height = 588
       Margins.Left = 0
       Margins.Top = 0
@@ -2980,18 +2983,28 @@ object FrmPdv: TFrmPdv
       Margins.Bottom = 0
       TabOrder = 0
       object ScrlBxProducts: TScrollBox
-        Left = 1
-        Top = 1
-        Width = 798
-        Height = 586
-        Align = alClient
+        AlignWithMargins = True
+        Left = 4
+        Top = 66
+        Width = 815
+        Height = 520
+        Margins.Top = 65
+        Align = alTop
+        BevelEdges = []
+        BevelInner = bvNone
+        BevelOuter = bvNone
         TabOrder = 0
+        UseWheelForScrolling = True
+        ExplicitLeft = 1
+        ExplicitTop = 1
+        ExplicitWidth = 818
         object GridPnProducts: TGridPanel
           Left = 0
           Top = 0
           Width = 794
-          Height = 582
-          Align = alTop
+          Height = 500
+          BevelEdges = []
+          BevelOuter = bvNone
           ColumnCollection = <
             item
               SizeStyle = ssAbsolute
@@ -3017,7 +3030,44 @@ object FrmPdv: TFrmPdv
           ExpandStyle = emAddColumns
           RowCollection = <
             item
-              Value = 100.000000000000000000
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
+            end
+            item
+              SizeStyle = ssAbsolute
+              Value = 218.000000000000000000
             end>
           TabOrder = 0
         end
@@ -3027,31 +3077,30 @@ object FrmPdv: TFrmPdv
       AlignWithMargins = True
       Left = 21
       Top = 624
-      Width = 800
+      Width = 824
       Height = 85
       Margins.Left = 20
       Margins.Top = 60
       Margins.Right = 450
       Margins.Bottom = 180
-      AutoSize = True
       TabOrder = 2
     end
     object PnItemsList: TPanel
       AlignWithMargins = True
-      Left = 844
+      Left = 888
       Top = 21
-      Width = 400
+      Width = 356
       Height = 688
-      Margins.Left = 845
+      Margins.Left = 0
       Margins.Top = 20
       Margins.Right = 20
       Margins.Bottom = 75
       Align = alRight
-      AutoSize = True
+      BevelInner = bvRaised
       TabOrder = 1
     end
     object BtnCancelar: TButton
-      Left = 732
+      Left = 755
       Top = 728
       Width = 89
       Height = 41
@@ -3059,12 +3108,21 @@ object FrmPdv: TFrmPdv
       TabOrder = 3
     end
     object BtnPay: TButton
-      Left = 844
+      Left = 888
       Top = 728
-      Width = 400
+      Width = 356
       Height = 41
       Caption = 'Pay'
       TabOrder = 4
+    end
+    object Button1: TButton
+      Left = 512
+      Top = 728
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 5
+      OnClick = Button1Click
     end
   end
   object Menu: TMainMenu
