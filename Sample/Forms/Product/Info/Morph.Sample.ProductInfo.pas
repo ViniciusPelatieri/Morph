@@ -25,6 +25,7 @@ type
     MenuCategories: TMenuItem;
     BtnSave: TButton;
     BtnEdit: TButton;
+    LbEdtShortName: TLabeledEdit;
     procedure MenuCategoriesClick(Sender: TObject);
   private
     { Private declarations }

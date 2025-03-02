@@ -481,8 +481,8 @@ object FrmProductInfo: TFrmProductInfo
       Stretch = True
     end
     object LbCategory: TLabel
-      Left = 519
-      Top = 63
+      Left = 151
+      Top = 111
       Width = 48
       Height = 15
       Caption = 'Category'
@@ -511,7 +511,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtPrice: TLabeledEdit
-      Left = 151
+      Left = 292
       Top = 130
       Width = 73
       Height = 23
@@ -522,7 +522,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtMaxDiscount: TLabeledEdit
-      Left = 230
+      Left = 371
       Top = 130
       Width = 81
       Height = 23
@@ -533,7 +533,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtAvaliableQtd: TLabeledEdit
-      Left = 151
+      Left = 292
       Top = 82
       Width = 81
       Height = 23
@@ -544,7 +544,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtMinimumStockQtd: TLabeledEdit
-      Left = 247
+      Left = 388
       Top = 82
       Width = 81
       Height = 23
@@ -555,7 +555,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtMinSellQtd: TLabeledEdit
-      Left = 343
+      Left = 484
       Top = 82
       Width = 73
       Height = 23
@@ -566,7 +566,7 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object LbEdtMaxSellQtd: TLabeledEdit
-      Left = 431
+      Left = 572
       Top = 82
       Width = 73
       Height = 23
@@ -577,9 +577,9 @@ object FrmProductInfo: TFrmProductInfo
       Text = ''
     end
     object CbCategory: TComboBox
-      Left = 519
-      Top = 82
-      Width = 90
+      Left = 151
+      Top = 130
+      Width = 117
       Height = 23
       TabOrder = 8
     end
@@ -598,6 +598,17 @@ object FrmProductInfo: TFrmProductInfo
       Height = 25
       Caption = 'Edit'
       TabOrder = 10
+    end
+    object LbEdtShortName: TLabeledEdit
+      Left = 151
+      Top = 82
+      Width = 129
+      Height = 23
+      EditLabel.Width = 90
+      EditLabel.Height = 15
+      EditLabel.Caption = 'LbEdtShortName'
+      TabOrder = 11
+      Text = ''
     end
   end
   object Menu: TMainMenu
