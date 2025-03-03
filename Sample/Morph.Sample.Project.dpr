@@ -24,7 +24,8 @@ uses
   Morph.Sample.OrderStatusSearch in 'Forms\Order\Search\Morph.Sample.OrderStatusSearch.pas' {FrmOrderStatusSearch},
   Morph.Sample.OrderStatusInfo in 'Forms\Order\Info\Morph.Sample.OrderStatusInfo.pas' {FrmOrderStatusInfo},
   Morph.Sample.ProductButton in 'Frames\Orders\Morph.Sample.ProductButton.pas' {TFrameProductButton: TFrame},
-  Morph.Sample.MorphInit in 'DataModule\Morph.Sample.MorphInit.pas' {DMMorphInit: TDataModule};
+  Morph.Sample.MorphInit in 'DataModule\Morph.Sample.MorphInit.pas' {DMMorphInit: TDataModule},
+  Morph.Sample.Utilities in 'Units\Morph.Sample.Utilities.pas';
 
 {$R *.res}
 

@@ -36,7 +36,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function New(AOwner: TComponent) : TTFrameProductButton;
-    function SetImage(const anImageBytes: TBytes): TTFrameProductButton;
+    function SetImage(const AImageBytes: TBytes): TTFrameProductButton;
     function SetName(const aName: String): TTFrameProductButton;
     function SetPrice(const aPrice: Extended): TTFrameProductButton;
     function CallBack(const ACallBackProcedure: TProcedureWithIntParam): TTFrameProductButton;
@@ -45,7 +45,7 @@ type
 
 implementation
 
-uses System.Threading, System.UITypes;
+uses System.Threading, System.UITypes, Morph.Sample.Utilities;
 
 {$R *.dfm}
 
@@ -97,11 +97,14 @@ begin
 end;
 
 function TTFrameProductButton.SetImage(
-  const anImageBytes: TBytes): TTFrameProductButton;
+  const AImageBytes: TBytes): TTFrameProductButton;
 var
   LStream: TStream;
+  LResizedPNG: TBytes;
 begin
-  if Length(anImageBytes) = 0 then
+  LResizedPNG := TMorphSampleUtilities.ResizePNGFromBytes(AImageBytes, 126, 126);
+
+  if Length(LResizedPNG) = 0 then
   begin
     LoadDefaultImage;
     Exit;
@@ -109,7 +112,7 @@ begin
 
   LStream := TMemoryStream.Create;
   try
-    LStream.WriteBuffer(anImageBytes[0], Length(anImageBytes));
+    LStream.WriteBuffer(LResizedPNG[0], Length(LResizedPNG));
     LStream.Position := 0;
 
     FProductImage := TSkImage.MakeFromEncodedStream(LStream);

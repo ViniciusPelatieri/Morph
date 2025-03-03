@@ -2973,13 +2973,13 @@ object FrmCategorySearch: TFrmCategorySearch
       Left = 1
       Top = 1
       Width = 595
-      Height = 152
+      Height = 64
       Align = alTop
       TabOrder = 0
       object LbEdtGlobalSearch: TLabeledEdit
         Left = 10
         Top = 27
-        Width = 535
+        Width = 559
         Height = 23
         EditLabel.Width = 72
         EditLabel.Height = 15
@@ -2987,59 +2987,12 @@ object FrmCategorySearch: TFrmCategorySearch
         TabOrder = 0
         Text = ''
       end
-      object BtnShowHideFilters: TButton
-        Left = 553
-        Top = 25
-        Width = 27
-        Height = 25
-        Caption = #55357#56636
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -20
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 1
-      end
-      object Obs: TLabeledEdit
-        Left = 11
-        Top = 121
-        Width = 578
-        Height = 23
-        EditLabel.Width = 21
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Obs'
-        TabOrder = 2
-        Text = ''
-      end
-      object LbEdtID: TLabeledEdit
-        Left = 11
-        Top = 74
-        Width = 34
-        Height = 23
-        EditLabel.Width = 11
-        EditLabel.Height = 15
-        EditLabel.Caption = 'ID'
-        TabOrder = 3
-        Text = ''
-      end
-      object LbEdtName: TLabeledEdit
-        Left = 51
-        Top = 74
-        Width = 234
-        Height = 23
-        EditLabel.Width = 32
-        EditLabel.Height = 15
-        EditLabel.Caption = 'Name'
-        TabOrder = 4
-        Text = ''
-      end
     end
     object DGGridCategories: TDBGrid
       Left = 1
-      Top = 153
+      Top = 65
       Width = 595
-      Height = 341
+      Height = 429
       Align = alClient
       TabOrder = 1
       TitleFont.Charset = DEFAULT_CHARSET

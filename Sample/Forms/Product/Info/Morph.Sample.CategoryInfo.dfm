@@ -2959,6 +2959,8 @@ object FrmcategoryInfo: TFrmcategoryInfo
     C104134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104
     134C30C104134C30C104134C30C104134C30C104134C30C104134C30C104134C
     30C104134CB0FF1FEDFF03ECFC843D6DE2421E0000000049454E44AE426082}
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   object PnBase: TPanel
     Left = 0
@@ -2967,7 +2969,7 @@ object FrmcategoryInfo: TFrmcategoryInfo
     Height = 133
     Align = alClient
     TabOrder = 0
-    object Obs: TLabeledEdit
+    object LbEdtObs: TLabeledEdit
       Left = 11
       Top = 71
       Width = 578
@@ -2986,6 +2988,7 @@ object FrmcategoryInfo: TFrmcategoryInfo
       EditLabel.Width = 11
       EditLabel.Height = 15
       EditLabel.Caption = 'ID'
+      ReadOnly = True
       TabOrder = 1
       Text = ''
     end
@@ -3015,6 +3018,7 @@ object FrmcategoryInfo: TFrmcategoryInfo
       Height = 25
       Caption = 'Save'
       TabOrder = 4
+      OnClick = BtnSaveClick
     end
   end
 end

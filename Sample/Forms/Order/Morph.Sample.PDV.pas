@@ -83,7 +83,7 @@ var
   i: Integer;
   CurrentButtonIndex: Integer;
 begin
-  CurrentButtonIndex := AddButtonToArray();
+ // CurrentButtonIndex := AddButtonToArray();
   SetLength(teste, 2);
   for i := 1 to Length(teste) do
   begin

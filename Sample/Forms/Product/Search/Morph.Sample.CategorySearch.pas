@@ -12,11 +12,7 @@ type
     PnBase: TPanel;
     PnSearchFilters: TPanel;
     LbEdtGlobalSearch: TLabeledEdit;
-    BtnShowHideFilters: TButton;
     DGGridCategories: TDBGrid;
-    Obs: TLabeledEdit;
-    LbEdtID: TLabeledEdit;
-    LbEdtName: TLabeledEdit;
     Menu: TMainMenu;
     MenuNewCategory: TMenuItem;
     procedure MenuNewCategoryClick(Sender: TObject);
