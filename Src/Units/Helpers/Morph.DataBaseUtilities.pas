@@ -9,7 +9,6 @@ type
   TMorphFireDacUtilities = class
     public
       class function Clone(const AFDConnection: TFDConnection): TFDConnection;
-      class function
   end;
 
 implementation

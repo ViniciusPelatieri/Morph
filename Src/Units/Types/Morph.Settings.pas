@@ -8,11 +8,19 @@ uses
 type
   TMorphSettings = class
     private
-      FConnection: TFDConnection;
-      FDBType: TMorphDBType;
-      FIgnoreCreatedStructure: Boolean;
+      const
+        CQueryLifeTime = 60000;
+        CWaitTimeBeforeCheckIfQueryIsInUse = 100;
+        CWaitTimeBeforeCheckIfQueryLifeTimeIsOver = 10000;
+      var
+        FConnection: TFDConnection;
+        FDBType: TMorphDBType;
+        FIgnoreCreatedStructure: Boolean;
     public
       class function New: TMorphSettings;
+      class function QueryLifeTime: Integer;
+      class function WaitTimeBeforeCheckIfQueryIsInUse: Integer;
+      class function WaitTimeBeforeCheckIfQueryLifeTimeIsOver: Integer;
       destructor Destroy; override;
       function Clone: TMorphSettings;
 
@@ -87,6 +95,21 @@ end;
 class function TMorphSettings.New: TMorphSettings;
 begin
   Result := TMorphSettings.Create;
+end;
+
+class function TMorphSettings.QueryLifeTime: Integer;
+begin
+  Result := CQueryLifeTime;
+end;
+
+class function TMorphSettings.WaitTimeBeforeCheckIfQueryIsInUse: Integer;
+begin
+  Result := CWaitTimeBeforeCheckIfQueryIsInUse;
+end;
+
+class function TMorphSettings.WaitTimeBeforeCheckIfQueryLifeTimeIsOver: Integer;
+begin
+  Result := CWaitTimeBeforeCheckIfQueryLifeTimeIsOver;
 end;
 
 end.

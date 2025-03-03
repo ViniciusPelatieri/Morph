@@ -314,6 +314,7 @@
         <DCCReference Include="Units\Types\Morph.InstructionSegment.pas"/>
         <DCCReference Include="Units\Helpers\Morph.DataBaseUtilities.pas"/>
         <DCCReference Include="Units\Types\Morph.InsertFromVisualComponents.pas"/>
+        <DCCReference Include="Units\Helpers\Morph.QueryExecutor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

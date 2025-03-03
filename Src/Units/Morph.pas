@@ -42,7 +42,6 @@ type
       procedure Clear;
       procedure ExecutePSQL(const aCommand : String);
       procedure ReloadDBTablesAndFieldsList;
-      procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
 
       class function New: TMorph;
 
@@ -80,8 +79,8 @@ type
       function GetFB2_5FieldTypeName: String;
       function CloneSettings: TMorphSettings;
       function IgnoreCreatedStructure: TMorph;
-      function AsTClientDataSet: TClientDataSet;
       function DoNotRaiseOnRedundances: TMorph;
+      function AsTClientDataSet: TClientDataSet;
       function Equals<T>(const aValue: T): TMorph;
       function GetTableNames: TMorphVector<String>;
       function Field(const AField: String): TMorph;
@@ -106,9 +105,10 @@ type
       function FDMTableFieldTypeConvert(const aFieldType: TFieldType): TMorphFieldTypes;
 
       //overloaded
-      function Insert(const aMphTable : TMphTable) : TMorph; overload;
-      function Insert(const aJSONInsert : String) : TMorph; overload;
       function Insert: TMorph; overload;
+      function Insert(const aJSONInsert : String) : TMorph; overload;
+      function Insert(const aMphTable : TMphTable) : TMorph; overload;
+
       function Content(const aJSONStringArray : String) : TMorph; overload;
       function Content(const aFDMemtable : TFDMemTable) : TMorph; overload;
     end;
@@ -117,7 +117,7 @@ implementation
 uses
   Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common,
   System.SysUtils, Morph.DataSetUtilities, Morph.PSQL.Structure.FB2_5,
-  Winapi.Windows, Morph.Messages, System.TypInfo, Morph.FireDacUtilities;
+  Winapi.Windows, Morph.Messages, System.TypInfo, Morph.DataBaseUtilities;
 
 { TMorph }
 
@@ -983,32 +983,6 @@ begin
   //  FTablesVector.Add
   finally
     FDQResult.Free;
-  end;
-end;
-
-procedure TMorph.RunPSQL(const aCommand: String;
-  const aQryAction: TMorphQryAction);
-begin
-  if Assigned(FDQResult) then
-    FDQResult.Free;
-
-  if Assigned(FTempConnection) then
-    FTempConnection.Free;
-
-  FDQResult := TFDQuery.Create(Nil);
-  FTempConnection := TMorphFireDacUtilities.Clone(FSettings.Connection);
-
-  FDQResult.Connection := FTempConnection;
-  FDQResult.FetchOptions.Mode := fmAll;
-  FDQResult.SQL.Text := aCommand;
-
-  try
-    case aQryAction of
-      Open: FDQResult.Open;
-      Execute: FDQResult.ExecSQL;
-    end;
-  except on E : Exception do
-    Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
   end;
 end;
 

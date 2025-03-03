@@ -19,7 +19,8 @@ uses
   Morph.Where in 'Units\Types\Morph.Where.pas',
   Morph.InstructionSegment in 'Units\Types\Morph.InstructionSegment.pas',
   Morph.DataBaseUtilities in 'Units\Helpers\Morph.DataBaseUtilities.pas',
-  Morph.InsertFromVisualComponents in 'Units\Types\Morph.InsertFromVisualComponents.pas';
+  Morph.InsertFromVisualComponents in 'Units\Types\Morph.InsertFromVisualComponents.pas',
+  Morph.QueryExecutor in 'Units\Helpers\Morph.QueryExecutor.pas';
 
 {$R *.res}
 
