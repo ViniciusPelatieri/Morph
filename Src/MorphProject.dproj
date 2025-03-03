@@ -312,7 +312,8 @@
         <DCCReference Include="Units\Morph.Messages.pas"/>
         <DCCReference Include="Units\Types\Morph.Where.pas"/>
         <DCCReference Include="Units\Types\Morph.InstructionSegment.pas"/>
-        <DCCReference Include="Units\Helpers\Morph.DataConvertionsUtilities.pas"/>
+        <DCCReference Include="Units\Helpers\Morph.DataBaseUtilities.pas"/>
+        <DCCReference Include="Units\Types\Morph.InsertFromVisualComponents.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

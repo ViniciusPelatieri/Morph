@@ -7,7 +7,7 @@ type
   TMorphEmptyType = (Empty);
   TMorphFieldTypes = (mphUndefined, mphInteger, mphVarchar, mphFloat, mphDate, mphBoolean, mphTXTBlob,  mphBinaryBlob);
   TMorphBasicTypes = (mbtNumber, mbtString, mbtDate, mbtBoolean);
-  TMorphStages = (mpsCreate, mpsReference, mpsInsert, mpsDelete, mpsSelect);
+  TMorphStages = (mpsCreate, mpsReference, mpsInsert, mpsDelete, mpsSelect, mpsInsertFromVisualComponent);
   TMorphQryAction = (Open, Execute);
   TMorphRelationsbehavior = (mrbNoOrphanData, mrbNullOrphanData, mrbDeleteOrphanData);
   TMorphDateOrientation = (mdoDD_MM_AAAA, mdoMM_DD_AAAA, mdoAAAA_MM_DD);
@@ -15,4 +15,4 @@ type
 
 implementation
 
-end.
+end.     mover  RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction)  para o dababase utilities

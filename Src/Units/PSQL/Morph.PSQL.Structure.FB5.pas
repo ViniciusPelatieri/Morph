@@ -32,6 +32,10 @@ const PSQL_FB5_CAST = 'CAST';
 const PSQL_FB5_ALTER_TABLE = 'ALTER TABLE';
 const PSQL_FB5_DROP = 'DROP';
 const PSQL_FB5_ADD = 'ADD';
+const PSQL_FB5_MAX = 'MAX';
+const PSQL_FB5_MIN = 'MIN';
+const PSQL_FB5_AS = 'AS';
+const PSQL_FB5_FROM = 'FROM';
 
 {$REGION 'PSQL_FB5_LIST_TABLES_AND_FIELDS'}
 const PSQL_FB5_LIST_TABLES_AND_FIELDS = 'SELECT '+
@@ -44,7 +48,7 @@ const PSQL_FB5_LIST_TABLES_AND_FIELDS = 'SELECT '+
                                         'WHERE '+
                                           'R.RDB$SYSTEM_FLAG = 0 '+
                                         'ORDER BY '+
-                                          'R.RDB$RELATION_NAME, F.RDB$FIELD_POSITION;'
+                                          'R.RDB$RELATION_NAME, F.RDB$FIELD_POSITION;';
 {$ENDREGION}
 
 implementation

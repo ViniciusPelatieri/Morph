@@ -18,7 +18,8 @@ uses
   Morph.Messages in 'Units\Morph.Messages.pas',
   Morph.Where in 'Units\Types\Morph.Where.pas',
   Morph.InstructionSegment in 'Units\Types\Morph.InstructionSegment.pas',
-  Morph.DataConvertionsUtilities in 'Units\Helpers\Morph.DataConvertionsUtilities.pas';
+  Morph.DataBaseUtilities in 'Units\Helpers\Morph.DataBaseUtilities.pas',
+  Morph.InsertFromVisualComponents in 'Units\Types\Morph.InsertFromVisualComponents.pas';
 
 {$R *.res}
 

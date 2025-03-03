@@ -6,8 +6,9 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Comp.Client, System.JSON,
-  Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings, Morph.Vector, Datasnap.DBClient, System.Rtti,
-  System.Generics.Collections, Data.DB, Morph.Where;
+  Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings, Morph.Vector,
+  Datasnap.DBClient, System.Rtti, System.Generics.Collections, Data.DB,
+  Morph.Where, Vcl.ExtCtrls, Morph.InsertFromVisualComponents;
 
 type
   TMorph = class
@@ -18,7 +19,6 @@ type
       FFB5FieldTypeNames,
       FFB2_5FieldTypeNames: TDictionary<Integer, String>;
 
-      FFDConnection,
       FTempConnection: TFDConnection;
 
       FIgnoreCreatedStructure: Boolean;
@@ -29,10 +29,11 @@ type
 
       FDQResult: TFDQuery;
       FStage: TMorphStages;
-      FDBType: TMorphDBType;
       FInsertTable: TMphTable;
+      FSettings: TMorphSettings;
       FFieldsToProcess: TMorphFields;
       FDataOrientation: TMorphDateOrientation;
+      FInsertFromVisualComponents: TInsertFromVisualComponents;
       FFDMTTypeToMphFieldType: TDictionary<TFieldType, TMorphFieldTypes>;
     public
       constructor Create;
@@ -42,6 +43,8 @@ type
       procedure ExecutePSQL(const aCommand : String);
       procedure ReloadDBTablesAndFieldsList;
       procedure RunPSQL(const aCommand : String; const aQryAction : TMorphQryAction);
+
+      class function New: TMorph;
 
       function _Or: TMorph;
       function Add: TMorph;
@@ -59,13 +62,13 @@ type
       function Identity: TMorph;
       function tInteger: TMorph;
       function tBoolean: TMorph;
+      function AsInteger: Integer;
       function InsertInto: TMorph;
       function ForeignKey: TMorph;
       function References: TMorph;
       function PrimaryKey: TMorph;
       function tBinaryBlob: TMorph;
       function CreateTable: TMorph;
-      function NoOrphaData: TMorph;
       function NoOrphanData: TMorph;
       function NullOrphanData: TMorph;
       function GetDBType : TMorphDBType;
@@ -75,12 +78,15 @@ type
       function ExportSettings: TJSONObject;
       function GetFB5FieldTypeName: String;
       function GetFB2_5FieldTypeName: String;
+      function CloneSettings: TMorphSettings;
       function IgnoreCreatedStructure: TMorph;
       function AsTClientDataSet: TClientDataSet;
       function DoNotRaiseOnRedundances: TMorph;
       function Equals<T>(const aValue: T): TMorph;
       function GetTableNames: TMorphVector<String>;
-      function Field(const aField: String): TMorph;
+      function Field(const AField: String): TMorph;
+      function Max(const AFieldName: String): TMorph;
+      function Min(const AFieldName: String): TMorph;
       function FKName(const aFKName: String): TMorph;
       function From(const aTableName: String): TMorph;
       function tVarchar(const aSize: Integer): TMorph;
@@ -91,15 +97,18 @@ type
       function Values(const aValues: TArray<TValue>): TMorph;
       function AlterSegment(const aSegmentID: Integer): TMorph;
       function Fields(const aFieldNames: TArray<String>): TMorph;
-      function DatabaseType(const aDBType: TMorphDBType): TMorph;
+      function DatabaseType(const ADBType: TMorphDBType): TMorph;
+      function Settings(const ASettings: TMorphSettings): TMorph;
       function Connection(const aConnection: TFDConnection): TMorph;
       function GetBasicType(const aValue: TValue): TMorphBasicTypes;
+      function AssignToInsert(const ALabeledEdit: TLabeledEdit): TMorph;
       function DateOrientation(const anOrientation: TMorphDateOrientation): TMorph;
       function FDMTableFieldTypeConvert(const aFieldType: TFieldType): TMorphFieldTypes;
 
       //overloaded
       function Insert(const aMphTable : TMphTable) : TMorph; overload;
       function Insert(const aJSONInsert : String) : TMorph; overload;
+      function Insert: TMorph; overload;
       function Content(const aJSONStringArray : String) : TMorph; overload;
       function Content(const aFDMemtable : TFDMemTable) : TMorph; overload;
     end;
@@ -107,8 +116,8 @@ implementation
 
 uses
   Morph.PSQL.Structure.FB5, Morph.PSQL.Structure.Common,
-  System.SysUtils, Morph.DataSetUtilitys, Morph.PSQL.Structure.FB2_5,
-  Winapi.Windows, Morph.Messages, System.TypInfo;
+  System.SysUtils, Morph.DataSetUtilities, Morph.PSQL.Structure.FB2_5,
+  Winapi.Windows, Morph.Messages, System.TypInfo, Morph.FireDacUtilities;
 
 { TMorph }
 
@@ -165,7 +174,7 @@ end;
 
 function TMorph.All: TMorph;
 begin
-  case FDBType of
+  case FSettings.DatabaseType of
     FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+ PSQL_ASTERISK;
     FB5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+ PSQL_ASTERISK;
   end;
@@ -176,6 +185,32 @@ end;
 function TMorph.AlterSegment(const aSegmentID: Integer): TMorph;
 begin
 
+end;
+
+function TMorph.AsInteger: Integer;
+var
+  TempFDQuery: TFDQuery;
+  TempFDConnetion: TFDConnection;
+begin
+  TempFDQuery := TFDQuery.Create(Nil);
+  TempFDConnetion := TMorphFireDacUtilities.Clone(FSettings.Connection);
+  try
+    TempFDQuery.Connection := TempFDConnetion;
+    TempFDQuery.SQL.Text := FPSQLCommand;
+    TempFDQuery.Open;
+
+    Result := TempFDQuery.Fields[0].AsInteger;
+  finally
+    TempFDQuery.Free;
+    TempFDConnetion.Free;
+  end;
+end;
+
+function TMorph.AssignToInsert(const ALabeledEdit: TLabeledEdit): TMorph;
+begin
+  FInsertFromVisualComponents.AddComponent(ALabeledEdit);
+  FSTage := mpsInsertFromVisualComponent;
+  Result := Self;
 end;
 
 function TMorph.AsTClientDataSet: TClientDataSet;
@@ -219,6 +254,11 @@ begin
 
 end;
 
+function TMorph.CloneSettings: TMorphSettings;
+begin
+  Result := FSettings.Clone;
+end;
+
 function TMorph.Config: TMorph;
 begin
   Result := Self;
@@ -226,8 +266,7 @@ end;
 
 function TMorph.Connection(const aConnection: TFDConnection): TMorph;
 begin
-  FFDConnection := aConnection;
-  FDQResult.FetchOptions.Mode := fmAll;
+  FSettings.Connection(aConnection);
   Result := Self;
 end;
 
@@ -416,7 +455,10 @@ begin
   FIgnoreCreatedStructure := False;
 
   FDQResult := TFDQuery.Create(Nil);
+  FDQResult.FetchOptions.Mode := fmAll;
   FInsertTable := TMphTable.Create;
+  FSettings := TMorphSettings.Create;
+  FInsertFromVisualComponents := TInsertFromVisualComponents.Create;
 end;
 
 function TMorph.CreateTable: TMorph;
@@ -495,9 +537,9 @@ begin
   Result := Self;
 end;
 
-function TMorph.DatabaseType(const aDBType: TMorphDBType): TMorph;
+function TMorph.DatabaseType(const ADBType: TMorphDBType): TMorph;
 begin
-  FDBType := aDBType;
+  FSettings.DatabaseType(ADBType);
   Result := Self;
 end;
 
@@ -531,6 +573,8 @@ begin
   FFieldsToProcess.Free;
   FInsertTable.Free;
   FFDMTTypeToMphFieldType.Free;
+  FSettings.Free;
+  FInsertFromVisualComponents.Free;
   inherited;
 end;
 
@@ -541,7 +585,7 @@ end;
 
 function TMorph.Drop: TMorph;
 begin
-  case FDBType of
+  case FSettings.DatabaseType of
     FB2_5: FPSQLCommand:=PSQL_FB2_5_DROP_TABLE+PSQL_SPACE+FTableName;
 
     FB5:
@@ -589,7 +633,7 @@ begin
     Raise Exception.Create(Format(MORPH_MESSAGE_UNSUPORTED_FIELD_TYPE, [GetEnumName(TypeInfo(TFieldType), Ord(aFieldType))]));
 end;
 
-function TMorph.Field(const aField: String): TMorph;
+function TMorph.Field(const AField: String): TMorph;
 begin
   case FStage of
     mpsCreate:
@@ -601,6 +645,7 @@ begin
     begin
       FFieldsToProcess.Current.ReferencedField := aField;
     end;
+    mpsInsertFromVisualComponent: FInsertFromVisualComponents.SetFieldName(AField);
   end;
 
   Result := Self;
@@ -636,7 +681,7 @@ end;
 
 function TMorph.From(const aTableName: String): TMorph;
 begin
-  case FDBType of
+  case FSettings.DatabaseType of
     FB2_5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB2_5_FROM+PSQL_SPACE+ aTablename;
     FB5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB2_5_FROM+PSQL_SPACE+ aTablename;
   end;
@@ -662,7 +707,7 @@ end;
 
 function TMorph.GetDBType: TMorphDBType;
 begin
-  Result := FDBType;
+  Result := FSettings.DatabaseType;
 end;
 
 function TMorph.GetFB2_5FieldTypeName: String;
@@ -677,7 +722,7 @@ end;
 
 function TMorph.GetPSQLTypeName: String;
 begin
-  case FDBType of
+  case FSettings.DatabaseType of
     FB2_5: Result := GetFB5FieldTypeName;
     FB5: Result := GetFB5FieldTypeName;
   end;
@@ -793,9 +838,30 @@ begin
   end;
 end;
 
+function TMorph.Insert: TMorph;
+begin
+  try
+    FInsertFromVisualComponents.Insert;
+  finally
+    FInsertFromVisualComponents.Clear;
+  end;
+end;
+
 function TMorph.InsertInto: TMorph;
 begin
   FStage := mpsInsert;
+  Result := Self;
+end;
+
+function TMorph.Max(const AFieldName: String): TMorph;
+begin
+  FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_MAX+PSQL_OPEN_PARENTHESES+AFieldName+PSQL_CLOSED_PARENTHESES;
+  Result := Self;
+end;
+
+function TMorph.Min(const AFieldName: String): TMorph;
+begin
+  FPSQLCommand:=FPSQLCommand+PSQL_SPACE+PSQL_FB5_MIN+PSQL_OPEN_PARENTHESES+AFieldName+PSQL_CLOSED_PARENTHESES;
   Result := Self;
 end;
 
@@ -805,10 +871,9 @@ begin
   Result := Self;
 end;
 
-function TMorph.NoOrphaData: TMorph;
+class function TMorph.New: TMorph;
 begin
-  FFieldsToProcess.Current.NoOrphaData := True;
-  Result := Self;
+  Result := TMorph.Create;
 end;
 
 function TMorph.NoOrphanData: TMorph;
@@ -838,7 +903,7 @@ var
   FPSQLInsertBase : String;
 begin
   try
-    case FDBType of
+    case FSettings.DatabaseType of
       FB2_5:;
       FB5:
       begin
@@ -914,8 +979,8 @@ procedure TMorph.ReloadDBTablesAndFieldsList;
 begin
   OpenPSQL(PSQL_FB5_LIST_TABLES_AND_FIELDS);
   try
-    FTablesVector.Clear;
-    FTablesVector.Add
+  //  FTablesVector.Clear;
+  //  FTablesVector.Add
   finally
     FDQResult.Free;
   end;
@@ -931,28 +996,20 @@ begin
     FTempConnection.Free;
 
   FDQResult := TFDQuery.Create(Nil);
-  FTempConnection := TFDConnection.Create(Nil);
+  FTempConnection := TMorphFireDacUtilities.Clone(FSettings.Connection);
 
-    FTempConnection.Params.DriverID := FFDConnection.Params.DriverID;
-    FTempConnection.Params.Database := FFDConnection.Params.Database;
-    FTempConnection.Params.UserName := FFDConnection.Params.UserName;
-    FTempConnection.Params.Password := FFDConnection.Params.Password;
-    FTempConnection.TxOptions.AutoCommit := True;
-    FTempConnection.LoginPrompt := False;
-    FTempConnection.Open;
+  FDQResult.Connection := FTempConnection;
+  FDQResult.FetchOptions.Mode := fmAll;
+  FDQResult.SQL.Text := aCommand;
 
-    FDQResult.Connection := FTempConnection;
-    FDQResult.FetchOptions.Mode := fmAll;
-    FDQResult.SQL.Text := aCommand;
-
-    try
-      case aQryAction of
-        Open: FDQResult.Open;
-        Execute: FDQResult.ExecSQL;
-      end;
-    except on E : Exception do
-      Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
+  try
+    case aQryAction of
+      Open: FDQResult.Open;
+      Execute: FDQResult.ExecSQL;
     end;
+  except on E : Exception do
+    Raise Exception.Create(Format(MORPH_MESSAGE_PSQL_EXCEPTION, [aCommand, E.Message]));
+  end;
 end;
 
 procedure TMorph.ExecutePSQL(const aCommand: String);
@@ -962,12 +1019,17 @@ end;
 
 function TMorph.Select: TMorph;
 begin
-  case FDBType of
+  case FSettings.DatabaseType of
     FB2_5: FPSQLCommand:=FPSQLCommand+ PSQL_FB2_5_SELECT;
-    FB5: FPSQLCommand:=FPSQLCommand+ PSQL_FB5_SELECT;
+    FB5: FPSQLCommand:=FPSQLCommand+PSQL_SPACE+ PSQL_FB5_SELECT;
   end;
 
   Result := Self;
+end;
+
+function TMorph.Settings(const ASettings: TMorphSettings): TMorph;
+begin
+  FSettings := ASettings;
 end;
 
 function TMorph.Table(const aTableName: String): TMorph;
