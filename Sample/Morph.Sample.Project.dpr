@@ -25,7 +25,8 @@ uses
   Morph.Sample.OrderStatusInfo in 'Forms\Order\Info\Morph.Sample.OrderStatusInfo.pas' {FrmOrderStatusInfo},
   Morph.Sample.ProductButton in 'Frames\Orders\Morph.Sample.ProductButton.pas' {TFrameProductButton: TFrame},
   Morph.Sample.MorphInit in 'DataModule\Morph.Sample.MorphInit.pas' {DMMorphInit: TDataModule},
-  Morph.Sample.Utilities in 'Units\Morph.Sample.Utilities.pas';
+  Morph.Sample.Utilities in 'Units\Morph.Sample.Utilities.pas',
+  delete in 'delete.pas' {Form1};
 
 {$R *.res}
 
@@ -34,5 +35,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TDMMorphInit, DMMorphInit);
   Application.CreateForm(TFrmLogo, FrmLogo);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
