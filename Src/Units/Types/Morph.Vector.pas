@@ -8,12 +8,20 @@ uses
 type
   TMorphVector<T> = class
   private
-    FArray: TArray<T>;
-    FArrayGUID: TArray<String>;
     FRecNo: Integer;
+    FArray: TArray<T>;
     FCurrentGUID: String;
+    FArrayGUID: TArray<String>;
     FGUIDsAndIndexes: TDictionary<String, Integer>;
+
     function NewGUID: String;
+
+    //exclusive for clone
+    function SetRecNo(const aValue: Integer): TMorphVector<T>;
+    function SetCurrentGUID(const AValue: String): TMorphVector<T>;
+    function SetElements(const anArray: TArray<T>): TMorphVector<T>;
+    function SetGUIDS(const AArray: TArray<String>): TMorphVector<T>;
+    function SetIDsAndIndexesDictionary(const ADictionary: TDictionary<String, Integer>): TMorphVector<T>;
   public
     constructor Create;
     destructor Destroy; override;
@@ -25,7 +33,6 @@ type
     procedure Previous;
     procedure Clear;
     procedure AddEmptyValue;
-    procedure SetIndexByGUID(const AGUID: String);
     procedure Add(const anElement : T);
     procedure SetCurrentElement(const aValue: T);
 
@@ -37,11 +44,7 @@ type
     function CurrentGUID: String;
     function GetElements : TArray<T>;
     function Clone : TMorphVector<T>;
-    function SetRecNo(const aValue: Integer): TMorphVector<T>;
-    function SetCurrentGUID(const AValue: String): TMorphVector<T>;
-    function SetElements(const anArray: TArray<T>): TMorphVector<T>;
-    function SetGUIDS(const AArray: TArray<String>): TMorphVector<T>;
-    function SetIDsAndIndexesDictionary(const ADictionary: TDictionary<String, Integer>): TMorphVector<T>;
+    function SetIndexByGUID(const AGUID: String): Integer;
 
     property GUIDS: TArray<String> read FArrayGUID; //read only
     property RecNo : Integer read FRecNo write FRecNo;
@@ -138,14 +141,20 @@ begin
       FGUIDsAndIndexes.Remove(FArrayGUID[I]);
   end;
 
-  FRecNo := FRecNo - 1;
-  if FRecNo < 0 then
+  if Length(AuxComponentArray) > 0 then
+  begin
+    if (FRecNo -1) < 0 then
+      FRecNo := 0
+    else
+      Dec(FRecNo, 1);
+
+    FCurrentGUID := FArrayGUID[FRecNo];
+  end
+  else
   begin
     FRecNo := -1;
     FCurrentGUID := '';
-  end
-  else
-    FCurrentGUID := FArrayGUID[FRecNo];
+  end;
 
   FArray := AuxComponentArray;
   FArrayGUID := AuxIDsArray;
@@ -257,14 +266,18 @@ begin
   Result := Self;
 end;
 
-procedure TMorphVector<T>.SetIndexByGUID(const AGUID: String);
+function TMorphVector<T>.SetIndexByGUID(const AGUID: String): Integer;
 var
   LIndex: Integer;
 begin
   if NOT FGUIDsAndIndexes.TryGetValue(AGUID, LIndex) then
-    Raise Exception.Create('This GUID is not contained by this vector.');
+  begin
+    Result := -1;
+    Exit;
+  end;
 
   FRecNo := LIndex;
+  Result := FRecNo;
   FCurrentGUID := FArrayGUID[LIndex];
 end;
 
