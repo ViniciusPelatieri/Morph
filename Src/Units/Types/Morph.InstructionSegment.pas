@@ -4,7 +4,7 @@ interface
 
 type
 
-TMorphInstructionSegment = class
+TMorphInstructionSegment = class      //Make this on 1.0
 
 end;
 

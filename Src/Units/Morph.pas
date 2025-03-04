@@ -8,7 +8,8 @@ uses
   FireDAC.Phys, FireDAC.VCLUI.Wait, FireDAC.Comp.Client, System.JSON,
   Morph.EnumeratedTypes, Morph.Table, Morph.Field, Morph.Settings, Morph.Vector,
   Datasnap.DBClient, System.Rtti, System.Generics.Collections, Data.DB,
-  Morph.Where, Vcl.ExtCtrls, Morph.InsertFromVisualComponents;
+  Morph.Where, Vcl.ExtCtrls, Morph.InsertFromVisualComponents,
+  Morph.SQLExecutor;
 
 type
   TMorph = class
@@ -32,6 +33,7 @@ type
       FInsertTable: TMphTable;
       FSettings: TMorphSettings;
       FFieldsToProcess: TMorphFields;
+      FMorphSQLExecutor: TMorphSQLExecutor;
       FDataOrientation: TMorphDateOrientation;
       FInsertFromVisualComponents: TInsertFromVisualComponents;
       FFDMTTypeToMphFieldType: TDictionary<TFieldType, TMorphFieldTypes>;
@@ -98,7 +100,7 @@ type
       function Fields(const aFieldNames: TArray<String>): TMorph;
       function DatabaseType(const ADBType: TMorphDBType): TMorph;
       function Settings(const ASettings: TMorphSettings): TMorph;
-      function Connection(const aConnection: TFDConnection): TMorph;
+      function Connection(const AConnection: TFDConnection): TMorph;
       function GetBasicType(const aValue: TValue): TMorphBasicTypes;
       function AssignToInsert(const ALabeledEdit: TLabeledEdit): TMorph;
       function DateOrientation(const anOrientation: TMorphDateOrientation): TMorph;
@@ -264,9 +266,10 @@ begin
   Result := Self;
 end;
 
-function TMorph.Connection(const aConnection: TFDConnection): TMorph;
+function TMorph.Connection(const AConnection: TFDConnection): TMorph;
 begin
   FSettings.Connection(aConnection);
+  FMorphSQLExecutor.Connection(AConnection);
   Result := Self;
 end;
 
@@ -459,6 +462,7 @@ begin
   FInsertTable := TMphTable.Create;
   FSettings := TMorphSettings.Create;
   FInsertFromVisualComponents := TInsertFromVisualComponents.Create;
+  FMorphSQLExecutor := TMorphSQLExecutor.Create;
 end;
 
 function TMorph.CreateTable: TMorph;
@@ -575,6 +579,7 @@ begin
   FFDMTTypeToMphFieldType.Free;
   FSettings.Free;
   FInsertFromVisualComponents.Free;
+  FMorphSQLExecutor.Free;
   inherited;
 end;
 
@@ -618,7 +623,7 @@ end;
 
 function TMorph.OpenPSQL(const aCommand: String): TMorph;
 begin
-  RunPSQL(aCommand, Open);
+  FMorphSQLExecutor.RunSQL(aCommand, mqaOpen);
 end;
 
 function TMorph.ExportSettings: TJSONObject;
@@ -988,7 +993,7 @@ end;
 
 procedure TMorph.ExecutePSQL(const aCommand: String);
 begin
-  RunPSQL(aCommand, Execute);
+  FMorphSQLExecutor.RunSQL(aCommand, mqaExecute);
 end;
 
 function TMorph.Select: TMorph;

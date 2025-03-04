@@ -8,7 +8,7 @@ type
   TMorphFieldTypes = (mphUndefined, mphInteger, mphVarchar, mphFloat, mphDate, mphBoolean, mphTXTBlob,  mphBinaryBlob);
   TMorphBasicTypes = (mbtNumber, mbtString, mbtDate, mbtBoolean);
   TMorphStages = (mpsCreate, mpsReference, mpsInsert, mpsDelete, mpsSelect, mpsInsertFromVisualComponent);
-  TMorphQryAction = (Open, Execute);
+  TMorphQryAction = (mqaOpen, mqaExecute);
   TMorphRelationsbehavior = (mrbNoOrphanData, mrbNullOrphanData, mrbDeleteOrphanData);
   TMorphDateOrientation = (mdoDD_MM_AAAA, mdoMM_DD_AAAA, mdoAAAA_MM_DD);
   TMorphSQLOperations = (msoField, msoEquals, msoDiffers, msoIsBiggerThan, msoIsSmallerThan, msoOr, msoAnd);

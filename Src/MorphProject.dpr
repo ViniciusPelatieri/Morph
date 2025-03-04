@@ -20,7 +20,7 @@ uses
   Morph.InstructionSegment in 'Units\Types\Morph.InstructionSegment.pas',
   Morph.DataBaseUtilities in 'Units\Helpers\Morph.DataBaseUtilities.pas',
   Morph.InsertFromVisualComponents in 'Units\Types\Morph.InsertFromVisualComponents.pas',
-  Morph.QueryExecutor in 'Units\Helpers\Morph.QueryExecutor.pas';
+  Morph.SQLExecutor in 'Units\Helpers\Morph.SQLExecutor.pas';
 
 {$R *.res}
 

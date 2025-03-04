@@ -59,12 +59,12 @@ procedure TInsertFromVisualComponents.Insert;
 var
   LPSQLCommand: String;
 begin
-  LPSQLCommand :=
-  TInsertStructure.First;
-  while NOT TInsertStructure.Eof do
-  begin
+  //LPSQLCommand :=
+  //TInsertStructure.First;
+ // while NOT TInsertStructure.Eof do
+ // begin
 
-  end;
+ // end;
 end;
 
 procedure TInsertFromVisualComponents.SetFieldName(const AFieldName: String);
